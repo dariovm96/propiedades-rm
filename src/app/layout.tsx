@@ -1,6 +1,7 @@
 import "./globals.css"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
+import { Toaster } from "sonner"
 
 export const metadata = {
   title: "Propiedades RM",
@@ -22,6 +23,7 @@ export default function RootLayout({
         </main>
 
         <Footer />
+        <Toaster position="top-right" />
       </body>
     </html>
   )

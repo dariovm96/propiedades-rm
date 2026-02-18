@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import { supabase } from "@/lib/supabaseClient"
 import { uploadImages, deleteMultipleImages } from "@/lib/storage"
 import { Property } from "@/types/property"
@@ -57,11 +58,7 @@ export default function EditPropertyForm({ property }: Props) {
 
       // 1️⃣ SUBIR NUEVAS IMÁGENES
       if (imagesFiles.length > 0) {
-        const newImagePaths = await uploadImages(
-          property.id,
-          imagesFiles,
-          existingImages
-        )
+        const newImagePaths = await uploadImages(property.id, imagesFiles)
         updatedImages = [...updatedImages, ...newImagePaths]
       }
 
@@ -89,6 +86,7 @@ export default function EditPropertyForm({ property }: Props) {
 
       if (error) throw error
 
+      toast.success("Propiedad actualizada correctamente")
       router.push("/admin/dashboard")
     } catch (err: any) {
       alert(err.message)

@@ -1,44 +1,55 @@
 import { supabase } from "@/lib/supabaseClient"
 import { STORAGE_BUCKETS } from "@/lib/constants"
+import { v4 as uuidv4 } from "uuid"
+
+/**
+ * Configuración de validaciones
+ */
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"]
+const MAX_SIZE_MB = 5
+const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024
 
 export async function uploadImages(
     propertyId: string,
-    files: File[],
-    existingImages: string[] = []
+    files: File[]
 ): Promise<string[]> {
     const uploadedPaths: string[] = []
 
-    // 🔎 Extraer índices existentes
-    const existingIndexes = existingImages
-        .map((path) => {
-            const fileName = path.split("/").pop() // 1.jpg
-            if (!fileName) return null
-            const numberPart = fileName.split(".")[0]
-            const num = Number(numberPart)
-            return isNaN(num) ? null : num
-        })
-        .filter((n): n is number => n !== null)
-
-    const maxIndex =
-        existingIndexes.length > 0 ? Math.max(...existingIndexes) : 0
-
-    let nextIndex = maxIndex + 1
-
     for (const file of files) {
-        const fileExt = file.name.split(".").pop()
-        const fileName = `${nextIndex}.${fileExt}`
+
+        // 🔐 Validar tipo MIME
+        if (!ALLOWED_TYPES.includes(file.type)) {
+            throw new Error(
+                "Only JPG, PNG and WEBP images are allowed"
+            )
+        }
+
+        // 🔐 Validar tamaño
+        if (file.size > MAX_SIZE_BYTES) {
+            throw new Error(
+                `Image "${file.name}" exceeds the ${MAX_SIZE_MB}MB limit`
+            )
+        }
+
+        // Obtener extensión original
+        const originalExt = file.name.split(".").pop()
+        const fileExt = originalExt ? originalExt.toLowerCase() : "jpg"
+
+        // Generar nombre único
+        const fileName = `${uuidv4()}.${fileExt}`
         const filePath = `${propertyId}/${fileName}`
 
         const { error } = await supabase.storage
             .from(STORAGE_BUCKETS.PROPERTY_IMAGES)
             .upload(filePath, file, {
-                upsert: false, // 🔥 IMPORTANTE: nunca sobrescribir
+                upsert: false, // nunca sobreescribir
             })
 
-        if (error) throw error
+        if (error) {
+            throw new Error(`Failed to upload ${file.name}: ${error.message}`)
+        }
 
         uploadedPaths.push(filePath)
-        nextIndex++
     }
 
     return uploadedPaths
@@ -49,7 +60,9 @@ export async function deleteImage(path: string): Promise<void> {
         .from(STORAGE_BUCKETS.PROPERTY_IMAGES)
         .remove([path])
 
-    if (error) throw error
+    if (error) {
+        throw new Error(`Failed to delete image: ${error.message}`)
+    }
 }
 
 export async function deleteMultipleImages(paths: string[]): Promise<void> {
@@ -59,5 +72,7 @@ export async function deleteMultipleImages(paths: string[]): Promise<void> {
         .from(STORAGE_BUCKETS.PROPERTY_IMAGES)
         .remove(paths)
 
-    if (error) throw error
+    if (error) {
+        throw new Error(`Failed to delete images: ${error.message}`)
+    }
 }

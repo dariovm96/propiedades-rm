@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import { supabase } from "@/lib/supabaseClient"
 import { uploadImages } from "@/lib/storage"
 
@@ -97,6 +98,7 @@ export default function NuevaPropiedadPage() {
 
       if (updateError) throw updateError
 
+      toast.success("Propiedad creada correctamente")
       router.push("/admin/dashboard")
     } catch (error: any) {
       console.error("Error al insertar:", error)
