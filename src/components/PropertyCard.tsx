@@ -1,6 +1,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { Property } from "@/types/property"
+import { getPublicImageUrl } from "@/lib/storage-helpers"
 
 type Props = {
     property: Property
@@ -16,7 +17,7 @@ export default function PropertyCard({ property }: Props) {
     // 🔥 portada = primera imagen
     const cover =
         property.images?.length
-            ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/property-images/${property.images[0]}`
+            ? getPublicImageUrl(property.images[0])
             : null
 
     return (
@@ -40,20 +41,20 @@ export default function PropertyCard({ property }: Props) {
                 )}
             </div>
 
-            <div className="p-5 space-y-3">
-                <div className="flex justify-between items-start">
-                    <h3 className="font-semibold text-lg">{property.title}</h3>
+            <div className="p-4 sm:p-5 space-y-3">
+                <div className="flex justify-between items-start gap-2">
+                    <h3 className="font-semibold text-base sm:text-lg">{property.title}</h3>
 
                     <span
-                        className={`text-xs px-2 py-1 rounded ${statusColor[property.status]}`}
+                        className={`text-xs px-2 py-1 rounded flex-shrink-0 ${statusColor[property.status]}`}
                     >
                         {property.status}
                     </span>
                 </div>
 
-                <p className="text-sm text-gray-600">{property.location_text}</p>
+                <p className="text-xs sm:text-sm text-gray-600">{property.location_text}</p>
 
-                <div className="flex justify-between text-sm font-medium">
+                <div className="flex justify-between text-xs sm:text-sm font-medium gap-2">
                     <span>
                         {property.area_m2 && `${property.area_m2} m²`}
                     </span>

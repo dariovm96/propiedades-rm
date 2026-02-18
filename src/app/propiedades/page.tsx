@@ -15,13 +15,13 @@ export default async function PropiedadesPage() {
   const properties = (data || []) as Property[]
 
   return (
-    <section className="space-y-8">
-      <h1 className="text-3xl font-semibold">
+    <section className="space-y-6 sm:space-y-8">
+      <h1 className="text-2xl sm:text-3xl font-semibold">
         Propiedades disponibles
       </h1>
 
       {properties.length === 0 ? (
-        <p className="text-gray-500">
+        <p className="text-gray-500 text-sm sm:text-base">
           Aún no hay propiedades publicadas.
         </p>
       ) : (

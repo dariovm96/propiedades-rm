@@ -18,9 +18,9 @@ export default function PropertyGallery({ images }: Props) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2 sm:space-y-4">
       {/* Imagen principal */}
-      <div className="aspect-video w-full overflow-hidden rounded-xl bg-gray-100">
+      <div className="aspect-video w-full overflow-hidden rounded-lg sm:rounded-xl bg-gray-100">
         <img
           src={images[active]}
           alt="Imagen propiedad"
@@ -29,12 +29,12 @@ export default function PropertyGallery({ images }: Props) {
       </div>
 
       {/* Miniaturas */}
-      <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
+      <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-2 sm:gap-3">
         {images.map((img, index) => (
           <button
             key={index}
             onClick={() => setActive(index)}
-            className={`aspect-square overflow-hidden rounded-lg border-2 transition ${
+            className={`aspect-square overflow-hidden rounded border-2 transition ${
               active === index
                 ? "border-gray-900"
                 : "border-transparent opacity-70 hover:opacity-100"
