@@ -1,11 +1,25 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { supabase } from "@/lib/supabaseClient"
 import { TEL_URL, WHATSAPP_URL } from "@/config/contact"
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
+
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAdmin(!!session)
+    })
+
+    return () => {
+      subscription?.unsubscribe()
+    }
+  }, [])
 
   return (
     <header className="border-b bg-white sticky top-0 z-50">
@@ -55,6 +69,15 @@ export default function Header() {
               Propiedades
             </Link>
 
+            {isAdmin && (
+              <Link
+                href="/admin/dashboard"
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+              >
+                Admin
+              </Link>
+            )}
+
             <a
               href={TEL_URL}
               className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition"
@@ -90,6 +113,16 @@ export default function Header() {
             >
               Propiedades
             </Link>
+
+            {isAdmin && (
+              <Link
+                href="/admin/dashboard"
+                className="block w-full text-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+                onClick={() => setIsOpen(false)}
+              >
+                Admin
+              </Link>
+            )}
 
             <a
               href={TEL_URL}

@@ -1,7 +1,7 @@
 import "./globals.css"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
-import { Toaster } from "sonner"
+import ToasterProvider from "../components/ToasterProvider"
 
 export const metadata = {
   title: "Propiedades RM",
@@ -15,7 +15,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className="overflow-x-hidden">
-      <body className="bg-white text-gray-900 min-h-screen flex flex-col overflow-x-hidden">
+      <body suppressHydrationWarning className="bg-white text-gray-900 min-h-screen flex flex-col overflow-x-hidden">
         <Header />
 
         <main className="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 py-8 sm:py-10">
@@ -23,7 +23,7 @@ export default function RootLayout({
         </main>
 
         <Footer />
-        <Toaster position="top-right" />
+        <ToasterProvider />
       </body>
     </html>
   )

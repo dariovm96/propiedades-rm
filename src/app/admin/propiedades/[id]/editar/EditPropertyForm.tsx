@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { supabase } from "@/lib/supabaseClient"
 import { uploadImages, deleteMultipleImages } from "@/lib/storage"
+import LoadingSpinner from "@/components/LoadingSpinner"
 import { Property } from "@/types/property"
 
 type Props = {
@@ -56,18 +57,15 @@ export default function EditPropertyForm({ property }: Props) {
     try {
       let updatedImages = [...existingImages]
 
-      // 1️⃣ SUBIR NUEVAS IMÁGENES
       if (imagesFiles.length > 0) {
         const newImagePaths = await uploadImages(property.id, imagesFiles)
         updatedImages = [...updatedImages, ...newImagePaths]
       }
 
-      // 2️⃣ ELIMINAR IMÁGENES MARCADAS
       if (imagesToDelete.length > 0) {
         await deleteMultipleImages(imagesToDelete)
       }
 
-      // 3️⃣ ACTUALIZAR PROPIEDAD
       const { error } = await supabase
         .from("properties")
         .update({
@@ -89,118 +87,177 @@ export default function EditPropertyForm({ property }: Props) {
       toast.success("Propiedad actualizada correctamente")
       router.push("/admin/dashboard")
     } catch (err: any) {
-      alert(err.message)
+      toast.error(err.message)
+    } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between mb-6 pb-4 border-b">
-        <h2 className="text-2xl font-bold">Editar Propiedad</h2>
+    <div className="max-w-4xl mx-auto py-12">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-2xl font-bold">Editar propiedad</h2>
+          <p className="text-sm text-gray-600">
+            Actualiza la informacion y las imagenes segun sea necesario.
+          </p>
+        </div>
         <button
           type="button"
           onClick={() => router.push("/admin/dashboard")}
-          className="text-gray-600 hover:text-gray-900 transition"
+          className="inline-flex items-center gap-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg transition"
         >
-          ← Volver al Dashboard
+          <span aria-hidden="true">←</span>
+          Volver
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <input
-          name="title"
-          value={form.title}
-          onChange={handleChange}
-          className="w-full border p-3 rounded"
-          placeholder="Título"
-        />
+      <form onSubmit={handleSubmit} className="bg-white border rounded-xl shadow-sm p-6 sm:p-8 space-y-8">
+        <div className="space-y-4">
+          <h3 className="text-sm font-semibold text-gray-900">Informacion principal</h3>
 
-        <textarea
-          name="description"
-          value={form.description}
-          onChange={handleChange}
-          className="w-full border p-3 rounded"
-          placeholder="Descripción"
-          rows={4}
-        />
+          <div className="space-y-2">
+            <label htmlFor="title" className="text-sm font-medium text-gray-700">
+              Titulo
+            </label>
+            <input
+              id="title"
+              name="title"
+              value={form.title}
+              onChange={handleChange}
+              className="w-full border p-3 rounded focus:outline-none focus:ring-2 focus:ring-gray-200"
+              placeholder="Titulo"
+            />
+          </div>
 
-        <input
-          name="location_text"
-          value={form.location_text}
-          onChange={handleChange}
-          className="w-full border p-3 rounded"
-          placeholder="Ubicación"
-        />
+          <div className="space-y-2">
+            <label htmlFor="description" className="text-sm font-medium text-gray-700">
+              Descripcion
+            </label>
+            <textarea
+              id="description"
+              name="description"
+              value={form.description}
+              onChange={handleChange}
+              className="w-full border p-3 rounded focus:outline-none focus:ring-2 focus:ring-gray-200"
+              placeholder="Descripcion"
+              rows={4}
+            />
+          </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <input
-            type="number"
-            name="price"
-            value={form.price}
-            onChange={handleChange}
-            className="border p-3 rounded"
-            placeholder="Precio"
-          />
-
-          <input
-            type="number"
-            name="area_m2"
-            value={form.area_m2}
-            onChange={handleChange}
-            className="border p-3 rounded"
-            placeholder="Superficie (m²)"
-          />
+          <div className="space-y-2">
+            <label htmlFor="location_text" className="text-sm font-medium text-gray-700">
+              Ubicacion
+            </label>
+            <input
+              id="location_text"
+              name="location_text"
+              value={form.location_text}
+              onChange={handleChange}
+              className="w-full border p-3 rounded focus:outline-none focus:ring-2 focus:ring-gray-200"
+              placeholder="Ubicacion"
+            />
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <select
-            name="currency"
-            value={form.currency}
-            onChange={handleChange}
-            className="border p-3 rounded"
-          >
-            <option value="CLP">CLP</option>
-            <option value="UF">UF</option>
-            <option value="USD">USD</option>
-          </select>
+        <div className="space-y-4">
+          <h3 className="text-sm font-semibold text-gray-900">Detalles</h3>
 
-          <select
-            name="status"
-            value={form.status}
-            onChange={handleChange}
-            className="border p-3 rounded"
-          >
-            <option value="available">Disponible</option>
-            <option value="sold">Vendida</option>
-            <option value="rented">Arrendada</option>
-          </select>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="flex flex-col gap-2">
+              <label htmlFor="price" className="text-sm font-medium text-gray-700">
+                Precio
+              </label>
+              <input
+                id="price"
+                type="number"
+                name="price"
+                value={form.price}
+                onChange={handleChange}
+                className="border p-3 rounded h-12 focus:outline-none focus:ring-2 focus:ring-gray-200"
+                placeholder="Precio"
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label htmlFor="area_m2" className="text-sm font-medium text-gray-700">
+                Superficie (m2)
+              </label>
+              <input
+                id="area_m2"
+                type="number"
+                name="area_m2"
+                value={form.area_m2}
+                onChange={handleChange}
+                className="border p-3 rounded h-12 focus:outline-none focus:ring-2 focus:ring-gray-200"
+                placeholder="Superficie (m2)"
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label htmlFor="currency" className="text-sm font-medium text-gray-700">
+                Moneda
+              </label>
+              <select
+                id="currency"
+                name="currency"
+                value={form.currency}
+                onChange={handleChange}
+                className="border p-3 rounded h-12 focus:outline-none focus:ring-2 focus:ring-gray-200"
+              >
+                <option value="CLP">CLP</option>
+                <option value="UF">UF</option>
+                <option value="USD">USD</option>
+              </select>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label htmlFor="status" className="text-sm font-medium text-gray-700">
+                Estado
+              </label>
+              <select
+                id="status"
+                name="status"
+                value={form.status}
+                onChange={handleChange}
+                className="border p-3 rounded h-12 focus:outline-none focus:ring-2 focus:ring-gray-200"
+              >
+                <option value="available">Disponible</option>
+                <option value="sold">Vendida</option>
+                <option value="rented">Arrendada</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="contact_phone" className="text-sm font-medium text-gray-700">
+              Telefono de contacto
+            </label>
+            <input
+              id="contact_phone"
+              name="contact_phone"
+              value={form.contact_phone}
+              onChange={handleChange}
+              className="w-full border p-3 rounded focus:outline-none focus:ring-2 focus:ring-gray-200"
+              placeholder="Telefono de contacto (opcional)"
+            />
+            <p className="text-xs text-gray-500">Opcional. Se muestra en el panel admin.</p>
+          </div>
+
+          <label className="flex items-center gap-2 text-sm text-gray-700">
+            <input
+              type="checkbox"
+              checked={form.highlighted}
+              onChange={(e) => setForm({ ...form, highlighted: e.target.checked })}
+            />
+            Destacar propiedad
+          </label>
         </div>
 
-        <input
-          name="contact_phone"
-          value={form.contact_phone}
-          onChange={handleChange}
-          className="w-full border p-3 rounded"
-          placeholder="Teléfono de contacto (opcional)"
-        />
-
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={form.highlighted}
-            onChange={(e) =>
-              setForm({ ...form, highlighted: e.target.checked })
-            }
-          />
-          <label>Destacar propiedad</label>
-        </div>
-
-        {/* IMÁGENES EXISTENTES */}
         {existingImages.length > 0 && (
-          <div>
-            <p className="font-medium mb-2">Imágenes actuales</p>
-            <div className="grid grid-cols-4 gap-3">
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold text-gray-900">Imagenes actuales</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {existingImages.map((img, i) => (
                 <div key={i} className="relative group">
                   <img
@@ -221,29 +278,39 @@ export default function EditPropertyForm({ property }: Props) {
           </div>
         )}
 
-        {/* NUEVAS IMÁGENES */}
-        <div>
-          <label className="block font-medium mb-2">Agregar nuevas imágenes</label>
-          <input
-            type="file"
-            multiple
-            accept="image/*"
-            onChange={handleImagesChange}
-            className="w-full border p-3 rounded"
-          />
-          {imagesFiles.length > 0 && (
-            <p className="text-sm text-gray-600 mt-2">
-              {imagesFiles.length} archivo(s) seleccionado(s)
-            </p>
-          )}
+        <div className="space-y-4">
+          <h3 className="text-sm font-semibold text-gray-900">Agregar nuevas imagenes</h3>
+          <div className="border border-dashed rounded-lg p-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+              <label className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-900 text-white hover:bg-gray-800 cursor-pointer transition text-sm">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Seleccionar imagenes
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleImagesChange}
+                  className="sr-only"
+                />
+              </label>
+              <span className="text-xs text-gray-500">
+                {imagesFiles.length > 0
+                  ? `${imagesFiles.length} archivo(s) seleccionado(s)`
+                  : "Ningun archivo seleccionado"}
+              </span>
+            </div>
+          </div>
         </div>
 
         <div className="flex gap-3 pt-4">
           <button
             type="submit"
             disabled={loading}
-            className="bg-black text-white px-6 py-3 rounded disabled:bg-gray-400"
+            className="bg-black text-white px-6 py-3 rounded disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
+            {loading && <LoadingSpinner size="md" />}
             {loading ? "Actualizando..." : "Actualizar propiedad"}
           </button>
           <button
@@ -258,4 +325,3 @@ export default function EditPropertyForm({ property }: Props) {
     </div>
   )
 }
-

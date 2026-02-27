@@ -1,3 +1,5 @@
+export const revalidate = 60 // cache propiedades list for one minute
+
 import { supabase } from "@/lib/supabase"
 import PropertyGrid from "@/components/PropertyGrid"
 import { Property } from "@/types/property"

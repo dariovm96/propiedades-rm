@@ -1,3 +1,5 @@
+export const revalidate = 60 // cache property detail for one minute
+
 import { supabase } from "@/lib/supabase"
 import { notFound } from "next/navigation"
 import { Property } from "@/types/property"

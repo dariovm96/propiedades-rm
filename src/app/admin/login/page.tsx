@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { supabase } from "@/lib/supabaseClient"
+import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 
 export default function LoginPage() {
@@ -19,7 +20,7 @@ export default function LoginPage() {
     })
 
     if (error) {
-      alert(error.message)
+      toast.error(error.message)
     } else {
       router.push("/admin/dashboard")
     }
@@ -45,6 +46,11 @@ export default function LoginPage() {
         className="w-full border p-2 rounded"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && !loading) {
+            handleLogin()
+          }
+        }}
       />
 
       <button
