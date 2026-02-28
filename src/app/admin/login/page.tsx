@@ -14,18 +14,39 @@ export default function LoginPage() {
   const handleLogin = async () => {
     setLoading(true)
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
 
-    if (error) {
-      toast.error(error.message)
-    } else {
+      if (error) {
+        toast.error(error.message)
+        return
+      }
+
+      const authResponse = await fetch("/admin/auth", {
+        method: "GET",
+        cache: "no-store",
+      })
+
+      if (!authResponse.ok) {
+        await supabase.auth.signOut()
+
+        if (authResponse.status === 403) {
+          toast.error("No tienes permisos para acceder al panel de administración")
+        } else {
+          toast.error("No se pudo validar tu acceso al panel")
+        }
+        return
+      }
+
       router.push("/admin/dashboard")
+    } catch {
+      toast.error("Error de red. Inténtalo nuevamente")
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
   return (
@@ -35,7 +56,7 @@ export default function LoginPage() {
       <input
         type="email"
         placeholder="Email"
-        className="w-full border p-2 rounded"
+        className="w-full border border-brand-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-brand-200"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
@@ -43,7 +64,7 @@ export default function LoginPage() {
       <input
         type="password"
         placeholder="Password"
-        className="w-full border p-2 rounded"
+        className="w-full border border-brand-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-brand-200"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         onKeyDown={(e) => {
@@ -56,7 +77,7 @@ export default function LoginPage() {
       <button
         onClick={handleLogin}
         disabled={loading}
-        className="w-full bg-black text-white p-2 rounded"
+        className="w-full bg-brand-700 hover:bg-brand-800 text-white p-2 rounded transition disabled:opacity-70"
       >
         {loading ? "Ingresando..." : "Ingresar"}
       </button>

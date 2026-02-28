@@ -1,13 +1,11 @@
 import { supabase } from "@/lib/supabaseClient"
-import { STORAGE_BUCKETS } from "@/lib/constants"
+import {
+    IMAGE_ALLOWED_MIME_TYPES,
+    IMAGE_MAX_SIZE_BYTES,
+    IMAGE_MAX_SIZE_MB,
+    STORAGE_BUCKETS,
+} from "@/lib/constants"
 import { v4 as uuidv4 } from "uuid"
-
-/**
- * Configuración de validaciones
- */
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"]
-const MAX_SIZE_MB = 5
-const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024
 
 export async function uploadImages(
     propertyId: string,
@@ -18,16 +16,16 @@ export async function uploadImages(
     for (const file of files) {
 
         // 🔐 Validar tipo MIME
-        if (!ALLOWED_TYPES.includes(file.type)) {
+        if (!IMAGE_ALLOWED_MIME_TYPES.includes(file.type as (typeof IMAGE_ALLOWED_MIME_TYPES)[number])) {
             throw new Error(
                 "Only JPG, PNG and WEBP images are allowed"
             )
         }
 
         // 🔐 Validar tamaño
-        if (file.size > MAX_SIZE_BYTES) {
+        if (file.size > IMAGE_MAX_SIZE_BYTES) {
             throw new Error(
-                `Image "${file.name}" exceeds the ${MAX_SIZE_MB}MB limit`
+                `Image "${file.name}" exceeds the ${IMAGE_MAX_SIZE_MB}MB limit`
             )
         }
 

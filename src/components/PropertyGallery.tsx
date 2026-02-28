@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import ImageWithLoader from "@/components/ImageWithLoader"
 
 type Props = {
   images: string[]
@@ -11,7 +12,7 @@ export default function PropertyGallery({ images }: Props) {
 
   if (!images || images.length === 0) {
     return (
-      <div className="h-72 md:h-96 bg-gray-200 rounded-xl flex items-center justify-center text-gray-500">
+      <div className="h-72 md:h-96 bg-brand-100 rounded-xl flex items-center justify-center text-brand-muted">
         Sin imágenes
       </div>
     )
@@ -20,11 +21,14 @@ export default function PropertyGallery({ images }: Props) {
   return (
     <div className="space-y-2 sm:space-y-4">
       {/* Imagen principal */}
-      <div className="aspect-video w-full overflow-hidden rounded-lg sm:rounded-xl bg-gray-100">
-        <img
+      <div className="aspect-video w-full overflow-hidden rounded-lg sm:rounded-xl bg-brand-100">
+        <ImageWithLoader
           src={images[active]}
           alt="Imagen propiedad"
-          className="w-full h-full object-cover"
+          wrapperClassName="relative h-full w-full"
+          fill
+          imageClassName="object-cover"
+          unoptimized
         />
       </div>
 
@@ -36,14 +40,17 @@ export default function PropertyGallery({ images }: Props) {
             onClick={() => setActive(index)}
             className={`aspect-square overflow-hidden rounded border-2 transition ${
               active === index
-                ? "border-gray-900"
+                ? "border-brand-700"
                 : "border-transparent opacity-70 hover:opacity-100"
             }`}
           >
-            <img
+            <ImageWithLoader
               src={img}
-              alt=""
-              className="w-full h-full object-cover"
+              alt={`Miniatura ${index + 1}`}
+              wrapperClassName="relative h-full w-full"
+              fill
+              imageClassName="object-cover"
+              unoptimized
             />
           </button>
         ))}

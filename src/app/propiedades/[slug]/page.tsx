@@ -6,6 +6,7 @@ import { Property } from "@/types/property"
 import PropertyGallery from "@/components/PropertyGallery"
 import { CONTACT_PHONE } from "@/config/contact"
 import { getPublicImageUrl } from "@/lib/storage-helpers"
+import { PROPERTY_STATUS_BADGE_CLASSES, PROPERTY_STATUS_LABELS } from "@/lib/constants"
 
 type Props = {
     params: Promise<{
@@ -39,18 +40,9 @@ export default async function PropertyDetailPage({ params }: Props) {
     const imageUrls =
         property.images?.map((path) => getPublicImageUrl(path)) || []
 
-    /* ==============================
-       3. UI helpers
-    ============================== */
-    const statusText = {
-        available: "Disponible",
-        sold: "Vendida",
-        rented: "Arrendada",
-    }
-
-    /* ==============================
-       4. Render
-    ============================== */
+     /* ==============================
+         3. Render
+     ============================== */
     return (
         <section className="space-y-8 sm:space-y-10">
 
@@ -64,24 +56,26 @@ export default async function PropertyDetailPage({ params }: Props) {
                         {property.title}
                     </h1>
 
-                    <p className="text-sm sm:text-base text-gray-600 mb-3">
+                    <p className="text-sm sm:text-base text-brand-700 mb-3">
                         {property.location_text}
                     </p>
 
-                    <span className="inline-block text-xs sm:text-sm px-3 py-1 bg-gray-100 rounded">
-                        {statusText[property.status]}
+                    <span
+                        className={`inline-block text-xs sm:text-sm px-3 py-1 rounded ${PROPERTY_STATUS_BADGE_CLASSES[property.status]}`}
+                    >
+                        {PROPERTY_STATUS_LABELS[property.status]}
                     </span>
                 </div>
 
                 <div className="md:text-right space-y-2 text-sm sm:text-base">
                     {property.price && (
                         <p className="text-xl sm:text-2xl font-semibold">
-                            {property.currency} {property.price.toLocaleString()}
+                            ${property.price.toLocaleString()}
                         </p>
                     )}
 
                     {property.area_m2 && (
-                        <p className="text-gray-600">
+                        <p className="text-brand-700">
                             {property.area_m2} m²
                         </p>
                     )}
@@ -95,17 +89,17 @@ export default async function PropertyDetailPage({ params }: Props) {
                         Descripción
                     </h2>
 
-                    <p className="text-sm sm:text-base text-gray-700 whitespace-pre-line">
+                    <p className="text-sm sm:text-base text-brand-700 whitespace-pre-line">
                         {property.description}
                     </p>
                 </div>
             )}
 
             {/* Contacto (CTA principal del negocio) */}
-            <div className="border rounded-xl p-4 sm:p-6 bg-gray-50 flex flex-col sm:flex-row gap-3 sm:gap-4">
+            <div className="border border-brand-200 rounded-xl p-4 sm:p-6 bg-brand-100 flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <a
                     href={`tel:${property.contact_phone || CONTACT_PHONE}`}
-                    className="flex-1 text-center bg-gray-900 text-white py-2 sm:py-3 rounded-lg font-medium hover:bg-gray-700 transition text-sm sm:text-base"
+                    className="flex-1 text-center bg-brand-700 text-white py-2 sm:py-3 rounded-lg font-medium hover:bg-brand-800 transition text-sm sm:text-base"
                 >
                     📞 Llamar ahora
                 </a>
@@ -113,7 +107,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                 <a
                     href={`https://wa.me/${property.contact_phone || CONTACT_PHONE}`}
                     target="_blank"
-                    className="flex-1 text-center border py-2 sm:py-3 rounded-lg font-medium hover:bg-gray-100 transition text-sm sm:text-base"
+                    className="flex-1 text-center border border-brand-300 text-brand-700 py-2 sm:py-3 rounded-lg font-medium hover:bg-brand-100 transition text-sm sm:text-base"
                 >
                     💬 WhatsApp
                 </a>

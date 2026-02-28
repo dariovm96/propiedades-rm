@@ -7,12 +7,7 @@ import Link from "next/link"
 import { Property } from "@/types/property"
 import ConfirmDialog from "@/components/ConfirmDialog"
 import { toast } from "sonner"
-
-const statusTranslations: Record<string, string> = {
-  available: "Disponible",
-  sold: "Vendido",
-  rented: "Arrendado",
-}
+import { PROPERTY_STATUS_BADGE_CLASSES, PROPERTY_STATUS_LABELS } from "@/lib/constants"
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -92,7 +87,7 @@ export default function DashboardPage() {
     <div className="max-w-6xl mx-auto py-12 space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-        <span className="inline-flex items-center gap-2 text-sm font-semibold bg-gray-100 text-gray-800 px-3 py-1 rounded-full">
+        <span className="inline-flex items-center gap-2 text-sm font-semibold bg-brand-100 text-brand-700 px-3 py-1 rounded-full">
           <span className="w-2 h-2 rounded-full bg-green-500" aria-hidden="true" />
           {properties.length} {properties.length === 1 ? "propiedad" : "propiedades"}
         </span>
@@ -100,7 +95,7 @@ export default function DashboardPage() {
         <div className="flex gap-4">
           <Link
             href="/admin/propiedades/nueva"
-            className="inline-flex items-center gap-2 bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition"
+            className="inline-flex items-center gap-2 bg-brand-700 text-white px-4 py-2 rounded hover:bg-brand-800 transition"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -117,9 +112,9 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="border rounded-lg overflow-hidden shadow-sm">
-        <table className="w-full text-sm divide-y divide-gray-200">
-          <thead className="bg-gray-100">
+      <div className="border border-brand-200 rounded-lg overflow-hidden shadow-sm bg-white">
+        <table className="w-full text-sm divide-y divide-brand-200">
+          <thead className="bg-brand-100 text-brand-900">
             <tr>
                 <th className="text-left p-3">Título</th>
                 <th className="text-left p-3 hidden sm:table-cell">Área (m²)</th>
@@ -134,7 +129,7 @@ export default function DashboardPage() {
 
           <tbody>
             {properties.map((property) => (
-              <tr key={property.id} className="hover:bg-gray-50">
+              <tr key={property.id} className="hover:bg-brand-50">
                 <td className="p-3">{property.title}</td>
                 <td className="p-3 hidden sm:table-cell">
                   {property.area_m2 ? property.area_m2.toLocaleString() : "—"}
@@ -142,43 +137,51 @@ export default function DashboardPage() {
                 <td className="p-3">{property.location_text}</td>
                 <td className="p-3">
                   <span
-                    className={
-                      "px-2 py-1 rounded-full text-xs font-semibold " +
-                      (property.status === "available"
-                        ? "bg-green-100 text-green-800"
-                        : property.status === "sold"
-                        ? "bg-red-100 text-red-800"
-                        : "bg-yellow-100 text-yellow-800")
-                    }
+                    className={`px-2 py-1 rounded-full text-xs font-semibold ${PROPERTY_STATUS_BADGE_CLASSES[property.status]}`}
                   >
-                    {statusTranslations[property.status]}
+                    {PROPERTY_STATUS_LABELS[property.status]}
                   </span>
                 </td>
                 <td className="p-3 hidden sm:table-cell">
                   {property.contact_phone || "—"}
                 </td>
                 <td className="p-3">
-                  {property.currency} {property.price?.toLocaleString()}
+                  {property.price ? `$${property.price.toLocaleString()}` : "—"}
                 </td>
                 <td className="p-3">
                   {property.highlighted ? (
                     <svg
-                      className="w-5 h-5 text-yellow-500"
+                      className="w-5 h-5 text-brand-500"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.96a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.374 2.455a1 1 0 00-.364 1.118l1.286 3.96c.3.921-.755 1.688-1.54 1.118l-3.374-2.455a1 1 0 00-1.176 0l-3.374 2.455c-.784.57-1.84-.197-1.54-1.118l1.286-3.96a1 1 0 00-.364-1.118L2.363 9.387c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.96z" />
                     </svg>
                   ) : (
-                    <span className="text-gray-400">—</span>
+                    <span className="text-brand-muted">—</span>
                   )}
                 </td>
 
                 <td className="p-3">
                   <div className="flex gap-2">
+                    {property.slug && (
+                      <Link
+                        href={`/propiedades/${property.slug}`}
+                        className="inline-flex items-center gap-1 bg-brand-100 text-brand-700 hover:bg-brand-200 px-3 py-2 rounded-lg transition border border-brand-300"
+                        title="Ver propiedad"
+                        aria-label={`Ver ${property.title}`}
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        Ver
+                      </Link>
+                    )}
+
                     <Link
                       href={`/admin/propiedades/${property.id}/editar`}
-                      className="inline-flex items-center gap-1 bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-2 rounded-lg transition border border-blue-200"
+                      className="inline-flex items-center gap-1 bg-brand-100 text-brand-700 hover:bg-brand-200 px-3 py-2 rounded-lg transition border border-brand-300"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -205,7 +208,7 @@ export default function DashboardPage() {
 
             {properties.length === 0 && (
               <tr>
-                <td colSpan={5} className="p-6 text-center text-gray-500">
+                <td colSpan={5} className="p-6 text-center text-brand-muted">
                   No hay propiedades aún
                 </td>
               </tr>

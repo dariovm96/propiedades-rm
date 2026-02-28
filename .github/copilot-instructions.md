@@ -42,6 +42,8 @@ Do not introduce new libraries unless explicitly requested.
 - Never expose service role keys in frontend code.
 - Use property `id` (UUID) for storage folder paths.
 - Never use slug as a storage reference.
+- In admin route handlers, use `/lib/server-supabase.ts` (`createRouteSupabaseClient`) instead of rebuilding cookie/client setup inline.
+- In admin route handlers, use `/lib/admin-auth.ts` (`requireAdminUser`) for authentication/authorization checks instead of duplicating guard logic.
 
 ---
 
@@ -77,6 +79,16 @@ Do not introduce new libraries unless explicitly requested.
 - Keep functions small and focused.
 - Use descriptive variable names.
 - Do not generate overly abstract patterns unless requested.
+
+---
+
+## API Response Rules
+
+- In route handlers, always use shared response helpers from `/lib/api-response.ts`.
+- Use `jsonError(message, status, meta?)` for error responses.
+- Use `jsonSuccess(meta?, status?)` for successful responses.
+- Do not return manual `NextResponse.json({ error: ... })` or manual success payloads when these helpers apply.
+- Keep API status codes and error messages standardized using shared constants from `/lib/constants.ts`.
 
 ---
 

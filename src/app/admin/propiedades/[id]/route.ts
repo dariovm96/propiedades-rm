@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server"
-import { createServerClient } from "@supabase/ssr"
+import { NextRequest } from "next/server"
 import { createClient } from "@supabase/supabase-js"
-import { STORAGE_BUCKETS } from "@/lib/constants"
-
-import { cookies as getCookies } from "next/headers"
+import { ADMIN_API_MESSAGES, ADMIN_API_STATUS, STORAGE_BUCKETS } from "@/lib/constants"
+import { requireAdminUser } from "@/lib/admin-auth"
+import { jsonError, jsonSuccess } from "@/lib/api-response"
+import { createRouteSupabaseClient } from "@/lib/server-supabase"
 
 export async function DELETE(
   req: NextRequest,
@@ -11,56 +11,10 @@ export async function DELETE(
 ) {
   // unwrap params if it's a promise
   const { id } = (await ctx.params) as { id: string }
-  // perform deletion for given property id
-  const cookieStore = await getCookies()
-
-  // create a cookie methods object to satisfy supabase client requirements
-  const cookieMethods = {
-    // read
-    get: (name: string) => {
-      const c = cookieStore.get(name)
-      return c ? c.value : undefined
-    },
-    getAll: () => cookieStore.getAll().map((c: any) => ({ name: c.name, value: c.value })),
-
-    // write stubs (not needed for authentication check)
-    set: (_name: string, _value: string, _options?: any) => {},
-    remove: (_name: string) => {},
-    setAll: (_cookies: any[]) => {},
-    deleteAll: () => {},
-  }
-
-  // verify session using server client and cookies
-  const serverSupabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-    { cookies: cookieMethods }
-  )
-
-  const {
-    data: { session },
-  } = await serverSupabase.auth.getSession()
-
-  if (!session) {
-    // for API/fetch calls return JSON + 401 instead of redirecting to a page
-    // (redirects are followed by fetch and may return 200 HTML which hides auth failures)
-    // serialize cookies into plain objects to avoid serializing complex objects
-    const safeCookies = cookieStore.getAll().map((c: any) => ({
-      name: c.name,
-      value: typeof c.value === "string" ? c.value : String(c.value),
-      path: c.path || null,
-    }))
-    const debugInfo = {
-      cookies: safeCookies,
-      requestUrl: req.url,
-      headers: Object.fromEntries(req.headers.entries()),
-    }
-    try {
-      return NextResponse.json({ error: "no session", debug: debugInfo }, { status: 401 })
-    } catch (err) {
-      console.error("failed to serialize debug info", err)
-      return NextResponse.json({ error: "no session" }, { status: 401 })
-    }
+  const serverSupabase = await createRouteSupabaseClient()
+  const guard = await requireAdminUser(serverSupabase)
+  if ("response" in guard) {
+    return guard.response
   }
 
   // perform deletion with service role key to bypass RLS
@@ -70,7 +24,10 @@ export async function DELETE(
   )
 
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    return NextResponse.json({ error: "server misconfiguration" }, { status: 500 })
+    return jsonError(
+      ADMIN_API_MESSAGES.SERVER_MISCONFIGURATION,
+      ADMIN_API_STATUS.INTERNAL_SERVER_ERROR
+    )
   }
 
   // fetch property first to know which images to clean up
@@ -83,9 +40,9 @@ export async function DELETE(
   if (fetchError) {
     // if property doesn't exist treat as not found
     if (fetchError.code === "PGRST116") {
-      return NextResponse.json({ error: "property not found" }, { status: 404 })
+      return jsonError(ADMIN_API_MESSAGES.PROPERTY_NOT_FOUND, ADMIN_API_STATUS.NOT_FOUND)
     }
-    return NextResponse.json({ error: fetchError.message }, { status: 500 })
+    return jsonError(fetchError.message, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR)
   }
 
   const imagesToRemove: string[] = propertyData?.images || []
@@ -99,11 +56,11 @@ export async function DELETE(
 
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return jsonError(error.message, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR)
   }
 
   if (!deleted || deleted.length === 0) {
-    return NextResponse.json({ error: "no rows deleted" }, { status: 404 })
+    return jsonError(ADMIN_API_MESSAGES.NO_ROWS_DELETED, ADMIN_API_STATUS.NOT_FOUND)
   }
 
   // attempt to remove related images
@@ -114,14 +71,13 @@ export async function DELETE(
 
     if (storageErr) {
       // we don't fail the whole request, but return warning
-      return NextResponse.json({
-        success: true,
+      return jsonSuccess({
         deleted,
-        warning: "image cleanup failed",
+        warning: ADMIN_API_MESSAGES.IMAGE_CLEANUP_FAILED,
         storageError: storageErr.message,
       })
     }
   }
 
-  return NextResponse.json({ success: true, deleted })
+  return jsonSuccess({ deleted })
 }

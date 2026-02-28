@@ -1,11 +1,15 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { supabase } from "@/lib/supabaseClient"
 import { uploadImages } from "@/lib/storage"
 import LoadingSpinner from "@/components/LoadingSpinner"
+import PropertyFormFields from "@/components/PropertyFormFields"
+import ImageFilePicker from "@/components/ImageFilePicker"
+import ImageWithLoader from "@/components/ImageWithLoader"
+import { PropertyFormValues, toPropertyPayload } from "@/lib/property-form"
 
 function generateSlug(text: string) {
   return text
@@ -20,13 +24,23 @@ export default function NuevaPropiedadPage() {
   const [loading, setLoading] = useState(false)
   const [imagesFiles, setImagesFiles] = useState<File[]>([])
   const [previewUrls, setPreviewUrls] = useState<string[]>([])
+  const previewUrlsRef = useRef<string[]>([])
 
-  const [form, setForm] = useState({
+  useEffect(() => {
+    previewUrlsRef.current = previewUrls
+  }, [previewUrls])
+
+  useEffect(() => {
+    return () => {
+      previewUrlsRef.current.forEach((url) => URL.revokeObjectURL(url))
+    }
+  }, [])
+
+  const [form, setForm] = useState<PropertyFormValues>({
     title: "",
     description: "",
     location_text: "",
     price: "",
-    currency: "CLP",
     status: "available",
     area_m2: "",
     highlighted: false,
@@ -36,17 +50,39 @@ export default function NuevaPropiedadPage() {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
+    const { name, value } = e.target
+    if (name === "status") {
+      setForm((prev) => ({ ...prev, status: value as PropertyFormValues["status"] }))
+      return
+    }
+
+    setForm((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return
+  const handleImagesSelected = (incomingFiles: File[]) => {
+    const fileSignature = (file: File) => `${file.name}-${file.size}-${file.lastModified}`
+    const existingSignatures = new Set(imagesFiles.map(fileSignature))
 
-    const files = Array.from(e.target.files)
-    setImagesFiles(files)
+    const uniqueNewFiles = incomingFiles.filter((file) => !existingSignatures.has(fileSignature(file)))
+    if (uniqueNewFiles.length === 0) {
+      return
+    }
 
-    const previews = files.map((file) => URL.createObjectURL(file))
-    setPreviewUrls(previews)
+    setImagesFiles((prev) => [...prev, ...uniqueNewFiles])
+    setPreviewUrls((prev) => [...prev, ...uniqueNewFiles.map((file) => URL.createObjectURL(file))])
+  }
+
+  const handleRemoveNewImage = (indexToRemove: number) => {
+    setImagesFiles((prev) => prev.filter((_, index) => index !== indexToRemove))
+
+    setPreviewUrls((prev) => {
+      const urlToRemove = prev[indexToRemove]
+      if (urlToRemove) {
+        URL.revokeObjectURL(urlToRemove)
+      }
+
+      return prev.filter((_, index) => index !== indexToRemove)
+    })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -66,16 +102,8 @@ export default function NuevaPropiedadPage() {
         .from("properties")
         .insert([
           {
-            title: form.title,
+            ...toPropertyPayload(form),
             slug,
-            description: form.description || null,
-            location_text: form.location_text || null,
-            price: form.price ? Number(form.price) : null,
-            currency: form.currency || null,
-            status: form.status,
-            area_m2: form.area_m2 ? Number(form.area_m2) : null,
-            highlighted: form.highlighted,
-            contact_phone: form.contact_phone || null,
             images: [],
           },
         ])
@@ -101,8 +129,9 @@ export default function NuevaPropiedadPage() {
 
       toast.success("Propiedad creada correctamente")
       router.push("/admin/dashboard")
-    } catch (error: any) {
-      toast.error(error.message)
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Ocurrió un error inesperado"
+      toast.error(message)
     } finally {
       setLoading(false)
     }
@@ -113,201 +142,56 @@ export default function NuevaPropiedadPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold">Nueva propiedad</h1>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-brand-700">
             Completa la informacion basica y agrega imagenes para publicar.
           </p>
         </div>
         <button
           type="button"
           onClick={() => router.push("/admin/dashboard")}
-          className="inline-flex items-center gap-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg transition"
+          className="inline-flex items-center gap-2 text-sm font-medium text-brand-700 bg-brand-100 hover:bg-brand-200 px-3 py-2 rounded-lg transition"
         >
           <span aria-hidden="true">←</span>
           Volver
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white border rounded-xl shadow-sm p-6 sm:p-8 space-y-8">
-        <div className="space-y-4">
-          <h2 className="text-sm font-semibold text-gray-900">Informacion principal</h2>
-
-          <div className="space-y-2">
-            <label htmlFor="title" className="text-sm font-medium text-gray-700">
-              Titulo
-            </label>
-            <input
-              id="title"
-              name="title"
-              placeholder="Ej: Departamento con vista al mar"
-              required
-              className="w-full border p-3 rounded focus:outline-none focus:ring-2 focus:ring-gray-200"
-              value={form.title}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="description" className="text-sm font-medium text-gray-700">
-              Descripcion
-            </label>
-            <textarea
-              id="description"
-              name="description"
-              placeholder="Describe los principales atributos de la propiedad"
-              rows={4}
-              className="w-full border p-3 rounded focus:outline-none focus:ring-2 focus:ring-gray-200"
-              value={form.description}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="location_text" className="text-sm font-medium text-gray-700">
-              Ubicacion
-            </label>
-            <input
-              id="location_text"
-              name="location_text"
-              placeholder="Ej: Las Condes, Santiago"
-              className="w-full border p-3 rounded focus:outline-none focus:ring-2 focus:ring-gray-200"
-              value={form.location_text}
-              onChange={handleChange}
-            />
-          </div>
-        </div>
+      <form onSubmit={handleSubmit} className="bg-white border border-brand-200 rounded-xl shadow-sm p-6 sm:p-8 space-y-8">
+        <PropertyFormFields
+          form={form}
+          onChange={handleChange}
+          onHighlightedChange={(checked) => setForm((prev) => ({ ...prev, highlighted: checked }))}
+        />
 
         <div className="space-y-4">
-          <h2 className="text-sm font-semibold text-gray-900">Detalles</h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div className="flex flex-col gap-2">
-              <label htmlFor="price" className="text-sm font-medium text-gray-700">
-                Precio
-              </label>
-              <input
-                id="price"
-                name="price"
-                placeholder="Ej: 125000000"
-                type="number"
-                className="border p-3 rounded h-12 focus:outline-none focus:ring-2 focus:ring-gray-200"
-                value={form.price}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <label htmlFor="area_m2" className="text-sm font-medium text-gray-700">
-                Superficie (m2)
-              </label>
-              <input
-                id="area_m2"
-                name="area_m2"
-                placeholder="Ej: 85"
-                type="number"
-                className="border p-3 rounded h-12 focus:outline-none focus:ring-2 focus:ring-gray-200"
-                value={form.area_m2}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <label htmlFor="currency" className="text-sm font-medium text-gray-700">
-                Moneda
-              </label>
-              <select
-                id="currency"
-                name="currency"
-                className="border p-3 rounded h-12 focus:outline-none focus:ring-2 focus:ring-gray-200"
-                value={form.currency}
-                onChange={handleChange}
-              >
-                <option value="CLP">CLP</option>
-                <option value="UF">UF</option>
-                <option value="USD">USD</option>
-              </select>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <label htmlFor="status" className="text-sm font-medium text-gray-700">
-                Estado
-              </label>
-              <select
-                id="status"
-                name="status"
-                className="border p-3 rounded h-12 focus:outline-none focus:ring-2 focus:ring-gray-200"
-                value={form.status}
-                onChange={handleChange}
-              >
-                <option value="available">Disponible</option>
-                <option value="sold">Vendida</option>
-                <option value="rented">Arrendada</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="contact_phone" className="text-sm font-medium text-gray-700">
-              Telefono de contacto
-            </label>
-            <input
-              id="contact_phone"
-              name="contact_phone"
-              placeholder="Ej: +56 9 1234 5678"
-              className="w-full border p-3 rounded focus:outline-none focus:ring-2 focus:ring-gray-200"
-              value={form.contact_phone}
-              onChange={handleChange}
-            />
-            <p className="text-xs text-gray-500">Opcional. Si se muestra, se ve en el panel admin.</p>
-          </div>
-
-          <label className="flex items-center gap-2 text-sm text-gray-700">
-            <input
-              type="checkbox"
-              checked={form.highlighted}
-              onChange={(e) => setForm({ ...form, highlighted: e.target.checked })}
-            />
-            Destacar propiedad
-          </label>
-        </div>
-
-        <div className="space-y-4">
-          <h2 className="text-sm font-semibold text-gray-900">Imagenes</h2>
-          <div className="border border-dashed rounded-lg p-4">
-            <label className="block mb-2 font-medium text-gray-700">
-              Imagenes de la propiedad
-            </label>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-              <label className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-900 text-white hover:bg-gray-800 cursor-pointer transition text-sm">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                Seleccionar imagenes
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={handleImagesChange}
-                  className="sr-only"
-                />
-              </label>
-              <span className="text-xs text-gray-500">
-                {imagesFiles.length > 0
-                  ? `${imagesFiles.length} archivo(s) seleccionado(s)`
-                  : "Ningun archivo seleccionado"}
-              </span>
-            </div>
-            <p className="text-xs text-gray-500 mt-2">Maximo 5 MB por imagen. JPG, PNG o WEBP.</p>
-          </div>
+          <h2 className="text-sm font-semibold text-brand-900">Imagenes</h2>
+          <ImageFilePicker
+            selectedCount={imagesFiles.length}
+            onFilesSelected={handleImagesSelected}
+            helperText="Maximo 5 MB por imagen. JPG, PNG o WEBP. Puedes seleccionar en tandas sin mantener Ctrl."
+          />
 
           {previewUrls.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               {previewUrls.map((url, index) => (
-                <img
-                  key={index}
-                  src={url}
-                  alt="preview"
-                  className="h-32 w-full object-cover rounded"
-                />
+                <div key={url} className="relative h-32 w-full group">
+                  <ImageWithLoader
+                    src={url}
+                    alt={`Nueva imagen ${index + 1}`}
+                    wrapperClassName="relative h-full w-full"
+                    fill
+                    imageClassName="object-cover rounded"
+                    unoptimized
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveNewImage(index)}
+                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+                    aria-label={`Quitar nueva imagen ${index + 1}`}
+                  >
+                    ✕
+                  </button>
+                </div>
               ))}
             </div>
           )}
@@ -317,7 +201,7 @@ export default function NuevaPropiedadPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-black text-white px-6 py-3 rounded disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full bg-brand-700 text-white px-6 py-3 rounded hover:bg-brand-800 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition"
           >
             {loading && <LoadingSpinner size="md" />}
             {loading ? "Guardando..." : "Crear propiedad"}
