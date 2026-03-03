@@ -3,8 +3,8 @@
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { usePathname } from "next/navigation"
-import { TEL_URL, WHATSAPP_URL } from "@/config/contact"
-import WhatsAppIcon from "@/components/icons/WhatsAppIcon"
+import { CONTACT_PHONE_DISPLAY, TEL_URL, WHATSAPP_URL } from "@/config/contact"
+import ContactActionButton from "@/components/ContactActionButton"
 
 export default function Header() {
   const pathname = usePathname()
@@ -56,31 +56,31 @@ export default function Header() {
 
   const headerClasses = isTransparent
     ? "border-transparent bg-transparent shadow-none"
-    : "border-b border-brand-200 bg-header-bg/95 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-header-bg/90"
+    : "border-b border-border-subtle bg-surface-1/95 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-surface-1/90"
 
   const logoClasses = isTransparent
     ? "text-white drop-shadow-sm"
-    : "text-brand-accent"
+    : "text-content-primary"
 
   const menuButtonClasses = isTransparent
     ? "md:hidden rounded-lg p-2 text-white transition hover:bg-white/15"
-    : "md:hidden rounded-lg p-2 transition hover:bg-brand-100"
+    : "md:hidden rounded-lg p-2 transition hover:bg-surface-2"
 
   const desktopNavClasses = isTransparent
     ? "hidden md:flex items-center gap-6 text-sm font-medium text-white"
-    : "hidden md:flex items-center gap-6 text-sm font-medium text-brand-800"
+    : "hidden md:flex items-center gap-6 text-sm font-medium text-content-secondary"
 
   const desktopLinkClasses = isTransparent
     ? "drop-shadow-sm transition hover:text-brand-100"
-    : "transition hover:text-brand-900"
+    : "transition hover:text-content-primary"
 
   const mobileNavClasses = isTransparent
     ? "md:hidden mt-4 space-y-3 rounded-xl border border-white/20 bg-black/45 p-4 text-white font-medium backdrop-blur-sm"
-    : "md:hidden mt-4 pt-4 border-t border-brand-200 space-y-3 text-brand-800 font-medium"
+    : "md:hidden mt-4 pt-4 border-t border-border-subtle space-y-3 text-content-secondary font-medium"
 
   const mobileLinkClasses = isTransparent
     ? "block py-2 transition hover:text-brand-100"
-    : "block py-2 transition hover:text-brand-900"
+    : "block py-2 transition hover:text-content-primary"
 
   const adminIconClasses = isTransparent
     ? "inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/40 bg-white/10 text-white transition hover:bg-white/20"
@@ -134,24 +134,24 @@ export default function Header() {
               Propiedades
             </Link>
 
-            <a
+            <ContactActionButton
               href={TEL_URL}
-              className="inline-flex items-center gap-2 bg-brand-700 text-white px-4 py-2 rounded-lg hover:bg-brand-800 transition"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-              </svg>
-              Llamar
-            </a>
+              variant="phone"
+              label="Llamar"
+              desktopLabel={CONTACT_PHONE_DISPLAY}
+              aria-label={`Llamar al ${CONTACT_PHONE_DISPLAY}`}
+              className="px-4 py-2 rounded-lg"
+              iconClassName="w-4 h-4"
+            />
 
-            <a
+            <ContactActionButton
               href={WHATSAPP_URL}
+              variant="whatsapp"
+              label="WhatsApp"
               target="_blank"
-              className="inline-flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition"
-            >
-              <WhatsAppIcon className="w-4 h-4" />
-              WhatsApp
-            </a>
+              className="px-4 py-2 rounded-lg"
+              iconClassName="w-4 h-4"
+            />
 
             {isAdmin && (
               <Link
@@ -186,24 +186,23 @@ export default function Header() {
               Propiedades
             </Link>
 
-            <a
+            <ContactActionButton
               href={TEL_URL}
-              className="inline-flex w-full items-center justify-center gap-2 bg-brand-700 text-white px-4 py-2 rounded-lg hover:bg-brand-800 transition"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-              </svg>
-              Llamar
-            </a>
+              variant="phone"
+              label="Llamar"
+              className="w-full px-4 py-2 rounded-lg"
+              iconClassName="w-4 h-4"
+              aria-label={`Llamar al ${CONTACT_PHONE_DISPLAY}`}
+            />
 
-            <a
+            <ContactActionButton
               href={WHATSAPP_URL}
+              variant="whatsapp"
+              label="WhatsApp"
               target="_blank"
-              className="inline-flex w-full items-center justify-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition"
-            >
-              <WhatsAppIcon className="w-4 h-4" />
-              WhatsApp
-            </a>
+              className="w-full px-4 py-2 rounded-lg"
+              iconClassName="w-4 h-4"
+            />
 
             {isAdmin && (
               <div className="pt-1 flex justify-center">

@@ -5,6 +5,57 @@ import { requireAdminUser } from "@/lib/admin-auth"
 import { jsonError, jsonSuccess } from "@/lib/api-response"
 import { createRouteSupabaseClient } from "@/lib/server-supabase"
 
+export async function PATCH(
+  req: NextRequest,
+  ctx: { params: { id: string } | Promise<{ id: string }> }
+) {
+  const { id } = (await ctx.params) as { id: string }
+  const serverSupabase = await createRouteSupabaseClient()
+  const guard = await requireAdminUser(serverSupabase)
+  if ("response" in guard) {
+    return guard.response
+  }
+
+  const adminSupabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return jsonError(
+      ADMIN_API_MESSAGES.SERVER_MISCONFIGURATION,
+      ADMIN_API_STATUS.INTERNAL_SERVER_ERROR
+    )
+  }
+
+  let payload: { highlighted?: boolean }
+  try {
+    payload = (await req.json()) as { highlighted?: boolean }
+  } catch {
+    return jsonError(ADMIN_API_MESSAGES.INVALID_REQUEST, ADMIN_API_STATUS.BAD_REQUEST)
+  }
+
+  if (typeof payload.highlighted !== "boolean") {
+    return jsonError(ADMIN_API_MESSAGES.INVALID_REQUEST, ADMIN_API_STATUS.BAD_REQUEST)
+  }
+
+  const { data, error } = await adminSupabase
+    .from("properties")
+    .update({ highlighted: payload.highlighted })
+    .eq("id", id)
+    .select("id, highlighted")
+
+  if (error) {
+    return jsonError(error.message, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR)
+  }
+
+  if (!data || data.length === 0) {
+    return jsonError(ADMIN_API_MESSAGES.PROPERTY_NOT_FOUND, ADMIN_API_STATUS.NOT_FOUND)
+  }
+
+  return jsonSuccess({ property: data[0] })
+}
+
 export async function DELETE(
   req: NextRequest,
   ctx: { params: { id: string } | Promise<{ id: string }> }

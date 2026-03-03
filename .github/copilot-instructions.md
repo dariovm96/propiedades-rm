@@ -82,6 +82,23 @@ Do not introduce new libraries unless explicitly requested.
 
 ---
 
+## Type Safety Pattern (REQUIRED)
+
+- For every new table/entity, create a dedicated type file in `/src/types` (e.g. `/src/types/property-highlight.ts`).
+- Define separate contracts for:
+  - read model (row shape),
+  - form/edit model (UI state),
+  - write payloads (insert/update),
+  - API request/response payloads used by routes and clients.
+- In Supabase reads, prefer `.returns<T>()` on queries instead of broad casting.
+- In form mappers (e.g. `toPropertyPayload`), return an explicit typed payload instead of inferred object literals.
+- For DB mutations, build typed payload variables first and pass those to `.insert()` / `.update()`.
+- Avoid `as` casts when a proper shared type can be introduced; keep any unavoidable cast local and minimal.
+- Keep data-layer types in `/src/types`; do not import data contracts from UI component files.
+- Use `docs/templates/entity-contract-template.md` as the default scaffold when adding a new table/entity.
+
+---
+
 ## API Response Rules
 
 - In route handlers, always use shared response helpers from `/lib/api-response.ts`.

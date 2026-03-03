@@ -2,7 +2,7 @@ import { Property } from "@/types/property"
 import PropertyCard from "./PropertyCard"
 
 type Props = {
-  properties: Property[]
+  properties: Array<Property & { highlights?: string[] }>
 }
 
 export default function PropertyGrid({ properties }: Props) {

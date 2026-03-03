@@ -13,3 +13,12 @@ export type Property = {
   contact_phone: string | null
   images: string[]
 }
+
+export type PropertyFormPayload = Pick<
+  Property,
+  "title" | "description" | "location_text" | "price" | "status" | "area_m2" | "highlighted" | "contact_phone"
+>
+
+export type PropertyInsertPayload = PropertyFormPayload & Pick<Property, "slug" | "images">
+
+export type PropertyUpdatePayload = PropertyFormPayload & Pick<Property, "images">

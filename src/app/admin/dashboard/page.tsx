@@ -18,12 +18,16 @@ export default function DashboardPage() {
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
+  const [highlightConfirmOpen, setHighlightConfirmOpen] = useState(false)
+  const [highlightTarget, setHighlightTarget] = useState<{ id: string; nextHighlighted: boolean } | null>(null)
+  const [highlightLoading, setHighlightLoading] = useState(false)
 
   useEffect(() => {
     const fetchProperties = async () => {
       const { data, error } = await supabase
         .from("properties")
         .select("*")
+        .returns<Property[]>()
         .order("created_at", { ascending: false })
 
       if (!data) {
@@ -81,6 +85,60 @@ export default function DashboardPage() {
     router.push("/admin/login")
   }
 
+  const requestHighlightToggle = (property: Property) => {
+    setHighlightTarget({
+      id: property.id,
+      nextHighlighted: !property.highlighted,
+    })
+    setHighlightConfirmOpen(true)
+  }
+
+  const handleToggleHighlight = async () => {
+    if (!highlightTarget) return
+
+    setHighlightLoading(true)
+    try {
+      const res = await fetch(`/admin/propiedades/${highlightTarget.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ highlighted: highlightTarget.nextHighlighted }),
+      })
+
+      if (res.redirected) {
+        toast.error("No autenticado. Por favor inicie sesión nuevamente.")
+        return
+      }
+
+      const contentType = res.headers.get("content-type") || ""
+      if (!res.ok || !contentType.includes("application/json")) {
+        const body = await res.json().catch(() => ({}))
+        toast.error(`No se pudo actualizar destacada: ${body.error || res.statusText}`)
+        return
+      }
+
+      setProperties((prev) =>
+        prev.map((property) =>
+          property.id === highlightTarget.id
+            ? { ...property, highlighted: highlightTarget.nextHighlighted }
+            : property
+        )
+      )
+
+      if (highlightTarget.nextHighlighted) {
+        toast.success("Propiedad destacada activada")
+      } else {
+        toast.success("Propiedad destacada desactivada")
+      }
+
+      setHighlightConfirmOpen(false)
+      setHighlightTarget(null)
+    } finally {
+      setHighlightLoading(false)
+    }
+  }
+
   if (loading) return <div className="p-10">Cargando...</div>
 
   return (
@@ -122,7 +180,7 @@ export default function DashboardPage() {
                 <th className="text-left p-3">Estado</th>
                 <th className="text-left p-3 hidden sm:table-cell">Teléfono</th>
                 <th className="text-left p-3">Precio</th>
-                <th className="text-left p-3">Destacada</th>
+                <th className="text-center p-3">Destacada</th>
                 <th className="text-left p-3">Acciones</th>
               </tr>
           </thead>
@@ -148,18 +206,42 @@ export default function DashboardPage() {
                 <td className="p-3">
                   {property.price ? `$${property.price.toLocaleString()}` : "—"}
                 </td>
-                <td className="p-3">
-                  {property.highlighted ? (
-                    <svg
-                      className="w-5 h-5 text-brand-500"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.96a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.374 2.455a1 1 0 00-.364 1.118l1.286 3.96c.3.921-.755 1.688-1.54 1.118l-3.374-2.455a1 1 0 00-1.176 0l-3.374 2.455c-.784.57-1.84-.197-1.54-1.118l1.286-3.96a1 1 0 00-.364-1.118L2.363 9.387c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.96z" />
-                    </svg>
-                  ) : (
-                    <span className="text-brand-muted">—</span>
-                  )}
+                <td className="p-3 text-center">
+                  {(() => {
+                    const isRowToggleLoading =
+                      highlightLoading && highlightTarget?.id === property.id
+
+                    return (
+                  <button
+                    type="button"
+                    onClick={() => requestHighlightToggle(property)}
+                    disabled={isRowToggleLoading}
+                    className="inline-flex items-center justify-center rounded p-1 hover:bg-brand-100 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                    aria-label={property.highlighted ? "Quitar destacada" : "Marcar como destacada"}
+                    title={property.highlighted ? "Quitar destacada" : "Marcar como destacada"}
+                  >
+                    {property.highlighted ? (
+                      <svg
+                        className="w-5 h-5 text-brand-500"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.96a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.374 2.455a1 1 0 00-.364 1.118l1.286 3.96c.3.921-.755 1.688-1.54 1.118l-3.374-2.455a1 1 0 00-1.176 0l-3.374 2.455c-.784.57-1.84-.197-1.54-1.118l1.286-3.96a1 1 0 00-.364-1.118L2.363 9.387c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.96z" />
+                      </svg>
+                    ) : (
+                      <svg
+                        className="w-5 h-5 text-brand-muted"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l2.01 6.18a1 1 0 00.95.69h6.497c.969 0 1.371 1.24.588 1.81l-5.255 3.818a1 1 0 00-.364 1.118l2.01 6.18c.3.921-.755 1.688-1.54 1.118l-5.255-3.818a1 1 0 00-1.176 0l-5.255 3.818c-.784.57-1.84-.197-1.54-1.118l2.01-6.18a1 1 0 00-.364-1.118L1.004 11.607c-.783-.57-.38-1.81.588-1.81h6.497a1 1 0 00.95-.69l2.01-6.18z" />
+                      </svg>
+                    )}
+                  </button>
+                    )
+                  })()}
                 </td>
 
                 <td className="p-3">
@@ -226,6 +308,25 @@ export default function DashboardPage() {
         onCancel={() => {
           setConfirmOpen(false)
           setDeleteId(null)
+        }}
+      />
+
+      <ConfirmDialog
+        open={highlightConfirmOpen}
+        title={highlightTarget?.nextHighlighted ? "Activar destacada" : "Desactivar destacada"}
+        message={
+          highlightTarget?.nextHighlighted
+            ? "¿Confirmas marcar esta propiedad como destacada?"
+            : "¿Confirmas quitar esta propiedad de destacadas?"
+        }
+        loading={highlightLoading}
+        confirmLabel={highlightTarget?.nextHighlighted ? "Activar" : "Desactivar"}
+        confirmIntent="primary"
+        onConfirm={handleToggleHighlight}
+        onCancel={() => {
+          if (highlightLoading) return
+          setHighlightConfirmOpen(false)
+          setHighlightTarget(null)
         }}
       />
     </div>

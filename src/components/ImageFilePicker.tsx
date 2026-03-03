@@ -4,6 +4,9 @@ import {
   IMAGE_ALLOWED_MIME_TYPES,
   IMAGE_MAX_SIZE_BYTES,
   IMAGE_MAX_SIZE_MB,
+  IMAGE_MIN_LONGEST_SIDE_PX,
+  IMAGE_RECOMMENDED_ASPECT_RATIOS,
+  IMAGE_RECOMMENDED_ASPECT_RATIO_TOLERANCE,
 } from "@/lib/constants"
 
 type ImageFilePickerProps = {
@@ -20,24 +23,78 @@ export default function ImageFilePicker({
   const [isDragging, setIsDragging] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const validateAndSelectFiles = (incomingFiles: File[]) => {
+  const formatFileList = (names: string[], max = 3) => {
+    if (names.length <= max) {
+      return names.join(", ")
+    }
+
+    const visible = names.slice(0, max).join(", ")
+    return `${visible} y ${names.length - max} más`
+  }
+
+  const getImageDimensions = (file: File) =>
+    new Promise<{ width: number; height: number }>((resolve, reject) => {
+      const objectUrl = URL.createObjectURL(file)
+      const image = new Image()
+
+      image.onload = () => {
+        const dimensions = { width: image.naturalWidth, height: image.naturalHeight }
+        URL.revokeObjectURL(objectUrl)
+        resolve(dimensions)
+      }
+
+      image.onerror = () => {
+        URL.revokeObjectURL(objectUrl)
+        reject(new Error(`No se pudo leer dimensiones de ${file.name}`))
+      }
+
+      image.src = objectUrl
+    })
+
+  const isRecommendedAspectRatio = (width: number, height: number) => {
+    const ratio = width / height
+    return IMAGE_RECOMMENDED_ASPECT_RATIOS.some(
+      (targetRatio) => Math.abs(ratio - targetRatio) <= IMAGE_RECOMMENDED_ASPECT_RATIO_TOLERANCE
+    )
+  }
+
+  const validateAndSelectFiles = async (incomingFiles: File[]) => {
     const invalidTypeFiles: string[] = []
     const oversizedFiles: string[] = []
+    const lowResolutionFiles: string[] = []
+    const nonRecommendedRatioFiles: string[] = []
+    const unreadableFiles: string[] = []
     const validFiles: File[] = []
 
-    incomingFiles.forEach((file) => {
+    for (const file of incomingFiles) {
       if (!IMAGE_ALLOWED_MIME_TYPES.includes(file.type as (typeof IMAGE_ALLOWED_MIME_TYPES)[number])) {
         invalidTypeFiles.push(file.name)
-        return
+        continue
       }
 
       if (file.size > IMAGE_MAX_SIZE_BYTES) {
         oversizedFiles.push(file.name)
-        return
+        continue
+      }
+
+      try {
+        const { width, height } = await getImageDimensions(file)
+        const longestSide = Math.max(width, height)
+
+        if (longestSide < IMAGE_MIN_LONGEST_SIDE_PX) {
+          lowResolutionFiles.push(file.name)
+        }
+
+        if (!isRecommendedAspectRatio(width, height)) {
+          nonRecommendedRatioFiles.push(file.name)
+        }
+      } catch {
+        unreadableFiles.push(file.name)
+        continue
       }
 
       validFiles.push(file)
-    })
+    }
 
     if (invalidTypeFiles.length > 0) {
       toast.error("Algunos archivos no son válidos. Solo se permiten JPG, PNG o WEBP.")
@@ -47,22 +104,38 @@ export default function ImageFilePicker({
       toast.error(`Algunas imágenes superan el límite de ${IMAGE_MAX_SIZE_MB}MB.`)
     }
 
+    if (lowResolutionFiles.length > 0) {
+      toast.warning(
+        `Calidad ideal no alcanzada en: ${formatFileList(lowResolutionFiles)} (lado mayor sugerido: ${IMAGE_MIN_LONGEST_SIDE_PX}px, puedes subirla igual).`
+      )
+    }
+
+    if (unreadableFiles.length > 0) {
+      toast.error("No se pudieron leer algunas imágenes para validación.")
+    }
+
+    if (nonRecommendedRatioFiles.length > 0) {
+      toast.warning(
+        `Proporción sugerida no cumplida en: ${formatFileList(nonRecommendedRatioFiles)}. Ideal: 4:3 o 3:2 (puedes subirla igual).`
+      )
+    }
+
     if (validFiles.length > 0) {
       onFilesSelected(validFiles)
     }
   }
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files) return
-    validateAndSelectFiles(Array.from(event.target.files))
+    await validateAndSelectFiles(Array.from(event.target.files))
     event.target.value = ""
   }
 
-  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+  const handleDrop = async (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault()
     setIsDragging(false)
 
-    validateAndSelectFiles(Array.from(event.dataTransfer.files))
+    await validateAndSelectFiles(Array.from(event.dataTransfer.files))
   }
 
   return (
@@ -108,6 +181,9 @@ export default function ImageFilePicker({
 
       <p className="text-xs text-brand-muted mt-2">
         Arrastra y suelta imágenes aquí o usa el botón para seleccionarlas.
+      </p>
+      <p className="text-xs text-brand-muted mt-1">
+        Calidad ideal: lado mayor entre {IMAGE_MIN_LONGEST_SIDE_PX} y 2600px, proporción 4:3 o 3:2. Es una recomendación, no bloquea la carga.
       </p>
       {helperText && <p className="text-xs text-brand-muted mt-1">{helperText}</p>}
     </div>

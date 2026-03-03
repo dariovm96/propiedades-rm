@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase"
 import { notFound } from "next/navigation"
 import EditPropertyForm from "./EditPropertyForm"
+import { Property } from "@/types/property"
 
 type Props = {
     params: Promise<{
@@ -14,6 +15,7 @@ export default async function EditPropertyPage({ params }: Props) {
     const { data, error } = await supabase
         .from("properties")
         .select("*")
+        .returns<Property[]>()
         .eq("id", id)
         .single()
 

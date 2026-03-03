@@ -17,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className="overflow-x-hidden scroll-smooth">
-      <body suppressHydrationWarning className="bg-brand-50 text-brand-900 min-h-screen flex flex-col overflow-x-hidden">
+      <body suppressHydrationWarning className="bg-surface-0 text-content-primary min-h-screen flex flex-col overflow-x-hidden">
         <RouteScrollReset />
         <Header />
 

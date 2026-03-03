@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect } from "react"
 import LoadingSpinner from "@/components/LoadingSpinner"
 
 interface ConfirmDialogProps {
@@ -7,6 +8,10 @@ interface ConfirmDialogProps {
   title?: string
   message: string
   loading?: boolean
+  cancelLabel?: string
+  confirmLabel?: string
+  confirmIntent?: "danger" | "primary"
+  confirmButtonClassName?: string
   onConfirm: () => void
   onCancel: () => void
 }
@@ -16,10 +21,34 @@ export default function ConfirmDialog({
   title = "¿Estás seguro?",
   message,
   loading = false,
+  cancelLabel = "Cancelar",
+  confirmLabel = "Eliminar",
+  confirmIntent = "danger",
+  confirmButtonClassName,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
+  useEffect(() => {
+    if (!open || loading) {
+      return
+    }
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onCancel()
+      }
+    }
+
+    window.addEventListener("keydown", handleEscape)
+    return () => {
+      window.removeEventListener("keydown", handleEscape)
+    }
+  }, [open, loading, onCancel])
+
   if (!open) return null
+
+  const intentClass =
+    confirmIntent === "primary" ? "bg-brand-700 hover:bg-brand-800" : "bg-red-600 hover:bg-red-700"
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -40,15 +69,17 @@ export default function ConfirmDialog({
             disabled={loading}
             className="px-4 py-2 rounded border border-brand-300 text-brand-700 hover:bg-brand-100 disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            Cancelar
+            {cancelLabel}
           </button>
           <button
             onClick={onConfirm}
             disabled={loading}
-            className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className={`px-4 py-2 rounded text-white disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${
+              confirmButtonClassName ?? intentClass
+            }`}
           >
             {loading && <LoadingSpinner size="sm" className="text-white" />}
-            Eliminar
+            {confirmLabel}
           </button>
         </div>
       </div>

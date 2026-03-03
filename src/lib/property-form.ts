@@ -1,4 +1,5 @@
 import type { PropertyStatus } from "@/lib/constants"
+import { PropertyFormPayload } from "@/types/property"
 
 export type PropertyFormValues = {
   title: string
@@ -11,7 +12,7 @@ export type PropertyFormValues = {
   contact_phone: string
 }
 
-export function toPropertyPayload(form: PropertyFormValues) {
+export function toPropertyPayload(form: PropertyFormValues): PropertyFormPayload {
   return {
     title: form.title,
     description: form.description || null,

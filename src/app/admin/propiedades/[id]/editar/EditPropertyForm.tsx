@@ -6,12 +6,17 @@ import { toast } from "sonner"
 import { supabase } from "@/lib/supabaseClient"
 import { uploadImages, deleteMultipleImages } from "@/lib/storage"
 import LoadingSpinner from "@/components/LoadingSpinner"
+import ConfirmDialog from "@/components/ConfirmDialog"
 import PropertyFormFields from "@/components/PropertyFormFields"
+import PropertyHighlightsFields from "@/components/PropertyHighlightsFields"
 import ImageFilePicker from "@/components/ImageFilePicker"
 import ImageWithLoader from "@/components/ImageWithLoader"
 import { Property } from "@/types/property"
 import { PropertyFormValues, toPropertyPayload } from "@/lib/property-form"
 import { getPublicImageUrl } from "@/lib/storage-helpers"
+import { fetchPropertyHighlights, syncPropertyHighlights } from "@/lib/property-highlights-client"
+import { EditablePropertyHighlight } from "@/types/property-highlight"
+import { PropertyUpdatePayload } from "@/types/property"
 
 type Props = {
   property: Property
@@ -39,6 +44,10 @@ export default function EditPropertyForm({ property }: Props) {
     property.images || []
   )
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([])
+  const [confirmRemoveImageOpen, setConfirmRemoveImageOpen] = useState(false)
+  const [imagePendingRemoval, setImagePendingRemoval] = useState<string | null>(null)
+  const [highlights, setHighlights] = useState<EditablePropertyHighlight[]>([])
+  const [initialHighlights, setInitialHighlights] = useState<EditablePropertyHighlight[]>([])
 
   useEffect(() => {
     previewUrlsRef.current = previewUrls
@@ -49,6 +58,36 @@ export default function EditPropertyForm({ property }: Props) {
       previewUrlsRef.current.forEach((url) => URL.revokeObjectURL(url))
     }
   }, [])
+
+  useEffect(() => {
+    let cancelled = false
+
+    const loadHighlights = async () => {
+      try {
+        const items = await fetchPropertyHighlights(property.id)
+        if (cancelled) {
+          return
+        }
+
+        const withFallback = items.length > 0 ? items : [{ text: "" }]
+        setHighlights(withFallback)
+        setInitialHighlights(withFallback)
+      } catch {
+        if (cancelled) {
+          return
+        }
+
+        setHighlights([{ text: "" }])
+        setInitialHighlights([])
+      }
+    }
+
+    loadHighlights()
+
+    return () => {
+      cancelled = true
+    }
+  }, [property.id])
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -89,8 +128,20 @@ export default function EditPropertyForm({ property }: Props) {
   }
 
   const handleRemoveImage = (imagePath: string) => {
+    setImagePendingRemoval(imagePath)
+    setConfirmRemoveImageOpen(true)
+  }
+
+  const confirmRemoveImage = () => {
+    if (!imagePendingRemoval) {
+      return
+    }
+
+    const imagePath = imagePendingRemoval
     setExistingImages((prev) => prev.filter((img) => img !== imagePath))
     setImagesToDelete((prev) => [...prev, imagePath])
+    setConfirmRemoveImageOpen(false)
+    setImagePendingRemoval(null)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -109,15 +160,19 @@ export default function EditPropertyForm({ property }: Props) {
         await deleteMultipleImages(imagesToDelete)
       }
 
+      const updatePayload: PropertyUpdatePayload = {
+        ...toPropertyPayload(form),
+        images: updatedImages,
+      }
+
       const { error } = await supabase
         .from("properties")
-        .update({
-          ...toPropertyPayload(form),
-          images: updatedImages,
-        })
+        .update(updatePayload)
         .eq("id", property.id)
 
       if (error) throw error
+
+      await syncPropertyHighlights(property.id, initialHighlights, highlights)
 
       toast.success("Propiedad actualizada correctamente")
       router.push("/admin/dashboard")
@@ -154,6 +209,8 @@ export default function EditPropertyForm({ property }: Props) {
           onChange={handleChange}
           onHighlightedChange={(checked) => setForm((prev) => ({ ...prev, highlighted: checked }))}
         />
+
+        <PropertyHighlightsFields items={highlights} onChange={setHighlights} disabled={loading} />
 
         {existingImages.length > 0 && (
           <div className="space-y-4">
@@ -236,6 +293,20 @@ export default function EditPropertyForm({ property }: Props) {
           </button>
         </div>
       </form>
+
+      <ConfirmDialog
+        open={confirmRemoveImageOpen}
+        title="Quitar imagen"
+        message="¿Deseas quitar esta imagen de la propiedad? El cambio se guardará al actualizar."
+        confirmLabel="Quitar imagen"
+        loading={loading}
+        onConfirm={confirmRemoveImage}
+        onCancel={() => {
+          if (loading) return
+          setConfirmRemoveImageOpen(false)
+          setImagePendingRemoval(null)
+        }}
+      />
     </div>
   )
 }

@@ -7,9 +7,13 @@ import { supabase } from "@/lib/supabaseClient"
 import { uploadImages } from "@/lib/storage"
 import LoadingSpinner from "@/components/LoadingSpinner"
 import PropertyFormFields from "@/components/PropertyFormFields"
+import PropertyHighlightsFields from "@/components/PropertyHighlightsFields"
 import ImageFilePicker from "@/components/ImageFilePicker"
 import ImageWithLoader from "@/components/ImageWithLoader"
 import { PropertyFormValues, toPropertyPayload } from "@/lib/property-form"
+import { createPropertyHighlights } from "@/lib/property-highlights-client"
+import { EditablePropertyHighlight } from "@/types/property-highlight"
+import { PropertyInsertPayload } from "@/types/property"
 
 function generateSlug(text: string) {
   return text
@@ -24,6 +28,7 @@ export default function NuevaPropiedadPage() {
   const [loading, setLoading] = useState(false)
   const [imagesFiles, setImagesFiles] = useState<File[]>([])
   const [previewUrls, setPreviewUrls] = useState<string[]>([])
+  const [highlights, setHighlights] = useState<EditablePropertyHighlight[]>([{ text: "" }])
   const previewUrlsRef = useRef<string[]>([])
 
   useEffect(() => {
@@ -98,15 +103,15 @@ export default function NuevaPropiedadPage() {
         return
       }
 
+      const insertPayload: PropertyInsertPayload = {
+        ...toPropertyPayload(form),
+        slug,
+        images: [],
+      }
+
       const { data: insertedData, error: insertError } = await supabase
         .from("properties")
-        .insert([
-          {
-            ...toPropertyPayload(form),
-            slug,
-            images: [],
-          },
-        ])
+        .insert([insertPayload])
         .select()
         .single()
 
@@ -122,10 +127,12 @@ export default function NuevaPropiedadPage() {
 
       const { error: updateError } = await supabase
         .from("properties")
-        .update({ images: imagePaths })
+        .update({ images: imagePaths } satisfies Pick<PropertyInsertPayload, "images">)
         .eq("id", propertyId)
 
       if (updateError) throw updateError
+
+      await createPropertyHighlights(propertyId, highlights)
 
       toast.success("Propiedad creada correctamente")
       router.push("/admin/dashboard")
@@ -162,6 +169,8 @@ export default function NuevaPropiedadPage() {
           onChange={handleChange}
           onHighlightedChange={(checked) => setForm((prev) => ({ ...prev, highlighted: checked }))}
         />
+
+        <PropertyHighlightsFields items={highlights} onChange={setHighlights} disabled={loading} />
 
         <div className="space-y-4">
           <h2 className="text-sm font-semibold text-brand-900">Imagenes</h2>
