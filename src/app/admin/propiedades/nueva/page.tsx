@@ -145,25 +145,25 @@ export default function NuevaPropiedadPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-12">
+    <div className="max-w-4xl mx-auto py-12 text-slate-900 dark:text-slate-100">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold">Nueva propiedad</h1>
-          <p className="text-sm text-brand-700">
+          <p className="text-sm text-brand-700 dark:text-slate-300">
             Completa la informacion basica y agrega imagenes para publicar.
           </p>
         </div>
         <button
           type="button"
           onClick={() => router.push("/admin/dashboard")}
-          className="inline-flex items-center gap-2 text-sm font-medium text-brand-700 bg-brand-100 hover:bg-brand-200 px-3 py-2 rounded-lg transition"
+          className="inline-flex items-center gap-2 text-sm font-medium text-brand-700 bg-brand-100 hover:bg-brand-200 px-3 py-2 rounded-lg transition dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
         >
           <span aria-hidden="true">←</span>
           Volver
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white border border-brand-200 rounded-xl shadow-sm p-6 sm:p-8 space-y-8">
+      <form onSubmit={handleSubmit} className="bg-white border border-brand-200 rounded-xl shadow-sm p-6 sm:p-8 space-y-8 dark:bg-slate-900 dark:border-slate-700">
         <PropertyFormFields
           form={form}
           onChange={handleChange}
@@ -173,7 +173,9 @@ export default function NuevaPropiedadPage() {
         <PropertyHighlightsFields items={highlights} onChange={setHighlights} disabled={loading} />
 
         <div className="space-y-4">
-          <h2 className="text-sm font-semibold text-brand-900">Imagenes</h2>
+          <h2 className="rounded-lg border border-brand-200 bg-brand-50/85 px-3 py-2 text-sm font-semibold text-brand-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
+            Imagenes
+          </h2>
           <ImageFilePicker
             selectedCount={imagesFiles.length}
             onFilesSelected={handleImagesSelected}

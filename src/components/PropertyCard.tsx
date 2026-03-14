@@ -14,7 +14,7 @@ export default function PropertyCard({ property }: Props) {
         property.images?.length
             ? getPublicImageUrl(property.images[0])
             : null
-    const catalogHighlights = property.highlights?.slice(0, 2) ?? []
+    const catalogHighlights = property.highlights?.slice(0, 3) ?? []
     const remainingHighlights = Math.max((property.highlights?.length ?? 0) - catalogHighlights.length, 0)
 
     return (

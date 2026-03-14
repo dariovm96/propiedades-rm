@@ -4,6 +4,12 @@ import Footer from "@/components/Footer"
 import ToasterProvider from "../components/ToasterProvider"
 import ScrollToTopButton from "@/components/ScrollToTopButton"
 import RouteScrollReset from "@/components/RouteScrollReset"
+import { Outfit } from "next/font/google"
+
+const outfit = Outfit({
+  subsets: ["latin"],
+  variable: "--font-outfit",
+})
 
 export const metadata = {
   title: "Propiedades RM",
@@ -17,7 +23,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className="overflow-x-hidden scroll-smooth">
-      <body suppressHydrationWarning className="bg-surface-0 text-content-primary min-h-screen flex flex-col overflow-x-hidden">
+      <body
+        suppressHydrationWarning
+        className={`${outfit.variable} bg-surface-0 text-content-primary min-h-screen flex flex-col overflow-x-hidden`}
+      >
         <RouteScrollReset />
         <Header />
 

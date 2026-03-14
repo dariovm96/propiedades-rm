@@ -8,6 +8,7 @@ import { FEATURED_HOME_VIDEO } from "@/config/featured-video"
 import HeroScrollIndicator from "@/components/HeroScrollIndicator"
 import HeroParallaxImage from "@/components/HeroParallaxImage"
 import ContactActionButton from "@/components/ContactActionButton"
+import ScrollRevealStagger from "@/components/ScrollRevealStagger"
 import { PropertyHighlight } from "@/types/property-highlight"
 
 type HighlightedProperty = {
@@ -28,10 +29,10 @@ async function getHighlightedProperties(): Promise<HighlightedProperty[]> {
   const { data, error } = await supabase
     .from("properties")
     .select("id,title,slug,price,area_m2,location_text,status,images")
-    .returns<Omit<HighlightedProperty, "highlights">[]>()
     .eq("highlighted", true)
     .order("created_at", { ascending: false })
     .limit(3)
+    .returns<Omit<HighlightedProperty, "highlights">[]>()
 
   if (error || !data) {
     return []
@@ -154,7 +155,7 @@ export default async function Home() {
           <section className="space-y-6 py-2 sm:space-y-8 sm:py-4">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-brand-600">Nuestra selección</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-brand-600 max-md:dark:text-sky-200">Nuestra selección</p>
                 <h2 className="text-2xl font-semibold text-content-primary sm:text-3xl">Propiedades destacadas</h2>
                 <p className="max-w-2xl text-sm text-content-secondary sm:text-base">
                   Una selección curada para visitar hoy, con información clara y contacto directo.
@@ -163,7 +164,7 @@ export default async function Home() {
 
               <Link
                 href="/propiedades"
-                className="inline-flex items-center gap-2 text-sm font-medium text-brand-700 transition hover:text-brand-800"
+                className="inline-flex items-center gap-2 text-sm font-medium text-brand-700 transition hover:text-brand-800 max-md:dark:text-sky-100 max-md:dark:hover:text-white"
               >
                 Ver todas las propiedades
                 <span aria-hidden="true">→</span>
@@ -173,7 +174,7 @@ export default async function Home() {
             <div className="grid auto-rows-fr gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
               {highlightedProperties.map((property) => {
                 const cover = property.images?.[0] ? getPublicImageUrl(property.images[0]) : null
-                const catalogHighlights = property.highlights.slice(0, 2)
+                const catalogHighlights = property.highlights.slice(0, 3)
                 const remainingHighlights = Math.max(property.highlights.length - catalogHighlights.length, 0)
 
                 return (
@@ -211,7 +212,7 @@ export default async function Home() {
                           <h3 className="line-clamp-2 min-h-[2.8rem] text-base font-semibold leading-tight text-content-primary sm:text-lg">
                             {property.title}
                           </h3>
-                          <p className="whitespace-nowrap text-sm font-bold text-brand-700 sm:text-base">
+                          <p className="whitespace-nowrap text-sm font-bold text-brand-700 sm:text-base max-md:dark:text-sky-100">
                             {property.price ? `$${property.price.toLocaleString()}` : "Precio a consultar"}
                           </p>
                         </div>
@@ -255,18 +256,25 @@ export default async function Home() {
           </section>
         )}
 
-        <section className="relative left-1/2 right-1/2 -mx-[50vw] w-screen bg-surface-1/65 py-12 sm:py-14">
+        <section className="relative left-1/2 right-1/2 -mx-[50vw] w-screen border-y border-[#A9C3EC] bg-[linear-gradient(180deg,#95B5E8_0%,#B7CCEF_18%,#DCE8FB_34%,#EEF4FF_50%,#DCE8FB_66%,#B7CCEF_82%,#95B5E8_100%)] py-12 sm:py-14 max-md:dark:border-border-subtle max-md:dark:bg-none max-md:dark:bg-surface-1">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <div className="space-y-10">
-            <div className="space-y-3 text-center">
-              <h2 className="text-2xl font-semibold text-content-primary sm:text-3xl">¿Por qué elegirnos?</h2>
-              <p className="text-sm text-content-secondary sm:text-base">
-                Te acompañamos en cada paso con un enfoque claro, cercano y confiable.
-              </p>
-            </div>
+            <ScrollRevealStagger className="space-y-10">
+              <div
+                className="featured-card-reveal-item space-y-3 text-center"
+                style={{ animationDelay: "280ms" }}
+              >
+                <h2 className="text-2xl font-semibold text-slate-900 sm:text-3xl max-md:dark:text-content-primary">¿Por qué elegirnos?</h2>
+                <p className="mx-auto max-w-2xl text-sm font-medium text-slate-800 sm:text-base max-md:dark:text-content-secondary">
+                  Te acompañamos en cada paso con un enfoque claro, cercano y confiable.
+                </p>
+              </div>
 
-            <div className="grid gap-5 sm:gap-6 md:grid-cols-3">
-              <article className="rounded-2xl border border-border-subtle bg-surface-0 p-5 text-center shadow-sm sm:p-6">
+              <div className="grid gap-5 sm:gap-6 md:grid-cols-3">
+                <article
+                  className="featured-card-reveal-item rounded-2xl border border-border-subtle bg-surface-0 p-5 text-center shadow-sm sm:p-6"
+                  style={{ animationDelay: "760ms", animationDuration: "1950ms" }}
+                >
                 <div className="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-brand-100 text-brand-700">
                   <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
                     <path d="M3 12l3 3 6-6 3 3 6-6" strokeLinecap="round" strokeLinejoin="round" />
@@ -276,9 +284,12 @@ export default async function Home() {
                 <p className="mt-2 text-sm leading-relaxed text-content-secondary">
                   Conectamos directamente con propietarios para una comunicación rápida y auténtica.
                 </p>
-              </article>
+                </article>
 
-              <article className="rounded-2xl border border-border-subtle bg-surface-0 p-5 text-center shadow-sm sm:p-6">
+                <article
+                  className="featured-card-reveal-item rounded-2xl border border-border-subtle bg-surface-0 p-5 text-center shadow-sm sm:p-6"
+                  style={{ animationDelay: "1080ms", animationDuration: "1950ms" }}
+                >
                 <div className="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-brand-100 text-brand-700">
                   <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
                     <path d="M12 6v6l4 2" strokeLinecap="round" strokeLinejoin="round" />
@@ -289,9 +300,12 @@ export default async function Home() {
                 <p className="mt-2 text-sm leading-relaxed text-content-secondary">
                   Resolvemos dudas con apoyo humano, claro y adaptado a tus necesidades reales.
                 </p>
-              </article>
+                </article>
 
-              <article className="rounded-2xl border border-border-subtle bg-surface-0 p-5 text-center shadow-sm sm:p-6">
+                <article
+                  className="featured-card-reveal-item rounded-2xl border border-border-subtle bg-surface-0 p-5 text-center shadow-sm sm:p-6"
+                  style={{ animationDelay: "1400ms", animationDuration: "1950ms" }}
+                >
                 <div className="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-brand-100 text-brand-700">
                   <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
                     <path d="M6 12h12" strokeLinecap="round" />
@@ -303,8 +317,9 @@ export default async function Home() {
                 <p className="mt-2 text-sm leading-relaxed text-content-secondary">
                   Presentamos información clara desde el inicio para que tomes decisiones con confianza.
                 </p>
-              </article>
-            </div>
+                </article>
+              </div>
+            </ScrollRevealStagger>
           </div>
           </div>
         </section>
@@ -312,7 +327,7 @@ export default async function Home() {
         <section className="py-10 sm:py-12">
           <div className="mx-auto max-w-6xl space-y-6">
             <div className="space-y-2 text-center sm:text-left">
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-brand-600">Propiedad top</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-brand-600 max-md:dark:text-sky-200">Propiedad top</p>
               <h2 className="text-2xl font-semibold text-content-primary sm:text-3xl">
                 {FEATURED_HOME_VIDEO.title}
               </h2>
@@ -335,10 +350,7 @@ export default async function Home() {
                 </video>
               </div>
 
-              <div className="flex flex-col gap-3 border-t border-border-subtle p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
-                <p className="text-xs text-content-secondary sm:text-sm">
-                  Video alojado en el sitio para asegurar disponibilidad y control de contenido.
-                </p>
+              <div className="flex border-t border-border-subtle p-4 sm:justify-end sm:p-5">
                 <Link
                   href={FEATURED_HOME_VIDEO.ctaHref}
                   className="inline-flex min-h-11 items-center justify-center rounded-lg bg-brand-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-800"

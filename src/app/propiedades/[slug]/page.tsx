@@ -10,6 +10,7 @@ import { getPublicImageUrl } from "@/lib/storage-helpers"
 import { PROPERTY_STATUS_BADGE_CLASSES, PROPERTY_STATUS_LABELS } from "@/lib/constants"
 import Link from "next/link"
 import { PropertyHighlight } from "@/types/property-highlight"
+import PropertyDetailTabs from "@/components/PropertyDetailTabs"
 
 type Props = {
     params: Promise<{
@@ -27,8 +28,8 @@ export default async function PropertyDetailPage({ params }: Props) {
     const { data, error } = await supabase
         .from("properties")
         .select("*")
-        .returns<Property[]>()
         .eq("slug", slug)
+        .returns<Property[]>()
         .single()
 
     if (error || !data) {
@@ -40,8 +41,8 @@ export default async function PropertyDetailPage({ params }: Props) {
     const { data: highlightsData } = await supabase
         .from("property_highlights")
         .select("*")
-        .returns<PropertyHighlight[]>()
         .eq("property_id", property.id)
+        .returns<PropertyHighlight[]>()
 
     const highlights = highlightsData ?? []
     const highlightTexts = highlights
@@ -65,113 +66,71 @@ export default async function PropertyDetailPage({ params }: Props) {
     const whatsappPhone = normalizedPhone.replace(/^\+/, "")
     const contactPhoneDisplay = contactPhone === CONTACT_PHONE ? CONTACT_PHONE_DISPLAY : phoneWithPrefix
     const formattedPrice = property.price ? `$${property.price.toLocaleString()}` : "Precio a consultar"
+    const areaLabel = property.area_m2 ? `${property.area_m2} m²` : "Superficie por confirmar"
 
      /* ==============================
          3. Render
      ============================== */
     return (
-        <section className="space-y-10 pt-8 sm:space-y-12 sm:pt-10">
-            <nav className="text-xs text-content-secondary sm:text-sm">
+        <section className="max-w-full space-y-10 pt-8 sm:space-y-12 sm:pt-10">
+            <nav className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-content-secondary sm:text-sm">
                 <Link href="/" className="hover:text-content-primary transition">Inicio</Link>
-                <span className="mx-2">/</span>
+                <span>/</span>
                 <Link href="/propiedades" className="hover:text-content-primary transition">Propiedades</Link>
-                <span className="mx-2">/</span>
-                <span className="text-content-primary font-medium">{property.title}</span>
+                <span>/</span>
+                <span className="break-words font-medium text-content-primary">{property.title}</span>
             </nav>
 
-            <PropertyGallery images={imageUrls} />
-
-            <header className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-start">
-                <div className="space-y-4">
-                    <span
-                        className={`inline-block rounded-full px-3 py-1 text-xs sm:text-sm ${PROPERTY_STATUS_BADGE_CLASSES[property.status]}`}
-                    >
-                        {PROPERTY_STATUS_LABELS[property.status]}
-                    </span>
-
-                    <h1 className="text-3xl font-bold leading-tight text-content-primary sm:text-4xl">
-                        {property.title}
-                    </h1>
-
-                    <p className="text-sm text-content-secondary sm:text-base">
-                        {property.location_text}
-                    </p>
-
-                    <div className="flex flex-wrap gap-2">
-                        {property.area_m2 && (
-                            <span className="rounded-full border border-border-subtle bg-surface-1 px-3 py-1 text-xs font-medium text-content-secondary sm:text-sm">
-                                {property.area_m2} m²
-                            </span>
-                        )}
-                        <span className="rounded-full border border-border-subtle bg-surface-1 px-3 py-1 text-xs font-medium text-content-secondary sm:text-sm">
-                            Publicación verificada
-                        </span>
-                    </div>
+            <section className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-stretch">
+                <div className="order-1 min-w-0 lg:order-2">
+                    <PropertyGallery images={imageUrls} />
                 </div>
 
-                <aside className="rounded-2xl border border-border-subtle bg-gradient-to-b from-surface-1 to-surface-0 p-4 shadow-sm sm:p-5 lg:min-w-[280px]">
-                    <p className="text-xs font-medium uppercase tracking-wide text-content-secondary">Precio de publicación</p>
-                    <p className="mt-1 text-2xl font-semibold text-brand-700 sm:text-3xl">
-                        {formattedPrice}
-                    </p>
-                    {property.area_m2 && (
-                        <p className="mt-2 text-sm text-content-secondary">{property.area_m2} m² construidos</p>
-                    )}
-                </aside>
-            </header>
+                <header className="order-2 flex min-w-0 flex-col gap-6 rounded-2xl border border-[#90AFDF] bg-[linear-gradient(180deg,#95B5E8_0%,#B7CCEF_18%,#DCE8FB_34%,#EEF4FF_50%,#DCE8FB_66%,#B7CCEF_82%,#95B5E8_100%)] p-4 shadow-md sm:gap-7 sm:p-6 lg:order-1 lg:h-full max-md:dark:border-border-subtle max-md:dark:bg-none max-md:dark:bg-surface-1">
+                    <div className="flex flex-wrap gap-2">
+                        <span className={`inline-block rounded-full px-3 py-1 text-xs sm:text-sm ${PROPERTY_STATUS_BADGE_CLASSES[property.status]}`}>
+                            {PROPERTY_STATUS_LABELS[property.status]}
+                        </span>
+                        <span className="inline-block rounded-full border border-white/80 bg-white/85 px-3 py-1 text-xs font-medium text-slate-700 sm:text-sm max-md:dark:border-slate-700 max-md:dark:bg-slate-800 max-md:dark:text-slate-200">
+                            Entrega inmediata
+                        </span>
+                    </div>
 
-            <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <article className="rounded-xl border border-border-subtle bg-surface-0 p-4 text-center">
-                    <p className="text-xs uppercase tracking-wide text-content-secondary">Estado</p>
-                    <p className="mt-1 text-sm font-semibold text-content-primary">{PROPERTY_STATUS_LABELS[property.status]}</p>
-                </article>
-                <article className="rounded-xl border border-border-subtle bg-surface-0 p-4 text-center">
-                    <p className="text-xs uppercase tracking-wide text-content-secondary">Superficie</p>
-                    <p className="mt-1 text-sm font-semibold text-content-primary">{property.area_m2 ? `${property.area_m2} m²` : "No informada"}</p>
-                </article>
-                <article className="rounded-xl border border-border-subtle bg-surface-0 p-4 text-center">
-                    <p className="text-xs uppercase tracking-wide text-content-secondary">Precio</p>
-                    <p className="mt-1 text-sm font-semibold text-content-primary">{formattedPrice}</p>
-                </article>
-                <article className="rounded-xl border border-border-subtle bg-surface-0 p-4 text-center">
-                    <p className="text-xs uppercase tracking-wide text-content-secondary">Contacto</p>
-                    <p className="mt-1 text-sm font-semibold text-content-primary">{contactPhoneDisplay}</p>
-                </article>
-            </section>
-
-            <section className="grid gap-8 lg:grid-cols-[1.25fr_0.75fr] lg:items-start">
-                {property.description && (
-                    <section className="space-y-3">
-                        <h2 className="text-lg font-semibold text-content-primary sm:text-xl">
-                            Descripción
-                        </h2>
-
-                        <p className="max-w-4xl whitespace-pre-line text-sm leading-relaxed text-content-secondary sm:text-base">
-                            {property.description}
+                    <div className="space-y-3">
+                        <h1 className="break-words text-2xl font-bold leading-tight text-[#0B2540] sm:text-4xl max-md:dark:text-slate-100">
+                            {property.title}
+                        </h1>
+                        <p className="text-sm font-medium text-slate-700 sm:text-base max-md:dark:text-slate-300">
+                            {property.location_text || "Ubicacion por confirmar"}
                         </p>
-                    </section>
-                )}
+                    </div>
 
-                {highlightTexts.length > 0 && (
-                    <aside className="space-y-3">
-                        <h2 className="text-lg font-semibold text-content-primary sm:text-xl">Detalles clave</h2>
-                        <div className="space-y-2">
-                            {highlightTexts.map((highlight, index) => (
-                                <div key={`${highlight}-${index}`} className="rounded-lg border border-border-subtle bg-surface-0 px-4 py-3 text-sm text-content-secondary">
-                                    {highlight}
-                                </div>
-                            ))}
-                        </div>
-                    </aside>
-                )}
+                    <div className="grid gap-3 sm:grid-cols-2 lg:mt-auto">
+                        <article className="rounded-xl border border-white/70 bg-white/65 p-4 backdrop-blur-[1px] max-md:dark:border-slate-700 max-md:dark:bg-slate-900/80">
+                            <p className="text-xs uppercase tracking-wide text-slate-600 max-md:dark:text-slate-300">Precio</p>
+                            <p className="mt-1 break-words text-xl font-semibold text-[#1E3A5F] sm:text-2xl max-md:dark:text-sky-200">{formattedPrice}</p>
+                        </article>
+
+                        <article className="rounded-xl border border-white/70 bg-white/65 p-4 backdrop-blur-[1px] max-md:dark:border-slate-700 max-md:dark:bg-slate-900/80">
+                            <p className="text-xs uppercase tracking-wide text-slate-600 max-md:dark:text-slate-300">Superficie</p>
+                            <p className="mt-1 break-words text-xl font-semibold text-slate-900 sm:text-2xl max-md:dark:text-slate-100">{areaLabel}</p>
+                        </article>
+                    </div>
+
+                </header>
             </section>
+
+            <PropertyDetailTabs
+                description={property.description}
+                highlights={highlightTexts}
+                locationText={property.location_text}
+            />
 
             <section className="rounded-2xl border border-border-subtle bg-gradient-to-b from-surface-0 to-surface-1/70 p-4 shadow-sm sm:p-6">
-                <div className="mb-4 space-y-1 text-center sm:text-left">
-                    <p className="text-xs font-medium uppercase tracking-wide text-content-secondary">
+                <div className="mb-6 text-center sm:mb-7">
+                    <p className="text-sm font-semibold uppercase tracking-[0.08em] text-content-secondary sm:text-base">
                         Contacto prioritario
                     </p>
-                    <p className="text-base font-semibold text-content-primary sm:text-lg">{contactPhoneDisplay}</p>
                 </div>
 
                 <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">

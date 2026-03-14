@@ -13,6 +13,9 @@ export default function DashboardPage() {
   const router = useRouter()
   const [properties, setProperties] = useState<Property[]>([])
   const [loading, setLoading] = useState(true)
+  const [currentPage, setCurrentPage] = useState(1)
+
+  const ITEMS_PER_PAGE = 5
 
   // modal helpers
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -72,7 +75,12 @@ export default function DashboardPage() {
       }
 
       // update UI only after backend confirms deletion
-      setProperties((prev) => prev.filter((p) => p.id !== id))
+      setProperties((prev) => {
+        const next = prev.filter((p) => p.id !== id)
+        const nextTotalPages = Math.max(1, Math.ceil(next.length / ITEMS_PER_PAGE))
+        setCurrentPage((page) => Math.min(page, nextTotalPages))
+        return next
+      })
       setConfirmOpen(false)
       setDeleteId(null)
     } finally {
@@ -139,21 +147,30 @@ export default function DashboardPage() {
     }
   }
 
-  if (loading) return <div className="p-10">Cargando...</div>
+  if (loading) return <div className="p-10 text-slate-900 dark:text-slate-100">Cargando...</div>
+
+  const totalPages = Math.max(1, Math.ceil(properties.length / ITEMS_PER_PAGE))
+  const pageNumbers = Array.from({ length: totalPages }, (_, index) => index + 1)
+  const paginatedProperties = properties.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  )
 
   return (
-    <div className="max-w-6xl mx-auto py-12 space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-        <span className="inline-flex items-center gap-2 text-sm font-semibold bg-brand-100 text-brand-700 px-3 py-1 rounded-full">
-          <span className="w-2 h-2 rounded-full bg-green-500" aria-hidden="true" />
-          {properties.length} {properties.length === 1 ? "propiedad" : "propiedades"}
-        </span>
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-6 text-slate-900 dark:text-slate-100">
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+          <span className="inline-flex items-center gap-2 text-sm font-semibold bg-brand-100 text-brand-700 px-3 py-1 rounded-full dark:bg-slate-800 dark:text-slate-100">
+            <span className="w-2 h-2 rounded-full bg-green-500" aria-hidden="true" />
+            {properties.length} {properties.length === 1 ? "propiedad" : "propiedades"}
+          </span>
+        </div>
 
-        <div className="flex gap-4">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 w-full sm:w-auto">
           <Link
             href="/admin/propiedades/nueva"
-            className="inline-flex items-center gap-2 bg-brand-700 text-white px-4 py-2 rounded hover:bg-brand-800 transition"
+            className="inline-flex items-center justify-center gap-2 bg-brand-700 text-white px-4 py-2 rounded hover:bg-brand-800 transition"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -170,9 +187,10 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="border border-brand-200 rounded-lg overflow-hidden shadow-sm bg-white">
-        <table className="w-full text-sm divide-y divide-brand-200">
-          <thead className="bg-brand-100 text-brand-900">
+      <div className="border border-brand-200 rounded-lg overflow-hidden shadow-sm bg-white dark:bg-slate-900 dark:border-slate-700">
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[960px] text-sm divide-y divide-brand-200 dark:divide-slate-700">
+          <thead className="bg-[#25394A] text-white dark:bg-[#25394A] dark:text-slate-100">
             <tr>
                 <th className="text-left p-3">Título</th>
                 <th className="text-left p-3 hidden sm:table-cell">Área (m²)</th>
@@ -186,8 +204,8 @@ export default function DashboardPage() {
           </thead>
 
           <tbody>
-            {properties.map((property) => (
-              <tr key={property.id} className="hover:bg-brand-50">
+            {paginatedProperties.map((property) => (
+              <tr key={property.id} className="odd:bg-white even:bg-brand-100/45 hover:bg-brand-200/35 dark:odd:bg-slate-900 dark:even:bg-slate-800/32 dark:hover:bg-slate-700/52">
                 <td className="p-3">{property.title}</td>
                 <td className="p-3 hidden sm:table-cell">
                   {property.area_m2 ? property.area_m2.toLocaleString() : "—"}
@@ -216,7 +234,7 @@ export default function DashboardPage() {
                     type="button"
                     onClick={() => requestHighlightToggle(property)}
                     disabled={isRowToggleLoading}
-                    className="inline-flex items-center justify-center rounded p-1 hover:bg-brand-100 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="inline-flex items-center justify-center rounded p-1 hover:bg-brand-100 dark:hover:bg-slate-700 transition disabled:opacity-60 disabled:cursor-not-allowed"
                     aria-label={property.highlighted ? "Quitar destacada" : "Marcar como destacada"}
                     title={property.highlighted ? "Quitar destacada" : "Marcar como destacada"}
                   >
@@ -230,7 +248,7 @@ export default function DashboardPage() {
                       </svg>
                     ) : (
                       <svg
-                        className="w-5 h-5 text-brand-muted"
+                        className="w-5 h-5 text-brand-muted dark:text-slate-300"
                         fill="none"
                         stroke="currentColor"
                         strokeWidth="1.8"
@@ -245,11 +263,11 @@ export default function DashboardPage() {
                 </td>
 
                 <td className="p-3">
-                  <div className="flex gap-2">
+                  <div className="flex flex-nowrap gap-2">
                     {property.slug && (
                       <Link
                         href={`/propiedades/${property.slug}`}
-                        className="inline-flex items-center gap-1 bg-brand-100 text-brand-700 hover:bg-brand-200 px-3 py-2 rounded-lg transition border border-brand-300"
+                        className="inline-flex items-center gap-1 rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-sky-700 transition hover:bg-sky-100 dark:border-sky-800 dark:bg-sky-950/40 dark:text-sky-300 dark:hover:bg-sky-900/50"
                         title="Ver propiedad"
                         aria-label={`Ver ${property.title}`}
                       >
@@ -263,7 +281,7 @@ export default function DashboardPage() {
 
                     <Link
                       href={`/admin/propiedades/${property.id}/editar`}
-                      className="inline-flex items-center gap-1 bg-brand-100 text-brand-700 hover:bg-brand-200 px-3 py-2 rounded-lg transition border border-brand-300"
+                      className="inline-flex items-center gap-1 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-amber-700 transition hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300 dark:hover:bg-amber-900/50"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -276,7 +294,7 @@ export default function DashboardPage() {
                         setDeleteId(property.id)
                         setConfirmOpen(true)
                       }}
-                      className="inline-flex items-center gap-1 bg-red-50 text-red-600 hover:bg-red-100 px-3 py-2 rounded-lg transition border border-red-200"
+                      className="inline-flex items-center gap-1 bg-red-50 text-red-600 hover:bg-red-100 px-3 py-2 rounded-lg transition border border-red-200 dark:bg-red-950/40 dark:text-red-300 dark:hover:bg-red-900/50 dark:border-red-800"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -290,14 +308,65 @@ export default function DashboardPage() {
 
             {properties.length === 0 && (
               <tr>
-                <td colSpan={5} className="p-6 text-center text-brand-muted">
+                <td colSpan={8} className="p-6 text-center text-brand-muted dark:text-slate-300">
                   No hay propiedades aún
                 </td>
               </tr>
             )}
           </tbody>
         </table>
+        </div>
       </div>
+
+      {properties.length > 0 && (
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <p className="text-sm text-brand-muted dark:text-slate-300">
+            Página {currentPage} de {totalPages}
+          </p>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+              disabled={currentPage === 1}
+              className="px-3 py-2 rounded border border-brand-300 text-brand-700 bg-white hover:bg-brand-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-slate-800 dark:text-slate-100 dark:border-slate-600 dark:hover:bg-slate-700"
+            >
+              Anterior
+            </button>
+
+            <div className="flex items-center gap-1">
+              {pageNumbers.map((pageNumber) => {
+                const isActive = pageNumber === currentPage
+
+                return (
+                  <button
+                    key={pageNumber}
+                    type="button"
+                    onClick={() => setCurrentPage(pageNumber)}
+                    aria-current={isActive ? "page" : undefined}
+                    className={`min-w-9 px-3 py-2 rounded border transition ${
+                      isActive
+                        ? "bg-brand-700 text-white border-brand-700"
+                        : "bg-white text-brand-700 border-brand-300 hover:bg-brand-50 dark:bg-slate-800 dark:text-slate-100 dark:border-slate-600 dark:hover:bg-slate-700"
+                    }`}
+                  >
+                    {pageNumber}
+                  </button>
+                )
+              })}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+              disabled={currentPage === totalPages}
+              className="px-3 py-2 rounded border border-brand-300 text-brand-700 bg-white hover:bg-brand-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-slate-800 dark:text-slate-100 dark:border-slate-600 dark:hover:bg-slate-700"
+            >
+              Siguiente
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* confirmation dialog */}
       <ConfirmDialog

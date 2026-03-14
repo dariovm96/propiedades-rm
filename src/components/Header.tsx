@@ -56,35 +56,42 @@ export default function Header() {
 
   const headerClasses = isTransparent
     ? "border-transparent bg-transparent shadow-none"
-    : "border-b border-border-subtle bg-surface-1/95 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-surface-1/90"
+    : "border-b border-[#10324D] bg-[#081F32]/92 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-[#081F32]/88 max-md:dark:border-border-subtle max-md:dark:bg-surface-1/95 max-md:dark:supports-[backdrop-filter]:bg-surface-1/85"
 
   const logoClasses = isTransparent
     ? "text-white drop-shadow-sm"
-    : "text-content-primary"
+    : "text-white drop-shadow-sm"
 
   const menuButtonClasses = isTransparent
     ? "md:hidden rounded-lg p-2 text-white transition hover:bg-white/15"
-    : "md:hidden rounded-lg p-2 transition hover:bg-surface-2"
+    : "md:hidden rounded-lg p-2 text-white transition hover:bg-white/15"
 
   const desktopNavClasses = isTransparent
     ? "hidden md:flex items-center gap-6 text-sm font-medium text-white"
-    : "hidden md:flex items-center gap-6 text-sm font-medium text-content-secondary"
+    : "hidden md:flex items-center gap-6 text-sm font-semibold text-slate-100"
 
   const desktopLinkClasses = isTransparent
     ? "drop-shadow-sm transition hover:text-brand-100"
-    : "transition hover:text-content-primary"
+    : "transition hover:text-sky-200"
 
   const mobileNavClasses = isTransparent
     ? "md:hidden mt-4 space-y-3 rounded-xl border border-white/20 bg-black/45 p-4 text-white font-medium backdrop-blur-sm"
-    : "md:hidden mt-4 pt-4 border-t border-border-subtle space-y-3 text-content-secondary font-medium"
+    : "md:hidden mt-4 pt-4 border-t border-white/20 space-y-3 text-white font-semibold max-md:dark:border-border-subtle max-md:dark:text-white"
 
   const mobileLinkClasses = isTransparent
-    ? "block py-2 transition hover:text-brand-100"
-    : "block py-2 transition hover:text-content-primary"
+    ? "block py-2 text-white transition hover:text-brand-100"
+    : "block py-2 text-white transition hover:text-sky-200 max-md:dark:text-white max-md:dark:hover:text-sky-200"
 
-  const adminIconClasses = isTransparent
-    ? "inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/40 bg-white/10 text-white transition hover:bg-white/20"
-    : "inline-flex h-9 w-9 items-center justify-center rounded-lg bg-brand-700 text-white transition hover:bg-brand-800"
+  const phoneHeaderButtonClasses = "px-4 py-2 rounded-lg"
+
+  const whatsappHeaderButtonClasses = "px-4 py-2 rounded-lg"
+
+  const mobilePhoneHeaderButtonClasses = "w-full px-4 py-2 rounded-lg"
+
+  const mobileWhatsappHeaderButtonClasses = "w-full px-4 py-2 rounded-lg"
+
+  const adminIconClasses =
+    "inline-flex min-h-9 items-center justify-center gap-2 rounded-lg border border-white/40 bg-white/10 px-3 text-white transition hover:bg-white/20"
 
   return (
     <header className={`fixed top-0 z-50 w-full transition-colors duration-300 ${headerClasses}`}>
@@ -140,7 +147,7 @@ export default function Header() {
               label="Llamar"
               desktopLabel={CONTACT_PHONE_DISPLAY}
               aria-label={`Llamar al ${CONTACT_PHONE_DISPLAY}`}
-              className="px-4 py-2 rounded-lg"
+              className={phoneHeaderButtonClasses}
               iconClassName="w-4 h-4"
             />
 
@@ -149,7 +156,7 @@ export default function Header() {
               variant="whatsapp"
               label="WhatsApp"
               target="_blank"
-              className="px-4 py-2 rounded-lg"
+              className={whatsappHeaderButtonClasses}
               iconClassName="w-4 h-4"
             />
 
@@ -162,6 +169,7 @@ export default function Header() {
                 <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5.121 17.804A9.01 9.01 0 0112 15a9.01 9.01 0 016.879 2.804M15 8a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
+                <span className="text-sm font-semibold">Panel</span>
               </Link>
             )}
           </nav>
@@ -190,7 +198,7 @@ export default function Header() {
               href={TEL_URL}
               variant="phone"
               label="Llamar"
-              className="w-full px-4 py-2 rounded-lg"
+              className={mobilePhoneHeaderButtonClasses}
               iconClassName="w-4 h-4"
               aria-label={`Llamar al ${CONTACT_PHONE_DISPLAY}`}
             />
@@ -200,7 +208,7 @@ export default function Header() {
               variant="whatsapp"
               label="WhatsApp"
               target="_blank"
-              className="w-full px-4 py-2 rounded-lg"
+              className={mobileWhatsappHeaderButtonClasses}
               iconClassName="w-4 h-4"
             />
 
@@ -215,6 +223,7 @@ export default function Header() {
                   <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5.121 17.804A9.01 9.01 0 0112 15a9.01 9.01 0 016.879 2.804M15 8a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
+                  <span className="text-sm font-semibold">Panel</span>
                 </Link>
               </div>
             )}

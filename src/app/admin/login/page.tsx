@@ -50,13 +50,13 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="max-w-md mx-auto py-20 space-y-4">
+    <div className="max-w-md mx-auto py-20 space-y-4 text-slate-900 dark:text-slate-100">
       <h1 className="text-2xl font-bold">Admin Login</h1>
 
       <input
         type="email"
         placeholder="Email"
-        className="w-full border border-brand-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-brand-200"
+        className="w-full border border-brand-300 p-2 rounded bg-white text-brand-900 placeholder:text-brand-muted focus:outline-none focus:ring-2 focus:ring-brand-200 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-400 dark:border-slate-600 dark:focus:ring-slate-500/40"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
@@ -64,7 +64,7 @@ export default function LoginPage() {
       <input
         type="password"
         placeholder="Password"
-        className="w-full border border-brand-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-brand-200"
+        className="w-full border border-brand-300 p-2 rounded bg-white text-brand-900 placeholder:text-brand-muted focus:outline-none focus:ring-2 focus:ring-brand-200 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-400 dark:border-slate-600 dark:focus:ring-slate-500/40"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         onKeyDown={(e) => {

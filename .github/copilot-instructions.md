@@ -69,6 +69,7 @@ Do not introduce new libraries unless explicitly requested.
 - Avoid fixed widths unless necessary.
 - Ensure touch-friendly UI elements.
 - Prevent horizontal scrolling on mobile.
+- For every frontend layout change, verify behavior at 360px and 390px widths (no clipped content, no overlap, no horizontal scroll, and readable touch targets).
 
 ---
 

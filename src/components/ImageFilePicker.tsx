@@ -140,7 +140,7 @@ export default function ImageFilePicker({
 
   return (
     <div
-      className={`border border-brand-300 border-dashed rounded-lg p-4 transition ${isDragging ? "border-brand-700 bg-brand-100" : ""}`}
+      className={`border border-brand-300 border-dashed rounded-lg p-4 transition dark:border-slate-600 dark:bg-slate-900/40 ${isDragging ? "border-brand-700 bg-brand-100 dark:border-slate-400 dark:bg-slate-800" : ""}`}
       onDragOver={(event) => {
         event.preventDefault()
         setIsDragging(true)
@@ -172,20 +172,20 @@ export default function ImageFilePicker({
             className="sr-only"
           />
         </label>
-        <span className="text-xs text-brand-muted">
+        <span className="text-xs text-brand-muted dark:text-slate-400">
           {selectedCount > 0
             ? `${selectedCount} archivo(s) seleccionado(s)`
             : "Ningun archivo seleccionado"}
         </span>
       </div>
 
-      <p className="text-xs text-brand-muted mt-2">
+      <p className="text-xs text-brand-muted dark:text-slate-400 mt-2">
         Arrastra y suelta imágenes aquí o usa el botón para seleccionarlas.
       </p>
-      <p className="text-xs text-brand-muted mt-1">
+      <p className="text-xs text-brand-muted dark:text-slate-400 mt-1">
         Calidad ideal: lado mayor entre {IMAGE_MIN_LONGEST_SIDE_PX} y 2600px, proporción 4:3 o 3:2. Es una recomendación, no bloquea la carga.
       </p>
-      {helperText && <p className="text-xs text-brand-muted mt-1">{helperText}</p>}
+      {helperText && <p className="text-xs text-brand-muted dark:text-slate-400 mt-1">{helperText}</p>}
     </div>
   )
 }
