@@ -3,7 +3,7 @@ import Link from "next/link"
 import { supabase } from "@/lib/supabase"
 import { getPublicImageUrl } from "@/lib/storage-helpers"
 import { PROPERTY_STATUS_LABELS } from "@/lib/constants"
-import { CONTACT_PHONE_DISPLAY, TEL_URL, WHATSAPP_URL } from "@/config/contact"
+import { ATTENTION_HOURS_LABEL, CONTACT_PHONE_DISPLAY, TEL_URL, WHATSAPP_URL } from "@/config/contact"
 import { FEATURED_HOME_VIDEO } from "@/config/featured-video"
 import HeroScrollIndicator from "@/components/HeroScrollIndicator"
 import HeroParallaxImage from "@/components/HeroParallaxImage"
@@ -120,6 +120,7 @@ export default async function Home() {
                       <span className="md:hidden">Llamar ahora</span>
                       <span className="hidden md:inline">{CONTACT_PHONE_DISPLAY}</span>
                     </span>
+                    <span className="mt-1 text-[11px] text-white/80 sm:text-xs">{ATTENTION_HOURS_LABEL}</span>
                   </a>
 
                   <div className="flex flex-col gap-3 sm:flex-row sm:justify-center md:justify-start">
@@ -399,6 +400,8 @@ export default async function Home() {
                 iconClassName="h-4 w-4"
               />
             </div>
+
+            <p className="text-xs text-content-secondary sm:text-sm">{ATTENTION_HOURS_LABEL}</p>
 
           </div>
         </section>

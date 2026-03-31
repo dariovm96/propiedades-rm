@@ -5,7 +5,7 @@ import { notFound } from "next/navigation"
 import { Property } from "@/types/property"
 import PropertyGallery from "@/components/PropertyGallery"
 import ContactActionButton from "@/components/ContactActionButton"
-import { CONTACT_PHONE, CONTACT_PHONE_DISPLAY } from "@/config/contact"
+import { ATTENTION_HOURS_LABEL, CONTACT_PHONE, CONTACT_PHONE_DISPLAY } from "@/config/contact"
 import { getPublicImageUrl } from "@/lib/storage-helpers"
 import { PROPERTY_STATUS_BADGE_CLASSES, PROPERTY_STATUS_LABELS } from "@/lib/constants"
 import Link from "next/link"
@@ -130,6 +130,9 @@ export default async function PropertyDetailPage({ params }: Props) {
                 <div className="mb-6 text-center sm:mb-7">
                     <p className="text-sm font-semibold uppercase tracking-[0.08em] text-content-secondary sm:text-base">
                         Contacto prioritario
+                    </p>
+                    <p className="mt-2 text-xs text-content-secondary sm:text-sm">
+                        {ATTENTION_HOURS_LABEL}
                     </p>
                 </div>
 
