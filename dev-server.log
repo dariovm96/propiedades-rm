@@ -1,0 +1,16 @@
+
+> propiedades-rm@0.1.0 dev
+> next dev --webpack
+
+▲ Next.js 16.1.6 (webpack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.100.6:3000
+- Environments: .env.local
+
+✓ Starting...
+✓ Ready in 1414ms
+○ Compiling / ...
+ GET / 200 in 4.5s (compile: 3.2s, render: 1257ms)
+ GET /robots.txt 200 in 732ms (compile: 721ms, render: 11ms)
+ GET /sitemap.xml 200 in 420ms (compile: 179ms, render: 241ms)
+[?25h

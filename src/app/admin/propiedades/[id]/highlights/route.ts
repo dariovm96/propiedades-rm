@@ -12,9 +12,10 @@ import {
   PropertyHighlightUpdateRequest,
 } from "@/types/property-highlight"
 
-type RouteCtx = { params: { id: string } | Promise<{ id: string }> }
+type RouteCtx = { params: Promise<{ id: string }> }
 
 type JsonObject = Record<string, unknown>
+type AdminSupabaseClient = NonNullable<ReturnType<typeof getServiceRoleSupabase>>
 
 function getServiceRoleSupabase() {
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
@@ -62,7 +63,7 @@ function buildHighlightPayloadVariants(
 }
 
 async function tryInsertHighlightVariants(
-  adminSupabase: any,
+  adminSupabase: AdminSupabaseClient,
   variants: JsonObject[]
 ) {
   let lastErrorMessage: string = ADMIN_API_MESSAGES.INVALID_HIGHLIGHT
@@ -85,7 +86,7 @@ async function tryInsertHighlightVariants(
 }
 
 async function tryUpdateHighlightVariants(
-  adminSupabase: any,
+  adminSupabase: AdminSupabaseClient,
   propertyId: string,
   highlightId: string,
   variants: JsonObject[]
@@ -140,7 +141,7 @@ async function requireAdminRouteAccess() {
 }
 
 export async function GET(_req: NextRequest, ctx: RouteCtx) {
-  const { id: propertyId } = (await ctx.params) as { id: string }
+  const { id: propertyId } = await ctx.params
   const access = await requireAdminRouteAccess()
   if ("errorResponse" in access) {
     return access.errorResponse
@@ -160,7 +161,7 @@ export async function GET(_req: NextRequest, ctx: RouteCtx) {
 }
 
 export async function POST(req: NextRequest, ctx: RouteCtx) {
-  const { id: propertyId } = (await ctx.params) as { id: string }
+  const { id: propertyId } = await ctx.params
   const access = await requireAdminRouteAccess()
   if ("errorResponse" in access) {
     return access.errorResponse
@@ -200,7 +201,7 @@ export async function POST(req: NextRequest, ctx: RouteCtx) {
 }
 
 export async function PATCH(req: NextRequest, ctx: RouteCtx) {
-  const { id: propertyId } = (await ctx.params) as { id: string }
+  const { id: propertyId } = await ctx.params
   const access = await requireAdminRouteAccess()
   if ("errorResponse" in access) {
     return access.errorResponse
@@ -276,7 +277,7 @@ export async function PATCH(req: NextRequest, ctx: RouteCtx) {
 }
 
 export async function DELETE(req: NextRequest, ctx: RouteCtx) {
-  const { id: propertyId } = (await ctx.params) as { id: string }
+  const { id: propertyId } = await ctx.params
   const access = await requireAdminRouteAccess()
   if ("errorResponse" in access) {
     return access.errorResponse

@@ -8,12 +8,18 @@ type PropertyFormFieldsProps = {
   form: PropertyFormValues
   onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void
   onHighlightedChange: (checked: boolean) => void
+  onOperationChange: (name: "for_sale" | "for_rent", checked: boolean) => void
+  fieldErrors?: Partial<
+    Record<"property_type" | "operation" | "region_slug" | "commune_slug" | "street" | "street_number" | "latitude" | "longitude", string>
+  >
 }
 
 export default function PropertyFormFields({
   form,
   onChange,
   onHighlightedChange,
+  onOperationChange,
+  fieldErrors,
 }: PropertyFormFieldsProps) {
   return (
     <>
@@ -147,6 +153,153 @@ export default function PropertyFormFields({
           />
           Destacar propiedad
         </label>
+
+        <div className="space-y-4">
+          <h3 className="rounded-lg border border-brand-200 bg-brand-50/85 px-3 py-2 text-sm font-semibold text-brand-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
+            Dirección
+          </h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="flex flex-col gap-2">
+              <label htmlFor="property_type" className="text-sm font-medium text-brand-700 dark:text-slate-200">
+                Tipo de propiedad
+              </label>
+              <select
+                id="property_type"
+                name="property_type"
+                className="border border-brand-300 p-3 rounded h-12 bg-white text-brand-900 focus:outline-none focus:ring-2 focus:ring-brand-200 dark:bg-slate-900 dark:text-slate-100 dark:border-slate-600 dark:focus:ring-slate-500/40"
+                value={form.property_type}
+                onChange={onChange}
+              >
+                <option value="">Selecciona un tipo</option>
+                <option value="departamento">Departamento</option>
+                <option value="casa">Casa</option>
+                <option value="terreno">Terreno</option>
+                <option value="local-comercial">Local comercial</option>
+              </select>
+              {fieldErrors?.property_type && <p className="text-xs text-red-600 dark:text-red-300">{fieldErrors.property_type}</p>}
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <span className="text-sm font-medium text-brand-700 dark:text-slate-200">Operación</span>
+              <div className="flex flex-wrap gap-4">
+                <label className="inline-flex items-center gap-2 text-sm text-brand-700 dark:text-slate-200">
+                  <input
+                    type="checkbox"
+                    checked={form.for_sale}
+                    onChange={(event) => onOperationChange("for_sale", event.target.checked)}
+                    className="accent-brand-700"
+                  />
+                  Venta
+                </label>
+                <label className="inline-flex items-center gap-2 text-sm text-brand-700 dark:text-slate-200">
+                  <input
+                    type="checkbox"
+                    checked={form.for_rent}
+                    onChange={(event) => onOperationChange("for_rent", event.target.checked)}
+                    className="accent-brand-700"
+                  />
+                  Arriendo
+                </label>
+              </div>
+              {fieldErrors?.operation && <p className="text-xs text-red-600 dark:text-red-300">{fieldErrors.operation}</p>}
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label htmlFor="region" className="text-sm font-medium text-brand-700 dark:text-slate-200">
+                Región
+              </label>
+              <input
+                id="region"
+                name="region"
+                placeholder="Ej: Metropolitana de Santiago"
+                className="border border-brand-300 p-3 rounded h-12 bg-white text-brand-900 placeholder:text-brand-muted focus:outline-none focus:ring-2 focus:ring-brand-200 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-400 dark:border-slate-600 dark:focus:ring-slate-500/40"
+                value={form.region}
+                onChange={onChange}
+              />
+              {fieldErrors?.region_slug && <p className="text-xs text-red-600 dark:text-red-300">{fieldErrors.region_slug}</p>}
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label htmlFor="commune" className="text-sm font-medium text-brand-700 dark:text-slate-200">
+                Comuna
+              </label>
+              <input
+                id="commune"
+                name="commune"
+                placeholder="Ej: Las Condes"
+                className="border border-brand-300 p-3 rounded h-12 bg-white text-brand-900 placeholder:text-brand-muted focus:outline-none focus:ring-2 focus:ring-brand-200 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-400 dark:border-slate-600 dark:focus:ring-slate-500/40"
+                value={form.commune}
+                onChange={onChange}
+              />
+              {fieldErrors?.commune_slug && <p className="text-xs text-red-600 dark:text-red-300">{fieldErrors.commune_slug}</p>}
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label htmlFor="street" className="text-sm font-medium text-brand-700 dark:text-slate-200">
+                Calle
+              </label>
+              <input
+                id="street"
+                name="street"
+                placeholder="Ej: Avenida Apoquindo"
+                required
+                className="border border-brand-300 p-3 rounded h-12 bg-white text-brand-900 placeholder:text-brand-muted focus:outline-none focus:ring-2 focus:ring-brand-200 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-400 dark:border-slate-600 dark:focus:ring-slate-500/40"
+                value={form.street}
+                onChange={onChange}
+              />
+              {fieldErrors?.street && <p className="text-xs text-red-600 dark:text-red-300">{fieldErrors.street}</p>}
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label htmlFor="street_number" className="text-sm font-medium text-brand-700 dark:text-slate-200">
+                Número
+              </label>
+              <input
+                id="street_number"
+                name="street_number"
+                placeholder="Ej: 1234"
+                required
+                className="border border-brand-300 p-3 rounded h-12 bg-white text-brand-900 placeholder:text-brand-muted focus:outline-none focus:ring-2 focus:ring-brand-200 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-400 dark:border-slate-600 dark:focus:ring-slate-500/40"
+                value={form.street_number}
+                onChange={onChange}
+              />
+              {fieldErrors?.street_number && <p className="text-xs text-red-600 dark:text-red-300">{fieldErrors.street_number}</p>}
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label htmlFor="latitude" className="text-sm font-medium text-brand-700 dark:text-slate-200">
+                Latitud
+              </label>
+              <input
+                id="latitude"
+                name="latitude"
+                type="text"
+                placeholder="Ej: -33.4167"
+                className="border border-brand-300 p-3 rounded h-12 bg-white text-brand-900 placeholder:text-brand-muted focus:outline-none focus:ring-2 focus:ring-brand-200 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-400 dark:border-slate-600 dark:focus:ring-slate-500/40"
+                value={form.latitude}
+                onChange={onChange}
+              />
+              {fieldErrors?.latitude && <p className="text-xs text-red-600 dark:text-red-300">{fieldErrors.latitude}</p>}
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label htmlFor="longitude" className="text-sm font-medium text-brand-700 dark:text-slate-200">
+                Longitud
+              </label>
+              <input
+                id="longitude"
+                name="longitude"
+                type="text"
+                placeholder="Ej: -70.65"
+                className="border border-brand-300 p-3 rounded h-12 bg-white text-brand-900 placeholder:text-brand-muted focus:outline-none focus:ring-2 focus:ring-brand-200 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-400 dark:border-slate-600 dark:focus:ring-slate-500/40"
+                value={form.longitude}
+                onChange={onChange}
+              />
+              {fieldErrors?.longitude && <p className="text-xs text-red-600 dark:text-red-300">{fieldErrors.longitude}</p>}
+            </div>
+          </div>
+        </div>
       </div>
     </>
   )

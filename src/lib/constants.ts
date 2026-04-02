@@ -30,6 +30,7 @@ export const ADMIN_API_MESSAGES = {
   SERVER_MISCONFIGURATION: "server misconfiguration",
   PROPERTY_NOT_FOUND: "property not found",
   INVALID_REQUEST: "invalid request",
+  SEO_VALIDATION_FAILED: "seo validation failed",
   INVALID_HIGHLIGHT: "invalid highlight",
   HIGHLIGHT_NOT_FOUND: "highlight not found",
   NO_ROWS_DELETED: "no rows deleted",

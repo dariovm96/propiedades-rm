@@ -37,6 +37,16 @@ Notes:
 
 - `ADMIN_EMAIL` is still supported as a fallback for backwards compatibility.
 
+## Testing
+
+Standard test runner is **Vitest**.
+
+- `npm run test`: run all tests once (non-watch)
+- `npm run test:watch`: local interactive watch mode
+- `npm run test:ci`: deterministic non-interactive gate for CI/verify (**source of truth**)
+
+For new guardrails, prefer Vitest APIs (`describe`, `it`, `expect`) and `@/...` imports.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

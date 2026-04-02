@@ -1,11 +1,15 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import PropertyLocationBlock from "@/components/map/PropertyLocationBlock"
 
 type PropertyDetailTabsProps = {
   description: string | null
   highlights: string[]
   locationText: string | null
+  latitude?: number | null
+  longitude?: number | null
+  propertyTitle: string
 }
 
 type TabKey = "detalle" | "ubicacion"
@@ -15,7 +19,14 @@ const TAB_ITEMS: { key: TabKey; label: string }[] = [
   { key: "ubicacion", label: "Ubicación" },
 ]
 
-export default function PropertyDetailTabs({ description, highlights, locationText }: PropertyDetailTabsProps) {
+export default function PropertyDetailTabs({
+  description,
+  highlights,
+  locationText,
+  latitude,
+  longitude,
+  propertyTitle,
+}: PropertyDetailTabsProps) {
   const [activeTab, setActiveTab] = useState<TabKey>("detalle")
 
   const hasDescription = useMemo(() => Boolean(description && description.trim().length > 0), [description])
@@ -91,9 +102,13 @@ export default function PropertyDetailTabs({ description, highlights, locationTe
               <p className="text-sm text-content-secondary sm:text-base">
                 {locationText || "Ubicacion exacta pendiente de publicacion."}
               </p>
-              <div className="mt-4 flex h-52 items-center justify-center rounded-lg bg-surface-0 text-center text-sm text-content-secondary sm:h-64">
-                Mapa interactivo (Leaflet) proximamente.
-              </div>
+
+              <PropertyLocationBlock
+                latitude={latitude}
+                longitude={longitude}
+                title={propertyTitle}
+                locationText={locationText}
+              />
             </div>
           </div>
         )}

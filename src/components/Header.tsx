@@ -5,37 +5,16 @@ import { useEffect, useState } from "react"
 import { usePathname } from "next/navigation"
 import { CONTACT_PHONE_DISPLAY, TEL_URL, WHATSAPP_URL } from "@/config/contact"
 import ContactActionButton from "@/components/ContactActionButton"
+import { useAdminSession } from "@/lib/admin/session-client"
 
 export default function Header() {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
-  const [isAdmin, setIsAdmin] = useState(false)
   const [hasScrolled, setHasScrolled] = useState(false)
+  const { isAdmin, isLoading: isAdminSessionLoading } = useAdminSession()
   const isHome = pathname === "/"
+  const showAdminPanel = isAdmin
   const isTransparent = isHome && !hasScrolled && !isOpen
-
-  useEffect(() => {
-    const refreshAdminState = async () => {
-      try {
-        const response = await fetch("/admin/auth", {
-          method: "GET",
-          cache: "no-store",
-        })
-
-        if (!response.ok) {
-          setIsAdmin(false)
-          return
-        }
-
-        const data: { authorized?: boolean } = await response.json().catch(() => ({}))
-        setIsAdmin(data.authorized === true)
-      } catch {
-        setIsAdmin(false)
-      }
-    }
-
-    void refreshAdminState()
-  }, [pathname])
 
   useEffect(() => {
     if (!isHome) {
@@ -160,7 +139,7 @@ export default function Header() {
               iconClassName="w-4 h-4"
             />
 
-            {isAdmin && (
+            {!isAdminSessionLoading && showAdminPanel && (
               <Link
                 href="/admin/dashboard"
                 aria-label="Panel de administración"
@@ -212,7 +191,7 @@ export default function Header() {
               iconClassName="w-4 h-4"
             />
 
-            {isAdmin && (
+            {!isAdminSessionLoading && showAdminPanel && (
               <div className="pt-1 flex justify-center">
                 <Link
                   href="/admin/dashboard"

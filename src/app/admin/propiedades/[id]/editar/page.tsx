@@ -15,8 +15,8 @@ export default async function EditPropertyPage({ params }: Props) {
     const { data, error } = await supabase
         .from("properties")
         .select("*")
-        .returns<Property[]>()
         .eq("id", id)
+        .returns<Property[]>()
         .single()
 
     if (error || !data) {

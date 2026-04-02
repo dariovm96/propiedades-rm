@@ -4,6 +4,35 @@ import { ADMIN_API_MESSAGES, ADMIN_API_STATUS, STORAGE_BUCKETS } from "@/lib/con
 import { requireAdminUser } from "@/lib/admin-auth"
 import { jsonError, jsonSuccess } from "@/lib/api-response"
 import { createRouteSupabaseClient } from "@/lib/server-supabase"
+import { validatePropertySeoPayload } from "@/lib/admin/property-seo-validation"
+
+type JsonObject = Record<string, unknown>
+
+function isPlainObject(value: unknown): value is JsonObject {
+  return typeof value === "object" && value !== null && !Array.isArray(value)
+}
+
+function isHighlightOnlyPayload(payload: JsonObject): payload is { highlighted: boolean } {
+  return Object.keys(payload).length === 1 && typeof payload.highlighted === "boolean"
+}
+
+function hasSeoValidationFields(payload: JsonObject): boolean {
+  const keys = [
+    "property_type",
+    "for_sale",
+    "for_rent",
+    "region",
+    "commune",
+    "street",
+    "street_number",
+    "region_slug",
+    "commune_slug",
+    "latitude",
+    "longitude",
+  ]
+
+  return keys.some((key) => key in payload)
+}
 
 export async function PATCH(
   req: NextRequest,
@@ -28,22 +57,47 @@ export async function PATCH(
     )
   }
 
-  let payload: { highlighted?: boolean }
+  let payload: unknown
   try {
-    payload = (await req.json()) as { highlighted?: boolean }
+    payload = await req.json()
   } catch {
     return jsonError(ADMIN_API_MESSAGES.INVALID_REQUEST, ADMIN_API_STATUS.BAD_REQUEST)
   }
 
-  if (typeof payload.highlighted !== "boolean") {
+  if (!isPlainObject(payload)) {
     return jsonError(ADMIN_API_MESSAGES.INVALID_REQUEST, ADMIN_API_STATUS.BAD_REQUEST)
   }
 
-  const { data, error } = await adminSupabase
-    .from("properties")
-    .update({ highlighted: payload.highlighted })
-    .eq("id", id)
-    .select("id, highlighted")
+  if (isHighlightOnlyPayload(payload)) {
+    const { data, error } = await adminSupabase
+      .from("properties")
+      .update({ highlighted: payload.highlighted })
+      .eq("id", id)
+      .select("id, highlighted")
+
+    if (error) {
+      return jsonError(error.message, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR)
+    }
+
+    if (!data || data.length === 0) {
+      return jsonError(ADMIN_API_MESSAGES.PROPERTY_NOT_FOUND, ADMIN_API_STATUS.NOT_FOUND)
+    }
+
+    return jsonSuccess({ property: data[0] })
+  }
+
+  if (!hasSeoValidationFields(payload)) {
+    return jsonError(ADMIN_API_MESSAGES.INVALID_REQUEST, ADMIN_API_STATUS.BAD_REQUEST)
+  }
+
+  const validation = validatePropertySeoPayload(payload)
+  if (!validation.ok) {
+    return jsonError(ADMIN_API_MESSAGES.SEO_VALIDATION_FAILED, ADMIN_API_STATUS.BAD_REQUEST, {
+      errors: validation.errors,
+    })
+  }
+
+  const { data, error } = await adminSupabase.from("properties").update(payload).eq("id", id).select("*")
 
   if (error) {
     return jsonError(error.message, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR)
