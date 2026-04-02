@@ -1,10 +1,11 @@
 import { NextRequest } from "next/server"
-import { createClient } from "@supabase/supabase-js"
 import { ADMIN_API_MESSAGES, ADMIN_API_STATUS, STORAGE_BUCKETS } from "@/lib/constants"
 import { requireAdminUser } from "@/lib/admin-auth"
 import { jsonError, jsonSuccess } from "@/lib/api-response"
-import { createRouteSupabaseClient } from "@/lib/server-supabase"
+import { createRouteSupabaseClient, requireServiceRoleClient } from "@/lib/server-supabase"
 import { validatePropertySeoPayload } from "@/lib/admin/property-seo-validation"
+import { withAdminRateLimit } from "@/lib/admin/admin-rate-limit-guard"
+import { enforceAdminCsrf } from "@/lib/security/csrf"
 
 type JsonObject = Record<string, unknown>
 
@@ -45,16 +46,24 @@ export async function PATCH(
     return guard.response
   }
 
-  const adminSupabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  const csrfDecision = enforceAdminCsrf(req)
+  if (!csrfDecision.ok) {
+    return csrfDecision.response
+  }
 
-  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    return jsonError(
-      ADMIN_API_MESSAGES.SERVER_MISCONFIGURATION,
-      ADMIN_API_STATUS.INTERNAL_SERVER_ERROR
-    )
+  const rateLimited = withAdminRateLimit(req, {
+    routeKey: "admin_propiedades_update_delete",
+    adminEmail: guard.user.email,
+  })
+  if (rateLimited) {
+    return rateLimited
+  }
+
+  let adminSupabase
+  try {
+    adminSupabase = requireServiceRoleClient()
+  } catch {
+    return jsonError(ADMIN_API_MESSAGES.SERVER_MISCONFIGURATION, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR)
   }
 
   let payload: unknown
@@ -122,17 +131,25 @@ export async function DELETE(
     return guard.response
   }
 
-  // perform deletion with service role key to bypass RLS
-  const adminSupabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  const csrfDecision = enforceAdminCsrf(req)
+  if (!csrfDecision.ok) {
+    return csrfDecision.response
+  }
 
-  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    return jsonError(
-      ADMIN_API_MESSAGES.SERVER_MISCONFIGURATION,
-      ADMIN_API_STATUS.INTERNAL_SERVER_ERROR
-    )
+  const rateLimited = withAdminRateLimit(req, {
+    routeKey: "admin_propiedades_update_delete",
+    adminEmail: guard.user.email,
+  })
+  if (rateLimited) {
+    return rateLimited
+  }
+
+  // perform deletion with service role key to bypass RLS
+  let adminSupabase
+  try {
+    adminSupabase = requireServiceRoleClient()
+  } catch {
+    return jsonError(ADMIN_API_MESSAGES.SERVER_MISCONFIGURATION, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR)
   }
 
   // fetch property first to know which images to clean up

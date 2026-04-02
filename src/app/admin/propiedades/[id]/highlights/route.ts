@@ -1,9 +1,9 @@
 import { NextRequest } from "next/server"
-import { createClient } from "@supabase/supabase-js"
 import { requireAdminUser } from "@/lib/admin-auth"
 import { jsonError, jsonSuccess } from "@/lib/api-response"
 import { ADMIN_API_MESSAGES, ADMIN_API_STATUS } from "@/lib/constants"
-import { createRouteSupabaseClient } from "@/lib/server-supabase"
+import { createRouteSupabaseClient, requireServiceRoleClient } from "@/lib/server-supabase"
+import { withAdminRateLimit } from "@/lib/admin/admin-rate-limit-guard"
 import {
   PROPERTY_HIGHLIGHT_TEXT_COLUMNS,
   PropertyHighlight,
@@ -11,19 +11,12 @@ import {
   PropertyHighlightDeleteRequest,
   PropertyHighlightUpdateRequest,
 } from "@/types/property-highlight"
+import { enforceAdminCsrf } from "@/lib/security/csrf"
 
 type RouteCtx = { params: Promise<{ id: string }> }
 
 type JsonObject = Record<string, unknown>
-type AdminSupabaseClient = NonNullable<ReturnType<typeof getServiceRoleSupabase>>
-
-function getServiceRoleSupabase() {
-  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    return null
-  }
-
-  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY)
-}
+type AdminSupabaseClient = ReturnType<typeof requireServiceRoleClient>
 
 function isPlainObject(value: unknown): value is JsonObject {
   return typeof value === "object" && value !== null && !Array.isArray(value)
@@ -127,8 +120,10 @@ async function requireAdminRouteAccess() {
     return { errorResponse: guard.response }
   }
 
-  const adminSupabase = getServiceRoleSupabase()
-  if (!adminSupabase) {
+  let adminSupabase
+  try {
+    adminSupabase = requireServiceRoleClient()
+  } catch {
     return {
       errorResponse: jsonError(
         ADMIN_API_MESSAGES.SERVER_MISCONFIGURATION,
@@ -137,7 +132,7 @@ async function requireAdminRouteAccess() {
     }
   }
 
-  return { adminSupabase }
+  return { adminSupabase, adminEmail: guard.user.email }
 }
 
 export async function GET(_req: NextRequest, ctx: RouteCtx) {
@@ -165,6 +160,19 @@ export async function POST(req: NextRequest, ctx: RouteCtx) {
   const access = await requireAdminRouteAccess()
   if ("errorResponse" in access) {
     return access.errorResponse
+  }
+
+  const csrfDecision = enforceAdminCsrf(req)
+  if (!csrfDecision.ok) {
+    return csrfDecision.response
+  }
+
+  const rateLimited = withAdminRateLimit(req, {
+    routeKey: "admin_propiedades_highlights_mutation",
+    adminEmail: access.adminEmail,
+  })
+  if (rateLimited) {
+    return rateLimited
   }
 
   const payload = await parseJsonSafely(req)
@@ -205,6 +213,19 @@ export async function PATCH(req: NextRequest, ctx: RouteCtx) {
   const access = await requireAdminRouteAccess()
   if ("errorResponse" in access) {
     return access.errorResponse
+  }
+
+  const csrfDecision = enforceAdminCsrf(req)
+  if (!csrfDecision.ok) {
+    return csrfDecision.response
+  }
+
+  const rateLimited = withAdminRateLimit(req, {
+    routeKey: "admin_propiedades_highlights_mutation",
+    adminEmail: access.adminEmail,
+  })
+  if (rateLimited) {
+    return rateLimited
   }
 
   const payload = await parseJsonSafely(req)
@@ -281,6 +302,19 @@ export async function DELETE(req: NextRequest, ctx: RouteCtx) {
   const access = await requireAdminRouteAccess()
   if ("errorResponse" in access) {
     return access.errorResponse
+  }
+
+  const csrfDecision = enforceAdminCsrf(req)
+  if (!csrfDecision.ok) {
+    return csrfDecision.response
+  }
+
+  const rateLimited = withAdminRateLimit(req, {
+    routeKey: "admin_propiedades_highlights_mutation",
+    adminEmail: access.adminEmail,
+  })
+  if (rateLimited) {
+    return rateLimited
   }
 
   const highlightIdFromQuery = req.nextUrl.searchParams.get("highlightId")

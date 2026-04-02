@@ -7,9 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run --configLoader native --pool=threads",
-    "test:watch": "vitest --configLoader native --pool=threads",
-    "test:ci": "vitest run --configLoader native --pool=threads"
+    "test": "vitest run --configLoader runner --pool=threads",
+    "test:watch": "vitest --configLoader runner --pool=threads",
+    "test:ci": "vitest run --configLoader runner --pool=threads"
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",

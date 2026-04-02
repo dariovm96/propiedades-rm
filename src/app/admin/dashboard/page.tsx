@@ -9,6 +9,9 @@ import ConfirmDialog from "@/components/ConfirmDialog"
 import { toast } from "sonner"
 import { PROPERTY_STATUS_BADGE_CLASSES, PROPERTY_STATUS_LABELS } from "@/lib/constants"
 
+const ADMIN_DASHBOARD_PROPERTIES_SELECT =
+  "id,title,slug,description,price,area_m2,location_text,property_type,for_sale,for_rent,region,region_slug,commune,commune_slug,street,street_number,latitude,longitude,status,highlighted,contact_phone,images"
+
 export default function DashboardPage() {
   const router = useRouter()
   const [properties, setProperties] = useState<Property[]>([])
@@ -29,7 +32,7 @@ export default function DashboardPage() {
     const fetchProperties = async () => {
       const { data, error } = await supabase
         .from("properties")
-        .select("*")
+        .select(ADMIN_DASHBOARD_PROPERTIES_SELECT)
         .returns<Property[]>()
         .order("created_at", { ascending: false })
 

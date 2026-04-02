@@ -1,15 +1,19 @@
 import Image from "next/image"
 import Link from "next/link"
+import type { Metadata } from "next"
 import { supabase } from "@/lib/supabase"
 import { getPublicImageUrl } from "@/lib/storage-helpers"
 import { PROPERTY_STATUS_LABELS } from "@/lib/constants"
 import { ATTENTION_HOURS_LABEL, CONTACT_PHONE_DISPLAY, TEL_URL, WHATSAPP_URL } from "@/config/contact"
 import { FEATURED_HOME_VIDEO } from "@/config/featured-video"
+import { buildHomePageMetadata } from "@/lib/seo/metadata"
 import HeroScrollIndicator from "@/components/HeroScrollIndicator"
 import HeroParallaxImage from "@/components/HeroParallaxImage"
 import ContactActionButton from "@/components/ContactActionButton"
 import ScrollRevealStagger from "@/components/ScrollRevealStagger"
 import { PropertyHighlight } from "@/types/property-highlight"
+
+const PROPERTY_HIGHLIGHTS_SELECT = "id,property_id,sort_order,highlight,text,title,label,name,value,description"
 
 type HighlightedProperty = {
   id: string
@@ -24,6 +28,7 @@ type HighlightedProperty = {
 }
 
 export const revalidate = 60
+export const metadata: Metadata = buildHomePageMetadata()
 
 async function getHighlightedProperties(): Promise<HighlightedProperty[]> {
   const { data, error } = await supabase
@@ -45,7 +50,7 @@ async function getHighlightedProperties(): Promise<HighlightedProperty[]> {
 
   const { data: highlightsData } = await supabase
     .from("property_highlights")
-    .select("*")
+    .select(PROPERTY_HIGHLIGHTS_SELECT)
     .order("sort_order", { ascending: true })
     .in("property_id", propertyIds)
     .returns<PropertyHighlight[]>()

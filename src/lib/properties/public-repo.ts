@@ -34,7 +34,7 @@ const PROPERTY_SEO_SELECT = [
   "created_at",
 ].join(",")
 
-const PROPERTY_HIGHLIGHTS_SELECT = "*"
+const PROPERTY_HIGHLIGHTS_SELECT = "id,property_id,sort_order,highlight,text,title,label,name,value,description"
 
 export async function getSeoPropertiesByListing(input: {
   tipo: PropertyTypeSlug | string

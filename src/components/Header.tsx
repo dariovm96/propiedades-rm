@@ -83,8 +83,11 @@ export default function Header() {
           {/* Hamburger menu button - visible only on mobile */}
           <button
             onClick={() => setIsOpen(!isOpen)}
+            type="button"
             className={menuButtonClasses}
             aria-label="Toggle menu"
+            aria-expanded={isOpen}
+            aria-controls="mobile-navigation"
           >
             <svg
               className="w-6 h-6"
@@ -111,7 +114,7 @@ export default function Header() {
           </button>
 
           {/* Desktop navigation - hidden on mobile */}
-          <nav className={desktopNavClasses}>
+          <nav className={desktopNavClasses} aria-label="Navegación principal">
             <Link href="/" className={desktopLinkClasses}>
               Inicio
             </Link>
@@ -156,7 +159,7 @@ export default function Header() {
 
         {/* Mobile navigation - visible when menu is open */}
         {isOpen && (
-          <nav className={mobileNavClasses}>
+          <nav id="mobile-navigation" className={mobileNavClasses} aria-label="Navegación móvil">
             <Link
               href="/"
               className={mobileLinkClasses}

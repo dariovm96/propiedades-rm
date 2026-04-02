@@ -37,6 +37,28 @@ export function buildOrganizationJsonLd(): JsonLdObject {
   }
 }
 
+export function isValidJsonLdObject(input: unknown): input is JsonLdObject {
+  return typeof input === "object" && input !== null && !Array.isArray(input)
+}
+
+export function safeJsonLdScriptContent(input: unknown): string | null {
+  if (!isValidJsonLdObject(input)) {
+    return null
+  }
+
+  const contextValue = input["@context"]
+  if (typeof contextValue !== "string" || contextValue.trim().length === 0) {
+    return null
+  }
+
+  const typeValue = input["@type"]
+  if (typeof typeValue !== "string" || typeValue.trim().length === 0) {
+    return null
+  }
+
+  return toJsonLdScriptContent(input)
+}
+
 export function buildPropertyJsonLd(input: {
   route: Required<Pick<PropertySeoRouteInput, "tipo" | "region_slug" | "commune_slug" | "slug">>
   property: Pick<
@@ -84,5 +106,20 @@ export function buildPropertyJsonLd(input: {
 }
 
 export function toJsonLdScriptContent(input: JsonLdObject): string {
-  return JSON.stringify(input)
+  return JSON.stringify(input).replace(/[<>&\u2028\u2029]/g, (char) => {
+    switch (char) {
+      case "<":
+        return "\\u003c"
+      case ">":
+        return "\\u003e"
+      case "&":
+        return "\\u0026"
+      case "\u2028":
+        return "\\u2028"
+      case "\u2029":
+        return "\\u2029"
+      default:
+        return char
+    }
+  })
 }

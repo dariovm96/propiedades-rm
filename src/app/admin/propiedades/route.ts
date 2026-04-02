@@ -1,23 +1,16 @@
 import { NextRequest } from "next/server"
-import { createClient } from "@supabase/supabase-js"
 import { requireAdminUser } from "@/lib/admin-auth"
 import { jsonError, jsonSuccess } from "@/lib/api-response"
 import { ADMIN_API_MESSAGES, ADMIN_API_STATUS } from "@/lib/constants"
 import { validatePropertySeoPayload } from "@/lib/admin/property-seo-validation"
-import { createRouteSupabaseClient } from "@/lib/server-supabase"
+import { createRouteSupabaseClient, requireServiceRoleClient } from "@/lib/server-supabase"
+import { withAdminRateLimit } from "@/lib/admin/admin-rate-limit-guard"
+import { enforceAdminCsrf } from "@/lib/security/csrf"
 
 type JsonObject = Record<string, unknown>
 
 function isPlainObject(value: unknown): value is JsonObject {
   return typeof value === "object" && value !== null && !Array.isArray(value)
-}
-
-function getServiceRoleSupabase() {
-  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    return null
-  }
-
-  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY)
 }
 
 export async function POST(req: NextRequest) {
@@ -27,12 +20,24 @@ export async function POST(req: NextRequest) {
     return guard.response
   }
 
-  const adminSupabase = getServiceRoleSupabase()
-  if (!adminSupabase) {
-    return jsonError(
-      ADMIN_API_MESSAGES.SERVER_MISCONFIGURATION,
-      ADMIN_API_STATUS.INTERNAL_SERVER_ERROR
-    )
+  const csrfDecision = enforceAdminCsrf(req)
+  if (!csrfDecision.ok) {
+    return csrfDecision.response
+  }
+
+  const rateLimited = withAdminRateLimit(req, {
+    routeKey: "admin_propiedades_create",
+    adminEmail: guard.user.email,
+  })
+  if (rateLimited) {
+    return rateLimited
+  }
+
+  let adminSupabase
+  try {
+    adminSupabase = requireServiceRoleClient()
+  } catch {
+    return jsonError(ADMIN_API_MESSAGES.SERVER_MISCONFIGURATION, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR)
   }
 
   let payload: unknown

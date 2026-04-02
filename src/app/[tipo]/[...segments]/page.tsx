@@ -10,7 +10,7 @@ import {
 } from "@/lib/properties/public-repo"
 import { isOperationSlug, isPropertyTypeSlug, toPropertyTypeSlug } from "@/lib/seo/routing"
 import { buildListingMetadata, buildPropertyMetadata } from "@/lib/seo/metadata"
-import { buildPropertyJsonLd, toJsonLdScriptContent } from "@/lib/seo/jsonld"
+import { buildPropertyJsonLd, safeJsonLdScriptContent } from "@/lib/seo/jsonld"
 import type { Property } from "@/types/property"
 import { toPropertyDetailViewModel } from "@/lib/properties/property-detail-view-model"
 import PropertyDetailVisual from "@/components/property-detail/PropertyDetailVisual"
@@ -167,7 +167,7 @@ async function renderCanonicalDetail(input: {
     notFound()
   }
 
-  const propertyJsonLd = toJsonLdScriptContent(
+  const propertyJsonLd = safeJsonLdScriptContent(
     buildPropertyJsonLd({
       route: {
         tipo: input.tipo,
@@ -187,7 +187,7 @@ async function renderCanonicalDetail(input: {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: propertyJsonLd }} />
+      {propertyJsonLd ? <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: propertyJsonLd }} /> : null}
       <PropertyDetailVisual model={viewModel} />
     </>
   )

@@ -16,6 +16,39 @@ type BaseMetadataInput = {
   ogImage?: string
 }
 
+const DEFAULT_SITE_TITLE = "Propiedades RM"
+const DEFAULT_HOME_TITLE = "Propiedades RM | Compra y arriendo sin intermediarios"
+const DEFAULT_HOME_DESCRIPTION =
+  "Descubre propiedades en venta y arriendo en la Región Metropolitana con contacto directo y asesoría personalizada."
+const DEFAULT_LISTING_TITLE = "Propiedades disponibles | Propiedades RM"
+const DEFAULT_LISTING_DESCRIPTION =
+  "Explora propiedades disponibles para compra o arriendo, con información clara y contacto directo con propietarios."
+const DEFAULT_PROPERTY_TITLE = "Propiedad | Propiedades RM"
+const DEFAULT_PROPERTY_DESCRIPTION = "Conocé esta propiedad en Propiedades RM y contactá directo con el propietario."
+
+function normalizeNonEmpty(value: string | null | undefined, fallback: string): string {
+  const normalized = value?.trim()
+  return normalized && normalized.length > 0 ? normalized : fallback
+}
+
+function normalizeCanonicalPath(path: string | null | undefined): string {
+  const normalized = path?.trim()
+  if (!normalized) {
+    return "/"
+  }
+
+  if (normalized.startsWith("http://") || normalized.startsWith("https://")) {
+    try {
+      const parsed = new URL(normalized)
+      return `${parsed.pathname}${parsed.search}${parsed.hash}` || "/"
+    } catch {
+      return "/"
+    }
+  }
+
+  return normalized.startsWith("/") ? normalized : `/${normalized}`
+}
+
 function getAbsoluteUrl(path: string): string {
   const base = resolveSeoBaseUrl()
   return new URL(path, `${base}/`).toString()
@@ -34,25 +67,27 @@ function toAbsoluteImageUrl(imagePathOrUrl?: string | null): string {
 }
 
 export function buildBaseMetadata(input: BaseMetadataInput): Metadata {
-  const canonical = getAbsoluteUrl(input.canonicalPath)
+  const title = normalizeNonEmpty(input.title, DEFAULT_SITE_TITLE)
+  const description = normalizeNonEmpty(input.description, DEFAULT_HOME_DESCRIPTION)
+  const canonical = getAbsoluteUrl(normalizeCanonicalPath(input.canonicalPath))
   const ogImageUrl = toAbsoluteImageUrl(input.ogImage)
 
   return {
-    title: input.title,
-    description: input.description,
+    title,
+    description,
     alternates: {
       canonical,
     },
     openGraph: {
-      title: input.title,
-      description: input.description,
+      title,
+      description,
       url: canonical,
       images: [ogImageUrl],
     },
     twitter: {
       card: "summary_large_image",
-      title: input.title,
-      description: input.description,
+      title,
+      description,
       images: [ogImageUrl],
     },
     robots: {
@@ -71,7 +106,7 @@ export function buildBaseMetadata(input: BaseMetadataInput): Metadata {
 
 export function buildSeoLayoutMetadata(): Metadata {
   const base = resolveSeoBaseUrlAsUrl()
-  const title = "Propiedades RM"
+  const title = DEFAULT_SITE_TITLE
   const description = "Compra y arriendo directo de propiedades sin intermediarios"
 
   return {
@@ -106,6 +141,22 @@ export function buildSeoLayoutMetadata(): Metadata {
   }
 }
 
+export function buildHomePageMetadata(): Metadata {
+  return buildBaseMetadata({
+    title: DEFAULT_HOME_TITLE,
+    description: DEFAULT_HOME_DESCRIPTION,
+    canonicalPath: "/",
+  })
+}
+
+export function buildPropertiesPageMetadata(): Metadata {
+  return buildBaseMetadata({
+    title: DEFAULT_LISTING_TITLE,
+    description: DEFAULT_LISTING_DESCRIPTION,
+    canonicalPath: "/propiedades",
+  })
+}
+
 export function buildLegacyPropertyMetadata(input: {
   slug: string
   title?: string | null
@@ -113,9 +164,8 @@ export function buildLegacyPropertyMetadata(input: {
   ogImage?: string | null
 }): Metadata {
   const cleanTitle = input.title?.trim()
-  const title = cleanTitle ? `${cleanTitle} | Propiedades RM` : "Propiedad | Propiedades RM"
-  const description =
-    input.description?.trim() || "Conocé esta propiedad en Propiedades RM y contactá directo con el propietario."
+  const title = cleanTitle ? `${cleanTitle} | Propiedades RM` : DEFAULT_PROPERTY_TITLE
+  const description = normalizeNonEmpty(input.description, DEFAULT_PROPERTY_DESCRIPTION)
 
   return buildBaseMetadata({
     title,
@@ -133,8 +183,14 @@ export function buildListingMetadata(input: {
   region_slug?: string | null
   commune_slug?: string | null
 }): Metadata {
-  const tipoLabel = PROPERTY_TYPE_LABELS[input.tipo as PropertyTypeSlug] ?? input.tipo
-  const operacionLabel = OPERATION_LABELS[input.operacion as OperationSlug] ?? input.operacion
+  const tipoLabel = normalizeNonEmpty(
+    PROPERTY_TYPE_LABELS[input.tipo as PropertyTypeSlug] ?? input.tipo,
+    "Propiedades"
+  )
+  const operacionLabel = normalizeNonEmpty(
+    OPERATION_LABELS[input.operacion as OperationSlug] ?? input.operacion,
+    "venta"
+  )
   const locationLabel = input.commune ?? input.region
   const locationSuffix = locationLabel ? ` en ${locationLabel}` : ""
 
@@ -168,10 +224,13 @@ export function buildPropertyMetadata(input: {
 }): Metadata {
   const locationText = [input.commune, input.region].filter(Boolean).join(", ")
   const operationPrefix = input.operationLabel ? `${input.operationLabel} · ` : ""
-  const metadataTitle = `${operationPrefix}${input.title}${locationText ? ` - ${locationText}` : ""} | Propiedades RM`
+  const normalizedTitle = normalizeNonEmpty(input.title, "Propiedad")
+  const metadataTitle = `${operationPrefix}${normalizedTitle}${locationText ? ` - ${locationText}` : ""} | Propiedades RM`
   const metadataDescription =
-    input.description?.trim() ||
-    `${input.title}${locationText ? ` ubicada en ${locationText}` : ""}. Revisa detalles y contacta directo con el propietario.`
+    normalizeNonEmpty(
+      input.description,
+      `${normalizedTitle}${locationText ? ` ubicada en ${locationText}` : ""}. Revisa detalles y contacta directo con el propietario.`
+    )
 
   return buildBaseMetadata({
     title: metadataTitle,
