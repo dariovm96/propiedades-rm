@@ -5,37 +5,16 @@ import { useEffect, useState } from "react"
 import { usePathname } from "next/navigation"
 import { CONTACT_PHONE_DISPLAY, TEL_URL, WHATSAPP_URL } from "@/config/contact"
 import ContactActionButton from "@/components/ContactActionButton"
+import { useAdminSession } from "@/lib/admin/session-client"
 
 export default function Header() {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
-  const [isAdmin, setIsAdmin] = useState(false)
   const [hasScrolled, setHasScrolled] = useState(false)
+  const { isAdmin, isLoading: isAdminSessionLoading } = useAdminSession()
   const isHome = pathname === "/"
+  const showAdminPanel = isAdmin
   const isTransparent = isHome && !hasScrolled && !isOpen
-
-  useEffect(() => {
-    const refreshAdminState = async () => {
-      try {
-        const response = await fetch("/admin/auth", {
-          method: "GET",
-          cache: "no-store",
-        })
-
-        if (!response.ok) {
-          setIsAdmin(false)
-          return
-        }
-
-        const data: { authorized?: boolean } = await response.json().catch(() => ({}))
-        setIsAdmin(data.authorized === true)
-      } catch {
-        setIsAdmin(false)
-      }
-    }
-
-    void refreshAdminState()
-  }, [pathname])
 
   useEffect(() => {
     if (!isHome) {
@@ -104,8 +83,11 @@ export default function Header() {
           {/* Hamburger menu button - visible only on mobile */}
           <button
             onClick={() => setIsOpen(!isOpen)}
+            type="button"
             className={menuButtonClasses}
             aria-label="Toggle menu"
+            aria-expanded={isOpen}
+            aria-controls="mobile-navigation"
           >
             <svg
               className="w-6 h-6"
@@ -132,7 +114,7 @@ export default function Header() {
           </button>
 
           {/* Desktop navigation - hidden on mobile */}
-          <nav className={desktopNavClasses}>
+          <nav className={desktopNavClasses} aria-label="Navegación principal">
             <Link href="/" className={desktopLinkClasses}>
               Inicio
             </Link>
@@ -160,7 +142,7 @@ export default function Header() {
               iconClassName="w-4 h-4"
             />
 
-            {isAdmin && (
+            {!isAdminSessionLoading && showAdminPanel && (
               <Link
                 href="/admin/dashboard"
                 aria-label="Panel de administración"
@@ -177,7 +159,7 @@ export default function Header() {
 
         {/* Mobile navigation - visible when menu is open */}
         {isOpen && (
-          <nav className={mobileNavClasses}>
+          <nav id="mobile-navigation" className={mobileNavClasses} aria-label="Navegación móvil">
             <Link
               href="/"
               className={mobileLinkClasses}
@@ -212,7 +194,7 @@ export default function Header() {
               iconClassName="w-4 h-4"
             />
 
-            {isAdmin && (
+            {!isAdminSessionLoading && showAdminPanel && (
               <div className="pt-1 flex justify-center">
                 <Link
                   href="/admin/dashboard"

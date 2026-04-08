@@ -5,9 +5,34 @@ import ImageWithLoader from "@/components/ImageWithLoader"
 
 type Props = {
   images: string[]
+  propertyTitle?: string
 }
 
-export default function PropertyGallery({ images }: Props) {
+function buildMainImageAlt(propertyTitle: string | undefined, imageIndex: number) {
+  if (propertyTitle && propertyTitle.trim().length > 0) {
+    return `${propertyTitle} - foto ${imageIndex + 1}`
+  }
+
+  return `Foto ${imageIndex + 1} de la propiedad`
+}
+
+function buildThumbnailAlt(propertyTitle: string | undefined, imageIndex: number) {
+  if (propertyTitle && propertyTitle.trim().length > 0) {
+    return `Miniatura ${imageIndex + 1} de ${propertyTitle}`
+  }
+
+  return `Miniatura ${imageIndex + 1} de la propiedad`
+}
+
+function buildZoomAlt(propertyTitle: string | undefined, imageIndex: number) {
+  if (propertyTitle && propertyTitle.trim().length > 0) {
+    return `Zoom de ${propertyTitle} - foto ${imageIndex + 1}`
+  }
+
+  return `Zoom foto ${imageIndex + 1} de la propiedad`
+}
+
+export default function PropertyGallery({ images, propertyTitle }: Props) {
   const [active, setActive] = useState(0)
   const [zoomOpen, setZoomOpen] = useState(false)
   const [zoomLevel, setZoomLevel] = useState(1)
@@ -102,10 +127,12 @@ export default function PropertyGallery({ images }: Props) {
               <div key={`${image}-${index}`} className="relative h-full min-w-full">
                 <ImageWithLoader
                   src={image}
-                  alt={`Foto ${index + 1} de la propiedad`}
+                  alt={buildMainImageAlt(propertyTitle, index)}
                   wrapperClassName="relative h-full w-full"
                   fill
                   imageClassName="object-cover"
+                  priority={index === safeActive && safeActive === 0}
+                  loading={index === safeActive && safeActive === 0 ? "eager" : "lazy"}
                   unoptimized
                 />
               </div>
@@ -164,10 +191,11 @@ export default function PropertyGallery({ images }: Props) {
             >
               <ImageWithLoader
                 src={image}
-                alt={`Miniatura ${index + 1}`}
+                alt={buildThumbnailAlt(propertyTitle, index)}
                 wrapperClassName="relative h-full w-full"
                 fill
                 imageClassName="object-cover"
+                loading="lazy"
                 unoptimized
               />
             </button>
@@ -238,11 +266,12 @@ export default function PropertyGallery({ images }: Props) {
                       <div className="relative mx-auto h-[72vh] max-h-[72vh] min-h-[280px] w-full max-w-5xl">
                         <ImageWithLoader
                           src={image}
-                          alt={`Zoom foto ${index + 1} de la propiedad`}
+                          alt={buildZoomAlt(propertyTitle, index)}
                           wrapperClassName="relative h-full w-full"
                           fill
                           imageClassName="object-contain transition-transform duration-200"
                           style={{ transform: `scale(${zoomLevel})`, transformOrigin: "center center" }}
+                          loading="lazy"
                           unoptimized
                         />
                       </div>

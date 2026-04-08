@@ -30,10 +30,12 @@ export const ADMIN_API_MESSAGES = {
   SERVER_MISCONFIGURATION: "server misconfiguration",
   PROPERTY_NOT_FOUND: "property not found",
   INVALID_REQUEST: "invalid request",
+  SEO_VALIDATION_FAILED: "seo validation failed",
   INVALID_HIGHLIGHT: "invalid highlight",
   HIGHLIGHT_NOT_FOUND: "highlight not found",
   NO_ROWS_DELETED: "no rows deleted",
   IMAGE_CLEANUP_FAILED: "image cleanup failed",
+  RATE_LIMIT_EXCEEDED: "rate limit exceeded",
 } as const
 
 export const ADMIN_API_STATUS = {
@@ -42,5 +44,6 @@ export const ADMIN_API_STATUS = {
   UNAUTHORIZED: 401,
   FORBIDDEN: 403,
   NOT_FOUND: 404,
+  TOO_MANY_REQUESTS: 429,
   INTERNAL_SERVER_ERROR: 500,
 } as const

@@ -14,17 +14,19 @@
 
 > Esta información es relevante para construir slugs, metadatos y contenido de fichas desde el primer día.
 
-| # | Tipo | Ubicación | Superficie | Operación | Estado |
-|---|------|-----------|------------|-----------|--------|
-| 1 | Terreno | La Estrella, Litueche, O'Higgins | 5.000 m² | Venta | Disponible |
-| 2 | Terreno | La Estrella, Litueche, O'Higgins | 5.000 m² | Venta | Disponible |
-| 3 | Terreno | La Estrella, Litueche, O'Higgins | 5.000 m² | Venta | Disponible |
-| 4 | Terreno | La Estrella, Litueche, O'Higgins | 10.000 m² | Venta | Disponible |
-| 5 | Terreno | La Estrella, Litueche, O'Higgins | 10.000 m² (con quebrada) | Venta | Disponible |
-| 6 | Terreno | Melipilla, Región Metropolitana | 5.000 m² (vista valle) | Venta | Disponible |
-| 7 | Terreno | Melipilla, Región Metropolitana | 5.000 m² (vista + agua pozo) | Venta | Disponible |
-| 8 | Casa + Terreno ⭐ | San Pedro de Melipilla, R.M. | 5.000 m² + Casa 450 m² | Venta | Disponible |
-| 9 | Local comercial | Centro de Melipilla, R.M. | 13 x 22 mts | Venta/Arriendo | Disponible |
+| # | Tipo | Ubicación | Superficie | Venta | Arriendo | Estado |
+|---|------|-----------|------------|-------|----------|--------|
+| 1 | Terreno | La Estrella, Litueche, O'Higgins | 5.000 m² | ✅ | ✅ | Disponible |
+| 2 | Terreno | La Estrella, Litueche, O'Higgins | 5.000 m² | ✅ | ✅ | Disponible |
+| 3 | Terreno | La Estrella, Litueche, O'Higgins | 5.000 m² | ✅ | ✅ | Disponible |
+| 4 | Terreno | La Estrella, Litueche, O'Higgins | 10.000 m² | ✅ | ✅ | Disponible |
+| 5 | Terreno | La Estrella, Litueche, O'Higgins | 10.000 m² (con quebrada) | ✅ | ✅ | Disponible |
+| 6 | Terreno | Melipilla, Región Metropolitana | 5.000 m² (vista valle) | ✅ | ✅ | Disponible |
+| 7 | Terreno | Melipilla, Región Metropolitana | 5.000 m² (vista + agua pozo) | ✅ | ✅ | Disponible |
+| 8 | Casa + Terreno ⭐ | San Pedro de Melipilla, R.M. | 5.000 m² + Casa 450 m² | ✅ | ✅ | Disponible |
+| 9 | Local comercial | Centro de Melipilla, R.M. | 13 x 22 mts | ✅ | ✅ | Disponible |
+
+> Una propiedad puede estar disponible para venta **y** arriendo simultáneamente. Los campos `for_sale` y `for_rent` son independientes.
 
 > ⭐ = Propiedad destacada (la Casona de San Pedro, marcada con `highlighted = true`)
 
@@ -40,11 +42,20 @@
 ALTER TABLE public.properties
   ADD COLUMN IF NOT EXISTS property_type text
     CHECK (property_type IN ('terreno', 'casa', 'local_comercial', 'departamento')),
-  ADD COLUMN IF NOT EXISTS operation_type text
-    CHECK (operation_type IN ('venta', 'arriendo'));
+  ADD COLUMN IF NOT EXISTS for_sale boolean NOT NULL DEFAULT false,
+  ADD COLUMN IF NOT EXISTS for_rent boolean NOT NULL DEFAULT false;
 ```
 
-**Por qué:** Hoy la tabla no distingue entre tipo de propiedad ni tipo de operación. Sin estos campos es imposible generar páginas de listado por categoría (`/terrenos/venta`, `/casas/arriendo`), que son fundamentales para el SEO de cola larga.
+**Por qué:** Hoy la tabla no distingue entre tipo de propiedad ni modalidad de operación. Sin `property_type` es imposible generar páginas de listado por categoría (`/terrenos/venta`, `/casas/arriendo`).
+
+Los booleanos `for_sale` y `for_rent` reemplazan a un campo `operation_type` de valor único, ya que **una misma propiedad puede estar disponible para venta y arriendo al mismo tiempo**. Esto evita duplicar registros y permite que la propiedad aparezca en ambos listados de Google sin restricción.
+
+**Restricción recomendada:** Al menos uno de los dos debe ser `true` cuando la propiedad esté activa:
+```sql
+ALTER TABLE public.properties
+  ADD CONSTRAINT properties_must_have_operation
+    CHECK (for_sale = true OR for_rent = true OR status != 'available');
+```
 
 ### 1.2 Reemplazar `location_text` por campos estructurados
 
@@ -73,11 +84,7 @@ ALTER TABLE public.properties
 | Casona San Pedro | Región Metropolitana de Santiago | `metropolitana` | San Pedro | `san-pedro` |
 | Local Melipilla centro | Región Metropolitana de Santiago | `metropolitana` | Melipilla | `melipilla` |
 
-### 1.4 Migración de datos existentes (si aplica)
-
-Si ya existen filas con `location_text`, ejecutar un script de migración que parsee el texto y pobле los nuevos campos. Una vez validados los nuevos campos, `location_text` puede mantenerse como fallback pero no debe usarse para lógica de negocio ni SEO.
-
-### 1.5 Actualizar la generación del `slug`
+### 1.4 Actualizar la generación del `slug`
 
 El slug de cada propiedad debe incluir contexto geográfico y de tipo para ser significativo para Google:
 
@@ -112,13 +119,16 @@ WHERE slug IS NULL OR slug = '';
 
 ### 2.1 Jerarquía de rutas en Next.js
 
+Las páginas de **listado** sí incluyen la operación en la URL, ya que son páginas específicas para personas buscando "terrenos en venta" o "terrenos en arriendo". La **ficha individual** no lleva operación, porque la propiedad puede ser ambas cosas a la vez.
+
 ```
-/                                                    → Home
-/propiedades                                         → Listado general
-/[tipo]/[operacion]                                  → Ej: /terrenos/venta
-/[tipo]/[operacion]/[region_slug]                    → Ej: /terrenos/venta/ohiggins
-/[tipo]/[operacion]/[region_slug]/[commune_slug]     → Ej: /terrenos/venta/ohiggins/la-estrella
-/[tipo]/[operacion]/[region_slug]/[commune_slug]/[slug] → Ficha individual
+/                                                 → Home
+/propiedades                                      → Listado general
+/[tipo]/venta                                     → Ej: /terrenos/venta
+/[tipo]/arriendo                                  → Ej: /terrenos/arriendo
+/[tipo]/venta/[region_slug]                       → Ej: /terrenos/venta/ohiggins
+/[tipo]/venta/[region_slug]/[commune_slug]        → Ej: /terrenos/venta/ohiggins/la-estrella
+/[tipo]/[region_slug]/[commune_slug]/[slug]       → Ficha individual (sin operación)
 ```
 
 **Estructura de carpetas en Next.js App Router:**
@@ -129,15 +139,19 @@ app/
 ├── propiedades/
 │   └── page.tsx                               → Listado general
 └── [tipo]/
-    └── [operacion]/
-        ├── page.tsx                           → /terrenos/venta
-        └── [region_slug]/
-            ├── page.tsx                       → /terrenos/venta/ohiggins
-            └── [commune_slug]/
-                ├── page.tsx                   → /terrenos/venta/ohiggins/la-estrella
-                └── [slug]/
-                    └── page.tsx               → Ficha individual
+    ├── [operacion]/
+    │   ├── page.tsx                           → /terrenos/venta
+    │   └── [region_slug]/
+    │       ├── page.tsx                       → /terrenos/venta/ohiggins
+    │       └── [commune_slug]/
+    │           └── page.tsx                   → /terrenos/venta/ohiggins/la-estrella
+    └── [region_slug]/
+        └── [commune_slug]/
+            └── [slug]/
+                └── page.tsx                   → Ficha individual
 ```
+
+> La ficha individual se aloja en `/[tipo]/[region_slug]/[commune_slug]/[slug]` y en ella se muestran las insignias "En Venta" y/o "En Arriendo" según los valores de `for_sale` y `for_rent` de la DB. Los listados filtrados sí usan `/[tipo]/venta/...` o `/[tipo]/arriendo/...`.
 
 ### 2.2 Valores válidos para segmentos de ruta
 
@@ -163,6 +177,14 @@ export const REGION_LABELS: Record<string, string> = {
   'ohiggins': "Región de O'Higgins",
   'metropolitana': 'Región Metropolitana',
 };
+
+// Mapeo de segmento de URL → columna DB para filtrar listados
+// /terrenos/venta  → WHERE for_sale = true
+// /terrenos/arriendo → WHERE for_rent = true
+export const OPERATION_TO_DB_FIELD: Record<string, 'for_sale' | 'for_rent'> = {
+  'venta': 'for_sale',
+  'arriendo': 'for_rent',
+};
 ```
 
 ---
@@ -186,6 +208,8 @@ export const metadata: Metadata = {
 
 ```typescript
 // app/[tipo]/[operacion]/[region_slug]/[commune_slug]/page.tsx
+// Ej: /terrenos/venta/ohiggins/la-estrella
+// La query a Supabase filtra por: property_type + OPERATION_TO_DB_FIELD[operacion] = true
 
 export async function generateMetadata({ params }): Promise<Metadata> {
   const { tipo, operacion, region_slug, commune_slug } = params;
@@ -209,18 +233,28 @@ export async function generateMetadata({ params }): Promise<Metadata> {
 
 ### 3.3 Ficha individual de propiedad
 
+La ficha ya no recibe `operacion` como parámetro de URL. En su lugar, genera la descripción SEO a partir de los campos `for_sale` y `for_rent` de la propiedad.
+
 ```typescript
-// app/[tipo]/[operacion]/[region_slug]/[commune_slug]/[slug]/page.tsx
+// app/[tipo]/[region_slug]/[commune_slug]/[slug]/page.tsx
 
 export async function generateMetadata({ params }): Promise<Metadata> {
   const property = await getPropertyBySlug(params.slug);
   if (!property) return { title: 'Propiedad no encontrada' };
 
+  // Construir etiqueta de operación dinámica según los booleanos
+  const operationLabel =
+    property.for_sale && property.for_rent
+      ? 'en venta y arriendo'
+      : property.for_sale
+      ? 'en venta'
+      : 'en arriendo';
+
   const title = `${property.title} | ${property.commune}, ${property.region} – Propiedades RM`;
 
   const description = [
     property.area_m2 ? `${property.area_m2.toLocaleString('es-CL')} m²` : null,
-    property.operation_type === 'venta' ? 'en venta' : 'en arriendo',
+    operationLabel,
     `en ${property.commune}, ${property.region}.`,
     property.price ? `Precio: $${property.price.toLocaleString('es-CL')} CLP.` : null,
     'Trato directo con propietario. Consulta disponibilidad.',
@@ -387,9 +421,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/locales-comerciales/arriendo`, priority: 0.7, changeFrequency: 'weekly' },
   ];
 
-  // Fichas individuales
+  // Fichas individuales — sin [operacion] en la URL
   const propertyRoutes: MetadataRoute.Sitemap = properties.map((p) => ({
-    url: `${baseUrl}/${p.property_type_slug}/${p.operation_type}/${p.region_slug}/${p.commune_slug}/${p.slug}`,
+    url: `${baseUrl}/${p.property_type_slug}/${p.region_slug}/${p.commune_slug}/${p.slug}`,
     lastModified: p.created_at,
     priority: p.highlighted ? 0.9 : 0.6,
     changeFrequency: 'monthly',
@@ -444,7 +478,60 @@ Google penaliza sitios lentos. Con Next.js App Router y las siguientes práctica
 - Activar caché en Supabase queries que no cambian con frecuencia.
 - No cargar el carrusel de imágenes completo al inicio; usar `loading="lazy"` para fotos secundarias.
 
-### 7.5 SEO Local (Google Business Profile)
+### 7.5 Mapa de ubicación en fichas de propiedad
+
+El cliente confirmó que **sí se debe mostrar el mapa** en cada ficha para que el usuario final pueda ver la ubicación del terreno o propiedad. Se recomienda usar **Leaflet + OpenStreetMap** (gratuito, sin límites de uso) en lugar de Google Maps (requiere tarjeta de crédito y tiene cuotas).
+
+**Implementación sugerida:**
+
+```bash
+npm install leaflet react-leaflet
+npm install -D @types/leaflet
+```
+
+```typescript
+// components/map/PropertyMap.tsx
+'use client';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+
+interface Props {
+  lat: number;
+  lng: number;
+  label: string;
+}
+
+export function PropertyMap({ lat, lng, label }: Props) {
+  return (
+    <MapContainer center={[lat, lng]} zoom={14} style={{ height: '360px', width: '100%' }}>
+      <TileLayer
+        attribution='© <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
+      <Marker position={[lat, lng]}>
+        <Popup>{label}</Popup>
+      </Marker>
+    </MapContainer>
+  );
+}
+```
+
+Para habilitar esto se deben agregar dos columnas a la DB:
+
+```sql
+ALTER TABLE public.properties
+  ADD COLUMN IF NOT EXISTS latitude  numeric(10, 7),
+  ADD COLUMN IF NOT EXISTS longitude numeric(10, 7);
+```
+
+El componente debe cargarse con `dynamic` de Next.js para evitar errores de SSR (Leaflet requiere `window`):
+
+```typescript
+import dynamic from 'next/dynamic';
+const PropertyMap = dynamic(() => import('@/components/map/PropertyMap'), { ssr: false });
+```
+
+### 7.6 SEO Local (Google Business Profile)
 
 Dado que el cliente opera en regiones específicas de Chile y recibe clientes por boca a boca, crear un **perfil de Google Business** es clave. Permite aparecer en búsquedas tipo "terrenos en venta Melipilla" con mapa. No requiere cambios en el código pero complementa todo el trabajo SEO.
 
@@ -454,16 +541,17 @@ Dado que el cliente opera en regiones específicas de Chile y recibe clientes po
 
 | Fase | Acción | Prioridad | Observación |
 |------|--------|-----------|-------------|
-| **1** | Migración DB: `property_type`, `operation_type`, campos de ubicación | 🔴 Crítica | Debe hacerse antes de publicar el sitio |
+| **1** | Migración DB: `property_type`, `for_sale`, `for_rent`, campos de ubicación, `latitude`, `longitude` | 🔴 Crítica | Debe hacerse antes de publicar el sitio |
 | **2** | Definir y asignar slugs con estructura geográfica | 🔴 Crítica | Define todas las URLs permanentes |
 | **3** | Metadatos dinámicos (`title`, `description`) en Next.js | 🔴 Crítica | Necesario para indexación básica |
 | **4** | Open Graph en fichas y listados | 🟠 Alta | Necesario para compartir en redes sociales |
 | **5** | Schema.org JSON-LD en fichas individuales | 🟠 Alta | Habilita rich snippets en Google |
 | **6** | Sitemap XML + robots.txt | 🟠 Alta | Acelera la indexación |
-| **7** | Imágenes con `alt` descriptivo y componente `<Image>` | 🟡 Media | Impacto en Core Web Vitals y accesibilidad |
-| **8** | OG Image dinámica por propiedad | 🟡 Media | Mejora CTR en redes sociales |
-| **9** | Google Business Profile | 🟡 Media | SEO local, no requiere código |
-| **10** | Fotografía profesional / dron | 🟢 Baja | Mejora tiempo de permanencia y conversión |
+| **7** | Mapa Leaflet + OSM en fichas de propiedad | 🟠 Alta | Confirmado por el cliente |
+| **8** | Imágenes con `alt` descriptivo y componente `<Image>` | 🟡 Media | Impacto en Core Web Vitals y accesibilidad |
+| **9** | OG Image dinámica por propiedad | 🟡 Media | Mejora CTR en redes sociales |
+| **10** | Google Business Profile | 🟡 Media | SEO local, no requiere código |
+| **11** | Fotografía profesional / dron | 🟢 Baja | Mejora tiempo de permanencia y conversión |
 
 ---
 
@@ -475,10 +563,12 @@ Dado que el cliente opera en regiones específicas de Chile y recibe clientes po
 
 3. **El campo `slug` ya existe** en la tabla `properties`. Solo se debe actualizar su generación para incluir contexto geográfico, no recrearlo desde cero.
 
-4. **`location_text` debe mantenerse** durante la transición como columna de fallback. No eliminarla hasta validar que todos los registros tienen los nuevos campos de ubicación completos.
+4. **No hay registros que migrar.** Los datos actuales en la DB son de prueba y serán eliminados. El esquema nuevo se aplica en limpio y los registros de producción se cargarán directamente con la estructura correcta.
 
-5. **El cliente no quiere mapa.** No implementar `MapComponent` ni integración con Google Maps/Leaflet como parte de este plan.
+5. **El mapa es requerido.** Implementar `PropertyMap` con Leaflet + OpenStreetMap en la ficha de cada propiedad. Recordar cargar el componente con `dynamic(..., { ssr: false })` para evitar errores con `window`. Agregar `latitude` y `longitude` a la tabla `properties`.
 
-6. **Datos de contacto:** La propiedad usa `contact_phone` en la DB. El teléfono de llamadas y el de WhatsApp son diferentes. Evaluar si agregar un campo `whatsapp_phone` a la tabla o manejarlo como configuración global en variables de entorno.
+6. **`for_sale` y `for_rent` son independientes.** Una propiedad puede tener ambos en `true`. Los listados filtrados (`/terrenos/venta`, `/terrenos/arriendo`) deben usar `OPERATION_TO_DB_FIELD` para mapear el segmento de URL al campo correcto en la query de Supabase. La ficha individual **no** recibe `operacion` como parámetro, sino que lee los booleanos directamente desde la DB para construir la etiqueta de operación.
 
-7. **Propiedad destacada:** La Casona de San Pedro debe tener `highlighted = true`. Verificar que este valor esté cargado correctamente antes de generar el sitemap (las propiedades destacadas reciben `priority: 0.9`).
+7. **`contact_phone` es opcional por propiedad.** Si el campo está vacío (`null`), el frontend debe usar el teléfono de contacto por defecto definido en una constante del código (número de los dueños del portal). Este campo está pensado para cuando se incorporen propiedades de terceros, permitiendo poner directamente el número del propietario sin intermediarios.
+
+8. **Propiedad destacada:** La Casona de San Pedro debe tener `highlighted = true`. Verificar que este valor esté cargado correctamente antes de generar el sitemap (las propiedades destacadas reciben `priority: 0.9`).

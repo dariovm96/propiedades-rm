@@ -1,12 +1,19 @@
 export const revalidate = 60 // cache propiedades list for one minute
 
+import type { Metadata } from "next"
 import { supabase } from "@/lib/supabase"
 import PropertyGrid from "@/components/PropertyGrid"
 import { Property } from "@/types/property"
 import { PropertyHighlight } from "@/types/property-highlight"
 import Link from "next/link"
+import { buildPropertiesPageMetadata } from "@/lib/seo/metadata"
 
 const PAGE_SIZE = 6
+export const metadata: Metadata = buildPropertiesPageMetadata()
+const PROPERTIES_COUNT_PROJECTION = "id"
+const PROPERTIES_LIST_PROJECTION =
+  "id,title,slug,description,price,area_m2,location_text,property_type,for_sale,for_rent,region,region_slug,commune,commune_slug,street,street_number,latitude,longitude,status,highlighted,contact_phone,images"
+const PROPERTY_HIGHLIGHTS_SELECT = "id,property_id,sort_order,highlight,text,title,label,name,value,description"
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>
 
@@ -70,7 +77,7 @@ export default async function PropiedadesPage({ searchParams }: { searchParams: 
 
   const { count, error: countError } = await supabase
     .from("properties")
-    .select("*", { count: "exact", head: true })
+    .select(PROPERTIES_COUNT_PROJECTION, { count: "exact", head: true })
 
   if (countError) {
     return <p>Error cargando propiedades</p>
@@ -84,7 +91,7 @@ export default async function PropiedadesPage({ searchParams }: { searchParams: 
 
   const { data, error } = await supabase
     .from("properties")
-    .select("*")
+    .select(PROPERTIES_LIST_PROJECTION)
     .returns<Property[]>()
     .order("created_at", { ascending: false })
     .range(from, to)
@@ -101,7 +108,7 @@ export default async function PropiedadesPage({ searchParams }: { searchParams: 
   if (propertyIds.length > 0) {
     const { data: highlightsData } = await supabase
       .from("property_highlights")
-      .select("*")
+      .select(PROPERTY_HIGHLIGHTS_SELECT)
       .order("sort_order", { ascending: true })
       .in("property_id", propertyIds)
       .returns<PropertyHighlight[]>()

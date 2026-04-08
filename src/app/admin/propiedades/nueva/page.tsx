@@ -10,18 +10,17 @@ import PropertyFormFields from "@/components/PropertyFormFields"
 import PropertyHighlightsFields from "@/components/PropertyHighlightsFields"
 import ImageFilePicker from "@/components/ImageFilePicker"
 import ImageWithLoader from "@/components/ImageWithLoader"
-import { PropertyFormValues, toPropertyPayload } from "@/lib/property-form"
+import {
+  deriveLocationSlugs,
+  normalizePropertySlug,
+  PropertyFormValues,
+  PropertySeoFieldErrors,
+  toPropertyPayload,
+  validatePropertySeoMinimums,
+} from "@/lib/property-form"
 import { createPropertyHighlights } from "@/lib/property-highlights-client"
 import { EditablePropertyHighlight } from "@/types/property-highlight"
 import { PropertyInsertPayload } from "@/types/property"
-
-function generateSlug(text: string) {
-  return text
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-}
 
 export default function NuevaPropiedadPage() {
   const router = useRouter()
@@ -29,6 +28,7 @@ export default function NuevaPropiedadPage() {
   const [imagesFiles, setImagesFiles] = useState<File[]>([])
   const [previewUrls, setPreviewUrls] = useState<string[]>([])
   const [highlights, setHighlights] = useState<EditablePropertyHighlight[]>([{ text: "" }])
+  const [fieldErrors, setFieldErrors] = useState<PropertySeoFieldErrors>({})
   const previewUrlsRef = useRef<string[]>([])
 
   useEffect(() => {
@@ -45,23 +45,61 @@ export default function NuevaPropiedadPage() {
     title: "",
     description: "",
     location_text: "",
+    region: "",
+    commune: "",
+    street: "",
+    street_number: "",
     price: "",
     status: "available",
     area_m2: "",
     highlighted: false,
     contact_phone: "",
+    property_type: "",
+    for_sale: true,
+    for_rent: false,
+    region_slug: "",
+    commune_slug: "",
+    latitude: "",
+    longitude: "",
   })
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target
+    const errorFieldName =
+      name === "region" ? "region_slug" : name === "commune" ? "commune_slug" : name
+
+    setFieldErrors((prev) => {
+      if (!(errorFieldName in prev)) {
+        return prev
+      }
+
+      const next = { ...prev }
+      delete next[errorFieldName as keyof PropertySeoFieldErrors]
+      return next
+    })
+
     if (name === "status") {
       setForm((prev) => ({ ...prev, status: value as PropertyFormValues["status"] }))
       return
     }
 
-    setForm((prev) => ({ ...prev, [name]: value }))
+    setForm((prev) => {
+      const next = { ...prev, [name]: value }
+
+      if (name === "region" || name === "commune") {
+        const derived = deriveLocationSlugs({
+          regionText: name === "region" ? value : prev.region,
+          communeText: name === "commune" ? value : prev.commune,
+        })
+
+        next.region_slug = derived.region_slug
+        next.commune_slug = derived.commune_slug
+      }
+
+      return next
+    })
   }
 
   const handleImagesSelected = (incomingFiles: File[]) => {
@@ -92,12 +130,21 @@ export default function NuevaPropiedadPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    const seoErrors = validatePropertySeoMinimums(form)
+    if (Object.keys(seoErrors).length > 0) {
+      setFieldErrors(seoErrors)
+      toast.error("Completa la dirección y los datos mínimos antes de guardar")
+      return
+    }
+
     setLoading(true)
 
     try {
-      const slug = generateSlug(form.title)
+      const slug = normalizePropertySlug(form.title)
 
       const { data: userData, error: userError } = await supabase.auth.getUser()
+
       if (userError || !userData.user) {
         toast.error("No autenticado")
         return
@@ -109,13 +156,29 @@ export default function NuevaPropiedadPage() {
         images: [],
       }
 
-      const { data: insertedData, error: insertError } = await supabase
-        .from("properties")
-        .insert([insertPayload])
-        .select()
-        .single()
+      const insertResponse = await fetch("/admin/propiedades", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(insertPayload),
+      })
 
-      if (insertError) throw insertError
+      if (insertResponse.redirected) {
+        throw new Error("No autenticado")
+      }
+
+      const insertBody = (await insertResponse.json().catch(() => ({}))) as {
+        error?: string
+        property?: { id: string }
+      }
+
+      if (!insertResponse.ok || !insertBody.property) {
+        throw new Error(insertBody.error || "No se pudo crear la propiedad")
+      }
+
+      const insertedData = insertBody.property
       if (!insertedData) throw new Error("No property data returned")
 
       const propertyId = insertedData.id
@@ -168,6 +231,19 @@ export default function NuevaPropiedadPage() {
           form={form}
           onChange={handleChange}
           onHighlightedChange={(checked) => setForm((prev) => ({ ...prev, highlighted: checked }))}
+          onOperationChange={(name, checked) => {
+            setForm((prev) => ({ ...prev, [name]: checked }))
+            setFieldErrors((prev) => {
+              if (!prev.operation) {
+                return prev
+              }
+
+              const next = { ...prev }
+              delete next.operation
+              return next
+            })
+          }}
+          fieldErrors={fieldErrors}
         />
 
         <PropertyHighlightsFields items={highlights} onChange={setHighlights} disabled={loading} />

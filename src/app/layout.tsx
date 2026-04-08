@@ -1,20 +1,22 @@
 import "./globals.css"
+import "leaflet/dist/leaflet.css"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import ToasterProvider from "../components/ToasterProvider"
 import ScrollToTopButton from "@/components/ScrollToTopButton"
 import RouteScrollReset from "@/components/RouteScrollReset"
 import { Outfit } from "next/font/google"
+import type { Metadata } from "next"
+import { buildSeoLayoutMetadata } from "@/lib/seo/metadata"
+import { buildOrganizationJsonLd, safeJsonLdScriptContent } from "@/lib/seo/jsonld"
 
 const outfit = Outfit({
   subsets: ["latin"],
   variable: "--font-outfit",
 })
 
-export const metadata = {
-  title: "Propiedades RM",
-  description: "Compra y arriendo directo de propiedades sin intermediarios",
-}
+export const metadata: Metadata = buildSeoLayoutMetadata()
+const organizationJsonLd = safeJsonLdScriptContent(buildOrganizationJsonLd())
 
 export default function RootLayout({
   children,
@@ -27,6 +29,9 @@ export default function RootLayout({
         suppressHydrationWarning
         className={`${outfit.variable} bg-surface-0 text-content-primary min-h-screen flex flex-col overflow-x-hidden`}
       >
+        {organizationJsonLd ? (
+          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: organizationJsonLd }} />
+        ) : null}
         <RouteScrollReset />
         <Header />
 

@@ -12,7 +12,13 @@ import PropertyHighlightsFields from "@/components/PropertyHighlightsFields"
 import ImageFilePicker from "@/components/ImageFilePicker"
 import ImageWithLoader from "@/components/ImageWithLoader"
 import { Property } from "@/types/property"
-import { PropertyFormValues, toPropertyPayload } from "@/lib/property-form"
+import {
+  deriveLocationSlugs,
+  PropertyFormValues,
+  PropertySeoFieldErrors,
+  toPropertyPayload,
+  validatePropertySeoMinimums,
+} from "@/lib/property-form"
 import { getPublicImageUrl } from "@/lib/storage-helpers"
 import { fetchPropertyHighlights, syncPropertyHighlights } from "@/lib/property-highlights-client"
 import { EditablePropertyHighlight } from "@/types/property-highlight"
@@ -30,11 +36,22 @@ export default function EditPropertyForm({ property }: Props) {
     title: property.title,
     description: property.description || "",
     location_text: property.location_text || "",
+    region: property.region || "",
+    commune: property.commune || "",
+    street: property.street || "",
+    street_number: property.street_number || "",
     price: property.price?.toString() || "",
     status: property.status,
     area_m2: property.area_m2?.toString() || "",
     highlighted: property.highlighted,
     contact_phone: property.contact_phone || "",
+    property_type: property.property_type || "",
+    for_sale: Boolean(property.for_sale),
+    for_rent: Boolean(property.for_rent),
+    region_slug: property.region_slug || "",
+    commune_slug: property.commune_slug || "",
+    latitude: property.latitude?.toString() || "",
+    longitude: property.longitude?.toString() || "",
   })
 
   const [imagesFiles, setImagesFiles] = useState<File[]>([])
@@ -48,6 +65,7 @@ export default function EditPropertyForm({ property }: Props) {
   const [imagePendingRemoval, setImagePendingRemoval] = useState<string | null>(null)
   const [highlights, setHighlights] = useState<EditablePropertyHighlight[]>([])
   const [initialHighlights, setInitialHighlights] = useState<EditablePropertyHighlight[]>([])
+  const [fieldErrors, setFieldErrors] = useState<PropertySeoFieldErrors>({})
 
   useEffect(() => {
     previewUrlsRef.current = previewUrls
@@ -93,12 +111,39 @@ export default function EditPropertyForm({ property }: Props) {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target
+    const errorFieldName =
+      name === "region" ? "region_slug" : name === "commune" ? "commune_slug" : name
+
+    setFieldErrors((prev) => {
+      if (!(errorFieldName in prev)) {
+        return prev
+      }
+
+      const next = { ...prev }
+      delete next[errorFieldName as keyof PropertySeoFieldErrors]
+      return next
+    })
+
     if (name === "status") {
       setForm((prev) => ({ ...prev, status: value as PropertyFormValues["status"] }))
       return
     }
 
-    setForm((prev) => ({ ...prev, [name]: value }))
+    setForm((prev) => {
+      const next = { ...prev, [name]: value }
+
+      if (name === "region" || name === "commune") {
+        const derived = deriveLocationSlugs({
+          regionText: name === "region" ? value : prev.region,
+          communeText: name === "commune" ? value : prev.commune,
+        })
+
+        next.region_slug = derived.region_slug
+        next.commune_slug = derived.commune_slug
+      }
+
+      return next
+    })
   }
 
   const handleImagesSelected = (incomingFiles: File[]) => {
@@ -146,9 +191,24 @@ export default function EditPropertyForm({ property }: Props) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    const seoErrors = validatePropertySeoMinimums(form)
+    if (Object.keys(seoErrors).length > 0) {
+      setFieldErrors(seoErrors)
+      toast.error("Completa la dirección y los datos mínimos antes de guardar")
+      return
+    }
+
     setLoading(true)
 
     try {
+      const { data: userData, error: userError } = await supabase.auth.getUser()
+
+      if (userError || !userData.user) {
+        toast.error("No autenticado")
+        return
+      }
+
       let updatedImages = [...existingImages]
 
       if (imagesFiles.length > 0) {
@@ -165,12 +225,26 @@ export default function EditPropertyForm({ property }: Props) {
         images: updatedImages,
       }
 
-      const { error } = await supabase
-        .from("properties")
-        .update(updatePayload)
-        .eq("id", property.id)
+      const updateResponse = await fetch(`/admin/propiedades/${property.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(updatePayload),
+      })
 
-      if (error) throw error
+      if (updateResponse.redirected) {
+        throw new Error("No autenticado")
+      }
+
+      const updateBody = (await updateResponse.json().catch(() => ({}))) as {
+        error?: string
+      }
+
+      if (!updateResponse.ok) {
+        throw new Error(updateBody.error || "No se pudo actualizar la propiedad")
+      }
 
       await syncPropertyHighlights(property.id, initialHighlights, highlights)
 
@@ -208,6 +282,19 @@ export default function EditPropertyForm({ property }: Props) {
           form={form}
           onChange={handleChange}
           onHighlightedChange={(checked) => setForm((prev) => ({ ...prev, highlighted: checked }))}
+          onOperationChange={(name, checked) => {
+            setForm((prev) => ({ ...prev, [name]: checked }))
+            setFieldErrors((prev) => {
+              if (!prev.operation) {
+                return prev
+              }
+
+              const next = { ...prev }
+              delete next.operation
+              return next
+            })
+          }}
+          fieldErrors={fieldErrors}
         />
 
         <PropertyHighlightsFields items={highlights} onChange={setHighlights} disabled={loading} />

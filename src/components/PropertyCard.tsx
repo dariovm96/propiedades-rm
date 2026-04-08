@@ -27,10 +27,11 @@ export default function PropertyCard({ property }: Props) {
                 {cover ? (
                     <ImageWithLoader
                         src={cover}
-                        alt={property.title}
+                        alt={`Imagen principal de ${property.title}`}
                         wrapperClassName="relative h-full w-full"
                         fill
                         imageClassName="object-cover group-hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
                     />
                 ) : (
                     <div className="h-full w-full flex items-center justify-center text-sm text-content-secondary">
