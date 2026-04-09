@@ -127,9 +127,27 @@ describe("admin routes security integration", () => {
     expect(patchResponse.headers.get("X-Frame-Options")).toBe("DENY")
     expect(highlightResponse.headers.get("X-Frame-Options")).toBe("DENY")
 
-    expect(createBody).toEqual({ error: "server misconfiguration" })
-    expect(patchBody).toEqual({ error: "server misconfiguration" })
-    expect(highlightBody).toEqual({ error: "server misconfiguration" })
+    expect(createBody).toEqual(
+      expect.objectContaining({
+        error: "internal_error",
+        message: "internal server error",
+      })
+    )
+    expect(patchBody).toEqual(
+      expect.objectContaining({
+        error: "internal_error",
+        message: "internal server error",
+      })
+    )
+    expect(highlightBody).toEqual(
+      expect.objectContaining({
+        error: "internal_error",
+        message: "internal server error",
+      })
+    )
+    expect(typeof createBody.requestId).toBe("string")
+    expect(typeof patchBody.requestId).toBe("string")
+    expect(typeof highlightBody.requestId).toBe("string")
   })
 
   it("pasa de 200 a 429 al exceder umbral en PATCH /admin/propiedades/:id", async () => {
@@ -168,7 +186,118 @@ describe("admin routes security integration", () => {
     assertResponse(blockedResponse)
     expect(blockedResponse.status).toBe(429)
     expect(blockedResponse.headers.get("Retry-After")).toBeTruthy()
-    await expect(blockedResponse.json()).resolves.toEqual({ error: "rate limit exceeded" })
+    const blockedBody = await blockedResponse.json()
+    expect(blockedBody).toEqual(
+      expect.objectContaining({
+        error: "rate_limited",
+        message: "rate limit exceeded",
+      })
+    )
+    expect(typeof blockedBody.requestId).toBe("string")
+  })
+
+  it("pasa de 201 a 429 al exceder umbral en POST /admin/propiedades", async () => {
+    requireServiceRoleClientMock.mockReturnValue(buildCreatePropertyClient())
+    const { POST } = await import("@/app/admin/propiedades/route")
+
+    const validPayload = {
+      property_type: "departamento",
+      for_sale: true,
+      for_rent: false,
+      region: "Región Metropolitana",
+      commune: "Santiago",
+      street: "Alameda",
+      street_number: "123",
+      region_slug: "region-metropolitana",
+      commune_slug: "santiago",
+      latitude: -33.45,
+      longitude: -70.66,
+    }
+
+    for (let index = 0; index < 20; index += 1) {
+      const response = await POST(
+        new NextRequest("http://localhost:3000/admin/propiedades", {
+          method: "POST",
+          headers: withSameOriginHeaders({
+            "content-type": "application/json",
+            "x-forwarded-for": "127.0.0.1",
+          }),
+          body: JSON.stringify(validPayload),
+        })
+      )
+
+      assertResponse(response)
+      expect(response.status).toBe(201)
+    }
+
+    const blockedResponse = await POST(
+      new NextRequest("http://localhost:3000/admin/propiedades", {
+        method: "POST",
+        headers: withSameOriginHeaders({
+          "content-type": "application/json",
+          "x-forwarded-for": "127.0.0.1",
+        }),
+        body: JSON.stringify(validPayload),
+      })
+    )
+
+    assertResponse(blockedResponse)
+    expect(blockedResponse.status).toBe(429)
+    expect(blockedResponse.headers.get("Retry-After")).toBeTruthy()
+    const blockedBody = await blockedResponse.json()
+    expect(blockedBody).toEqual(
+      expect.objectContaining({
+        error: "rate_limited",
+        message: "rate limit exceeded",
+      })
+    )
+    expect(typeof blockedBody.requestId).toBe("string")
+  })
+
+  it("pasa de 200 a 429 al exceder umbral en POST /admin/propiedades/:id/highlights", async () => {
+    requireServiceRoleClientMock.mockReturnValue(buildCreatePropertyClient())
+    const { POST } = await import("@/app/admin/propiedades/[id]/highlights/route")
+
+    for (let index = 0; index < 45; index += 1) {
+      const response = await POST(
+        new NextRequest("http://localhost:3000/admin/propiedades/abc/highlights", {
+          method: "POST",
+          headers: withSameOriginHeaders({
+            "content-type": "application/json",
+            "x-forwarded-for": "127.0.0.1",
+          }),
+          body: JSON.stringify({ text: `Highlight ${index}` }),
+        }),
+        { params: Promise.resolve({ id: "abc" }) }
+      )
+
+      assertResponse(response)
+      expect(response.status).toBe(200)
+    }
+
+    const blockedResponse = await POST(
+      new NextRequest("http://localhost:3000/admin/propiedades/abc/highlights", {
+        method: "POST",
+        headers: withSameOriginHeaders({
+          "content-type": "application/json",
+          "x-forwarded-for": "127.0.0.1",
+        }),
+        body: JSON.stringify({ text: "Blocked highlight" }),
+      }),
+      { params: Promise.resolve({ id: "abc" }) }
+    )
+
+    assertResponse(blockedResponse)
+    expect(blockedResponse.status).toBe(429)
+    expect(blockedResponse.headers.get("Retry-After")).toBeTruthy()
+    const blockedBody = await blockedResponse.json()
+    expect(blockedBody).toEqual(
+      expect.objectContaining({
+        error: "rate_limited",
+        message: "rate limit exceeded",
+      })
+    )
+    expect(typeof blockedBody.requestId).toBe("string")
   })
 
   it("rechaza mutaciones admin con 403 cuando origin/referer no son same-origin", async () => {
@@ -234,7 +363,14 @@ describe("admin routes security integration", () => {
       assertResponse(response)
       expect(response.status).toBe(403)
       expect(response.headers.get("X-Frame-Options")).toBe("DENY")
-      await expect(response.json()).resolves.toEqual({ error: "forbidden" })
+      const body = await response.json()
+      expect(body).toEqual(
+        expect.objectContaining({
+          error: "forbidden",
+          message: "forbidden",
+        })
+      )
+      expect(typeof body.requestId).toBe("string")
     }
   })
 

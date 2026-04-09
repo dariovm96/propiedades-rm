@@ -40,7 +40,7 @@ export function enforceAdminCsrf(req: NextRequest): CsrfDecision {
   if (!sameOriginByOrigin && !sameOriginByReferer) {
     return {
       ok: false,
-      response: jsonError(ADMIN_API_MESSAGES.FORBIDDEN, ADMIN_API_STATUS.FORBIDDEN),
+      response: jsonError(ADMIN_API_MESSAGES.FORBIDDEN, ADMIN_API_STATUS.FORBIDDEN, undefined, { request: req }),
     }
   }
 

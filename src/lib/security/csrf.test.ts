@@ -29,7 +29,14 @@ describe("enforceAdminCsrf", () => {
     }
 
     expect(decision.response.status).toBe(403)
-    await expect(decision.response.json()).resolves.toEqual({ error: "forbidden" })
+    const body = await decision.response.json()
+    expect(body).toEqual(
+      expect.objectContaining({
+        error: "forbidden",
+        message: "forbidden",
+      })
+    )
+    expect(typeof body.requestId).toBe("string")
   })
 
   it("permite mutaciones con origin same-origin", () => {

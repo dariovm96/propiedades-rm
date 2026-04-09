@@ -51,7 +51,7 @@ export async function PATCH(
     return csrfDecision.response
   }
 
-  const rateLimited = withAdminRateLimit(req, {
+  const rateLimited = await withAdminRateLimit(req, {
     routeKey: "admin_propiedades_update_delete",
     adminEmail: guard.user.email,
   })
@@ -63,18 +63,18 @@ export async function PATCH(
   try {
     adminSupabase = requireServiceRoleClient()
   } catch {
-    return jsonError(ADMIN_API_MESSAGES.SERVER_MISCONFIGURATION, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR)
+    return jsonError(ADMIN_API_MESSAGES.SERVER_MISCONFIGURATION, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR, undefined, { request: req })
   }
 
   let payload: unknown
   try {
     payload = await req.json()
   } catch {
-    return jsonError(ADMIN_API_MESSAGES.INVALID_REQUEST, ADMIN_API_STATUS.BAD_REQUEST)
+    return jsonError(ADMIN_API_MESSAGES.INVALID_REQUEST, ADMIN_API_STATUS.BAD_REQUEST, undefined, { request: req })
   }
 
   if (!isPlainObject(payload)) {
-    return jsonError(ADMIN_API_MESSAGES.INVALID_REQUEST, ADMIN_API_STATUS.BAD_REQUEST)
+    return jsonError(ADMIN_API_MESSAGES.INVALID_REQUEST, ADMIN_API_STATUS.BAD_REQUEST, undefined, { request: req })
   }
 
   if (isHighlightOnlyPayload(payload)) {
@@ -85,7 +85,7 @@ export async function PATCH(
       .select("id, highlighted")
 
     if (error) {
-      return jsonError(error.message, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR)
+      return jsonError(error.message, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR, undefined, { request: req })
     }
 
     if (!data || data.length === 0) {
@@ -96,20 +96,20 @@ export async function PATCH(
   }
 
   if (!hasSeoValidationFields(payload)) {
-    return jsonError(ADMIN_API_MESSAGES.INVALID_REQUEST, ADMIN_API_STATUS.BAD_REQUEST)
+    return jsonError(ADMIN_API_MESSAGES.INVALID_REQUEST, ADMIN_API_STATUS.BAD_REQUEST, undefined, { request: req })
   }
 
   const validation = validatePropertySeoPayload(payload)
   if (!validation.ok) {
     return jsonError(ADMIN_API_MESSAGES.SEO_VALIDATION_FAILED, ADMIN_API_STATUS.BAD_REQUEST, {
       errors: validation.errors,
-    })
+    }, { request: req })
   }
 
   const { data, error } = await adminSupabase.from("properties").update(payload).eq("id", id).select("*")
 
   if (error) {
-    return jsonError(error.message, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR)
+    return jsonError(error.message, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR, undefined, { request: req })
   }
 
   if (!data || data.length === 0) {
@@ -136,7 +136,7 @@ export async function DELETE(
     return csrfDecision.response
   }
 
-  const rateLimited = withAdminRateLimit(req, {
+  const rateLimited = await withAdminRateLimit(req, {
     routeKey: "admin_propiedades_update_delete",
     adminEmail: guard.user.email,
   })
@@ -149,7 +149,7 @@ export async function DELETE(
   try {
     adminSupabase = requireServiceRoleClient()
   } catch {
-    return jsonError(ADMIN_API_MESSAGES.SERVER_MISCONFIGURATION, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR)
+    return jsonError(ADMIN_API_MESSAGES.SERVER_MISCONFIGURATION, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR, undefined, { request: req })
   }
 
   // fetch property first to know which images to clean up
@@ -164,7 +164,7 @@ export async function DELETE(
     if (fetchError.code === "PGRST116") {
       return jsonError(ADMIN_API_MESSAGES.PROPERTY_NOT_FOUND, ADMIN_API_STATUS.NOT_FOUND)
     }
-    return jsonError(fetchError.message, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR)
+    return jsonError(fetchError.message, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR, undefined, { request: req })
   }
 
   const imagesToRemove: string[] = propertyData?.images || []
@@ -178,7 +178,7 @@ export async function DELETE(
 
 
   if (error) {
-    return jsonError(error.message, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR)
+    return jsonError(error.message, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR, undefined, { request: req })
   }
 
   if (!deleted || deleted.length === 0) {
@@ -196,7 +196,6 @@ export async function DELETE(
       return jsonSuccess({
         deleted,
         warning: ADMIN_API_MESSAGES.IMAGE_CLEANUP_FAILED,
-        storageError: storageErr.message,
       })
     }
   }

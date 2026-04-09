@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server"
 
 import { ADMIN_API_MESSAGES, ADMIN_API_STATUS } from "@/lib/constants"
 import { buildRateLimitBucketKey, checkRateLimit, RateLimitConfig } from "@/lib/admin/rate-limit"
+import { withSecurityHeaders } from "@/lib/security/headers"
+import { sanitizeError } from "@/lib/security/error-sanitizer"
 
 type AdminRateLimitRouteKey =
   | "admin_propiedades_create"
@@ -50,17 +52,17 @@ function hashBucketKey(value: string): string {
   return (hash >>> 0).toString(16)
 }
 
-export function withAdminRateLimit(
+export async function withAdminRateLimit(
   req: NextRequest,
   input: WithAdminRateLimitInput
-): NextResponse | null {
+): Promise<NextResponse | null> {
   const config = RATE_LIMIT_BY_ROUTE[input.routeKey]
   const ip = resolveClientIp(req)
   const adminEmail = input.adminEmail?.trim().toLowerCase() || "unknown-admin"
   const baseKey = `${input.routeKey}:${ip}:${adminEmail}`
   const bucketKey = buildRateLimitBucketKey(baseKey, config)
 
-  const decision = checkRateLimit(bucketKey, config)
+  const decision = await checkRateLimit(bucketKey, config)
   if (decision.allowed) {
     return null
   }
@@ -72,13 +74,23 @@ export function withAdminRateLimit(
     retryAfterSec: decision.retryAfterSec,
   })
 
-  return NextResponse.json(
-    { error: ADMIN_API_MESSAGES.RATE_LIMIT_EXCEEDED },
+  const requestId = typeof crypto !== "undefined" && "randomUUID" in crypto
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(16).slice(2)}`
+
+  const sanitized = sanitizeError({
+    status: ADMIN_API_STATUS.TOO_MANY_REQUESTS,
+    error: ADMIN_API_MESSAGES.RATE_LIMIT_EXCEEDED,
+    requestId,
+  })
+
+  return withSecurityHeaders(NextResponse.json(
+    sanitized.envelope,
     {
       status: ADMIN_API_STATUS.TOO_MANY_REQUESTS,
       headers: {
         "Retry-After": String(decision.retryAfterSec),
       },
     }
-  )
+  ), { request: req })
 }

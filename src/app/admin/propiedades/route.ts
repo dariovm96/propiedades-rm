@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     return csrfDecision.response
   }
 
-  const rateLimited = withAdminRateLimit(req, {
+  const rateLimited = await withAdminRateLimit(req, {
     routeKey: "admin_propiedades_create",
     adminEmail: guard.user.email,
   })
@@ -37,31 +37,31 @@ export async function POST(req: NextRequest) {
   try {
     adminSupabase = requireServiceRoleClient()
   } catch {
-    return jsonError(ADMIN_API_MESSAGES.SERVER_MISCONFIGURATION, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR)
+    return jsonError(ADMIN_API_MESSAGES.SERVER_MISCONFIGURATION, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR, undefined, { request: req })
   }
 
   let payload: unknown
   try {
     payload = await req.json()
   } catch {
-    return jsonError(ADMIN_API_MESSAGES.INVALID_REQUEST, ADMIN_API_STATUS.BAD_REQUEST)
+    return jsonError(ADMIN_API_MESSAGES.INVALID_REQUEST, ADMIN_API_STATUS.BAD_REQUEST, undefined, { request: req })
   }
 
   if (!isPlainObject(payload)) {
-    return jsonError(ADMIN_API_MESSAGES.INVALID_REQUEST, ADMIN_API_STATUS.BAD_REQUEST)
+    return jsonError(ADMIN_API_MESSAGES.INVALID_REQUEST, ADMIN_API_STATUS.BAD_REQUEST, undefined, { request: req })
   }
 
   const validation = validatePropertySeoPayload(payload)
   if (!validation.ok) {
     return jsonError(ADMIN_API_MESSAGES.SEO_VALIDATION_FAILED, ADMIN_API_STATUS.BAD_REQUEST, {
       errors: validation.errors,
-    })
+    }, { request: req })
   }
 
   const { data, error } = await adminSupabase.from("properties").insert(payload).select("*").single()
 
   if (error) {
-    return jsonError(error.message, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR)
+    return jsonError(error.message, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR, undefined, { request: req })
   }
 
   return jsonSuccess({ property: data }, 201)

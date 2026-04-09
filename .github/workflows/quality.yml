@@ -30,3 +30,29 @@ jobs:
 
       - name: Tests (CI)
         run: npm run test:ci
+
+  security-gates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Dependency audit (block High/Critical)
+        run: npm run security:audit
+
+      - name: Validate security exceptions (owner/evidence/expiry)
+        run: npm run security:exceptions
+
+      - name: Secret scanning (tracked files)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
