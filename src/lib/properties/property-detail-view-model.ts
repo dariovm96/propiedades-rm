@@ -107,7 +107,7 @@ export function toPropertyDetailViewModel(
     title: input.property.title,
     description: input.property.description,
     locationText: input.property.location_text || "Ubicacion por confirmar",
-    formattedPrice: input.property.price ? `$${input.property.price.toLocaleString()}` : "Precio a consultar",
+    formattedPrice: input.property.price ? `$${input.property.price.toLocaleString("es-CL")}` : "Precio a consultar",
     areaLabel: input.property.area_m2 ? `${input.property.area_m2} m²` : "Superficie por confirmar",
     status: input.property.status,
     imageUrls,
