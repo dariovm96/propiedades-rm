@@ -1,0 +1,17 @@
+schema_version: 1
+
+exceptions:
+  - id: "npm-audit-false-positive-template"
+    scanner: "npm-audit"
+    package: "example-package"
+    vulnerability_id: "GHSA-xxxx-yyyy-zzzz"
+    reason: "Template entry for documented false positives; replace with real approved exception if needed"
+    owner:
+      team: "security"
+      contact: "security@propiedades-rm.local"
+    evidence:
+      url: "https://github.com/propiedades-rm/propiedades-rm/security/advisories"
+      ticket: "SEC-000"
+    approved_by: "security-lead"
+    created_at: "2026-04-02"
+    expiry: "2026-12-31"

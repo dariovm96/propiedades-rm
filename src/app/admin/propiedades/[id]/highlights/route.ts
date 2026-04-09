@@ -112,7 +112,7 @@ async function parseJsonSafely(req: NextRequest): Promise<unknown | null> {
   }
 }
 
-async function requireAdminRouteAccess() {
+async function requireAdminRouteAccess(req?: NextRequest) {
   const serverSupabase = await createRouteSupabaseClient()
   const guard = await requireAdminUser(serverSupabase)
 
@@ -125,19 +125,18 @@ async function requireAdminRouteAccess() {
     adminSupabase = requireServiceRoleClient()
   } catch {
     return {
-      errorResponse: jsonError(
-        ADMIN_API_MESSAGES.SERVER_MISCONFIGURATION,
-        ADMIN_API_STATUS.INTERNAL_SERVER_ERROR
-      ),
+      errorResponse: jsonError(ADMIN_API_MESSAGES.SERVER_MISCONFIGURATION, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR, undefined, {
+        request: req,
+      }),
     }
   }
 
   return { adminSupabase, adminEmail: guard.user.email }
 }
 
-export async function GET(_req: NextRequest, ctx: RouteCtx) {
+export async function GET(req: NextRequest, ctx: RouteCtx) {
   const { id: propertyId } = await ctx.params
-  const access = await requireAdminRouteAccess()
+  const access = await requireAdminRouteAccess(req)
   if ("errorResponse" in access) {
     return access.errorResponse
   }
@@ -149,7 +148,7 @@ export async function GET(_req: NextRequest, ctx: RouteCtx) {
     .order("sort_order", { ascending: true })
 
   if (error) {
-    return jsonError(error.message, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR)
+    return jsonError(error.message, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR, undefined, { request: req })
   }
 
   return jsonSuccess({ highlights: ((data as PropertyHighlight[] | null) ?? []) })
@@ -157,7 +156,7 @@ export async function GET(_req: NextRequest, ctx: RouteCtx) {
 
 export async function POST(req: NextRequest, ctx: RouteCtx) {
   const { id: propertyId } = await ctx.params
-  const access = await requireAdminRouteAccess()
+  const access = await requireAdminRouteAccess(req)
   if ("errorResponse" in access) {
     return access.errorResponse
   }
@@ -167,7 +166,7 @@ export async function POST(req: NextRequest, ctx: RouteCtx) {
     return csrfDecision.response
   }
 
-  const rateLimited = withAdminRateLimit(req, {
+  const rateLimited = await withAdminRateLimit(req, {
     routeKey: "admin_propiedades_highlights_mutation",
     adminEmail: access.adminEmail,
   })
@@ -177,14 +176,14 @@ export async function POST(req: NextRequest, ctx: RouteCtx) {
 
   const payload = await parseJsonSafely(req)
   if (!isPlainObject(payload)) {
-    return jsonError(ADMIN_API_MESSAGES.INVALID_REQUEST, ADMIN_API_STATUS.BAD_REQUEST)
+    return jsonError(ADMIN_API_MESSAGES.INVALID_REQUEST, ADMIN_API_STATUS.BAD_REQUEST, undefined, { request: req })
   }
 
   const typedPayload = payload as PropertyHighlightCreateRequest
 
   const candidate = isPlainObject(typedPayload.highlight) ? typedPayload.highlight : typedPayload
   if (!isPlainObject(candidate)) {
-    return jsonError(ADMIN_API_MESSAGES.INVALID_HIGHLIGHT, ADMIN_API_STATUS.BAD_REQUEST)
+    return jsonError(ADMIN_API_MESSAGES.INVALID_HIGHLIGHT, ADMIN_API_STATUS.BAD_REQUEST, undefined, { request: req })
   }
 
   const insertData: JsonObject = {
@@ -202,7 +201,7 @@ export async function POST(req: NextRequest, ctx: RouteCtx) {
   const { data, error } = await tryInsertHighlightVariants(access.adminSupabase, variants)
 
   if (error) {
-    return jsonError(error.message, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR)
+    return jsonError(error.message, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR, undefined, { request: req })
   }
 
   return jsonSuccess({ highlight: data })
@@ -210,7 +209,7 @@ export async function POST(req: NextRequest, ctx: RouteCtx) {
 
 export async function PATCH(req: NextRequest, ctx: RouteCtx) {
   const { id: propertyId } = await ctx.params
-  const access = await requireAdminRouteAccess()
+  const access = await requireAdminRouteAccess(req)
   if ("errorResponse" in access) {
     return access.errorResponse
   }
@@ -220,7 +219,7 @@ export async function PATCH(req: NextRequest, ctx: RouteCtx) {
     return csrfDecision.response
   }
 
-  const rateLimited = withAdminRateLimit(req, {
+  const rateLimited = await withAdminRateLimit(req, {
     routeKey: "admin_propiedades_highlights_mutation",
     adminEmail: access.adminEmail,
   })
@@ -230,7 +229,7 @@ export async function PATCH(req: NextRequest, ctx: RouteCtx) {
 
   const payload = await parseJsonSafely(req)
   if (!isPlainObject(payload)) {
-    return jsonError(ADMIN_API_MESSAGES.INVALID_REQUEST, ADMIN_API_STATUS.BAD_REQUEST)
+    return jsonError(ADMIN_API_MESSAGES.INVALID_REQUEST, ADMIN_API_STATUS.BAD_REQUEST, undefined, { request: req })
   }
 
   const typedPayload = payload as PropertyHighlightUpdateRequest
@@ -240,7 +239,7 @@ export async function PATCH(req: NextRequest, ctx: RouteCtx) {
     (typeof typedPayload.id === "string" && typedPayload.id)
 
   if (!highlightId) {
-    return jsonError(ADMIN_API_MESSAGES.INVALID_REQUEST, ADMIN_API_STATUS.BAD_REQUEST)
+    return jsonError(ADMIN_API_MESSAGES.INVALID_REQUEST, ADMIN_API_STATUS.BAD_REQUEST, undefined, { request: req })
   }
 
   const updateCandidate =
@@ -260,7 +259,7 @@ export async function PATCH(req: NextRequest, ctx: RouteCtx) {
       : null
 
   if (!updateCandidate) {
-    return jsonError(ADMIN_API_MESSAGES.INVALID_HIGHLIGHT, ADMIN_API_STATUS.BAD_REQUEST)
+    return jsonError(ADMIN_API_MESSAGES.INVALID_HIGHLIGHT, ADMIN_API_STATUS.BAD_REQUEST, undefined, { request: req })
   }
 
   const updateData: JsonObject = {
@@ -276,7 +275,7 @@ export async function PATCH(req: NextRequest, ctx: RouteCtx) {
     : [updateDataWithoutText]
 
   if (Object.keys(updateDataWithoutText).length === 0 && !textValue) {
-    return jsonError(ADMIN_API_MESSAGES.INVALID_HIGHLIGHT, ADMIN_API_STATUS.BAD_REQUEST)
+    return jsonError(ADMIN_API_MESSAGES.INVALID_HIGHLIGHT, ADMIN_API_STATUS.BAD_REQUEST, undefined, { request: req })
   }
 
   const { data, error } = await tryUpdateHighlightVariants(
@@ -287,11 +286,11 @@ export async function PATCH(req: NextRequest, ctx: RouteCtx) {
   )
 
   if (error) {
-    return jsonError(error.message, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR)
+    return jsonError(error.message, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR, undefined, { request: req })
   }
 
   if (!data || data.length === 0) {
-    return jsonError(ADMIN_API_MESSAGES.HIGHLIGHT_NOT_FOUND, ADMIN_API_STATUS.NOT_FOUND)
+    return jsonError(ADMIN_API_MESSAGES.HIGHLIGHT_NOT_FOUND, ADMIN_API_STATUS.NOT_FOUND, undefined, { request: req })
   }
 
   return jsonSuccess({ highlight: data[0] })
@@ -299,7 +298,7 @@ export async function PATCH(req: NextRequest, ctx: RouteCtx) {
 
 export async function DELETE(req: NextRequest, ctx: RouteCtx) {
   const { id: propertyId } = await ctx.params
-  const access = await requireAdminRouteAccess()
+  const access = await requireAdminRouteAccess(req)
   if ("errorResponse" in access) {
     return access.errorResponse
   }
@@ -309,7 +308,7 @@ export async function DELETE(req: NextRequest, ctx: RouteCtx) {
     return csrfDecision.response
   }
 
-  const rateLimited = withAdminRateLimit(req, {
+  const rateLimited = await withAdminRateLimit(req, {
     routeKey: "admin_propiedades_highlights_mutation",
     adminEmail: access.adminEmail,
   })
@@ -330,7 +329,7 @@ export async function DELETE(req: NextRequest, ctx: RouteCtx) {
 
   const highlightId = highlightIdFromQuery || highlightIdFromBody
   if (!highlightId) {
-    return jsonError(ADMIN_API_MESSAGES.INVALID_REQUEST, ADMIN_API_STATUS.BAD_REQUEST)
+    return jsonError(ADMIN_API_MESSAGES.INVALID_REQUEST, ADMIN_API_STATUS.BAD_REQUEST, undefined, { request: req })
   }
 
   const { data, error } = await access.adminSupabase
@@ -341,11 +340,11 @@ export async function DELETE(req: NextRequest, ctx: RouteCtx) {
     .eq("property_id", propertyId)
 
   if (error) {
-    return jsonError(error.message, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR)
+    return jsonError(error.message, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR, undefined, { request: req })
   }
 
   if (!data || data.length === 0) {
-    return jsonError(ADMIN_API_MESSAGES.HIGHLIGHT_NOT_FOUND, ADMIN_API_STATUS.NOT_FOUND)
+    return jsonError(ADMIN_API_MESSAGES.HIGHLIGHT_NOT_FOUND, ADMIN_API_STATUS.NOT_FOUND, undefined, { request: req })
   }
 
   return jsonSuccess({ deleted: data })

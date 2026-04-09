@@ -47,6 +47,22 @@ Standard test runner is **Vitest**.
 
 For new guardrails, prefer Vitest APIs (`describe`, `it`, `expect`) and `@/...` imports.
 
+## Security Gates (CI)
+
+- `npm run security:audit`: runs dependency audit for production dependencies and fails on `high`/`critical` findings.
+- `npm run security:exceptions`: validates `.github/security-exceptions.yaml` and fails if any exception is missing traceability metadata (`owner`, `evidence`) or has expired `expiry`.
+- `.github/workflows/quality.yml` includes a blocking `security-gates` job for:
+  - dependency audit (`npm run security:audit`)
+  - security exceptions validation (`npm run security:exceptions`)
+  - secret scanning (`gitleaks/gitleaks-action@v2`)
+
+## Security Hardening Runbook
+
+- Operational checklist for pre-production, post-deploy, rollback, ownership and no-visual-impact evidence:
+  - `docs/security-hardening-checklist.md`
+- Evidence log used to close verify gaps (visual parity + CI gates execution proof):
+  - `docs/security-hardening-evidence.md`
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
