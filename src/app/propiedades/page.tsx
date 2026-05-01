@@ -134,28 +134,28 @@ export default async function PropiedadesPage({ searchParams }: { searchParams: 
   const previousPage = Math.max(1, currentPage - 1)
   const nextPage = Math.min(totalPages, currentPage + 1)
 
-  return (
-    <section className="space-y-8 sm:space-y-10">
-      <div className="space-y-5">
+return (
+    <section className="space-y-8 sm:space-y-10 py-4 sm:py-6">
+      <div className="space-y-6">
         <div className="space-y-2">
-          <h1 className="text-2xl font-semibold tracking-tight text-content-primary sm:text-4xl">
+          <h1 className="font-display text-2xl font-400 tracking-tight text-content-primary sm:text-3xl lg:text-4xl">
             Propiedades disponibles
           </h1>
 
-          <p className="max-w-2xl text-sm text-content-secondary sm:text-base">
+          <p className="max-w-2xl text-sm text-content-secondary lg:text-base">
             Explora nuestro catálogo y encuentra opciones verificadas para compra o arriendo.
           </p>
         </div>
 
-        <div className="inline-flex items-center gap-2 rounded-xl border border-border-subtle bg-surface-0 px-4 py-2 text-sm font-medium text-content-secondary">
-          <span className="h-2 w-2 rounded-full bg-green-500" aria-hidden="true" />
+        <div className="inline-flex items-center gap-2 rounded-2xl bg-surface-0 px-4 py-2.5 text-sm font-medium text-content-secondary shadow-card">
+          <span className="inline-flex h-2 w-2 rounded-full bg-amber-500" aria-hidden="true" />
           {totalProperties} {totalProperties === 1 ? "propiedad publicada" : "propiedades publicadas"}
         </div>
 
-        <div className="grid gap-3 rounded-2xl border border-border-subtle bg-surface-1 p-3 shadow-sm sm:grid-cols-2 lg:grid-cols-[1.8fr_repeat(3,minmax(0,1fr))_auto] sm:p-4">
+        <div className="grid gap-3 rounded-2xl bg-neutral-100 p-3 shadow-card sm:grid-cols-2 lg:grid-cols-[1.8fr_repeat(3,minmax(0,1fr))_auto] sm:p-4">
           <label className="relative sm:col-span-2 lg:col-span-1">
-            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-content-secondary">
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500">
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
                 <circle cx="11" cy="11" r="7" />
                 <path d="m20 20-3-3" strokeLinecap="round" />
               </svg>
@@ -163,27 +163,27 @@ export default async function PropiedadesPage({ searchParams }: { searchParams: 
             <input
               type="text"
               placeholder="Buscar por comuna, ciudad o código..."
-              className="h-11 w-full rounded-xl border border-border-subtle bg-surface-0 pl-9 pr-3 text-sm text-content-primary placeholder:text-content-secondary focus:outline-none focus:ring-2 focus:ring-brand-300"
+              className="h-11 w-full rounded-xl border border-neutral-200 bg-surface-0 pl-9 pr-3 text-sm text-content-primary placeholder:text-neutral-400 focus:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-200"
             />
           </label>
 
-          <select className="h-11 rounded-xl border border-border-subtle bg-surface-0 px-3 text-sm text-content-primary focus:outline-none focus:ring-2 focus:ring-brand-300">
+          <select className="h-11 rounded-xl border border-neutral-200 bg-surface-0 px-3 text-sm text-content-primary focus:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-200">
             <option>Rango de precio</option>
           </select>
 
-          <select className="h-11 rounded-xl border border-border-subtle bg-surface-0 px-3 text-sm text-content-primary focus:outline-none focus:ring-2 focus:ring-brand-300">
+          <select className="h-11 rounded-xl border border-neutral-200 bg-surface-0 px-3 text-sm text-content-primary focus:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-200">
             <option>Tipo de propiedad</option>
           </select>
 
-          <select className="h-11 rounded-xl border border-border-subtle bg-surface-0 px-3 text-sm text-content-primary focus:outline-none focus:ring-2 focus:ring-brand-300">
+          <select className="h-11 rounded-xl border border-neutral-200 bg-surface-0 px-3 text-sm text-content-primary focus:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-200">
             <option>Habitaciones y baños</option>
           </select>
 
           <button
             type="button"
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-brand-700 px-4 text-sm font-medium text-white shadow-sm transition hover:bg-brand-800"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-neutral-900 px-4 text-sm font-medium text-white transition hover:bg-neutral-800 btn-press"
           >
-            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
               <path d="M4 6h16" strokeLinecap="round" />
               <path d="M7 12h10" strokeLinecap="round" />
               <path d="M10 18h4" strokeLinecap="round" />
@@ -191,12 +191,14 @@ export default async function PropiedadesPage({ searchParams }: { searchParams: 
             Filtros
           </button>
         </div>
-
       </div>
 
       {totalProperties === 0 ? (
-        <div className="rounded-2xl border border-border-subtle border-dashed bg-surface-0 p-8 sm:p-10 text-center">
-          <p className="text-content-secondary text-sm sm:text-base">
+        <div className="rounded-2xl border border-dashed border-neutral-300 bg-surface-0 p-10 text-center shadow-card sm:p-12">
+          <svg className="mx-auto mb-4 h-12 w-12 text-neutral-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          <p className="text-sm text-neutral-500 sm:text-base">
             Aún no hay propiedades publicadas.
           </p>
         </div>
@@ -209,24 +211,30 @@ export default async function PropiedadesPage({ searchParams }: { searchParams: 
           {currentPage > 1 ? (
             <Link
               href={buildPageHref(resolvedSearchParams, previousPage)}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border-subtle bg-surface-0 text-content-secondary hover:text-content-primary"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-surface-0 text-neutral-600 shadow-card transition hover:bg-neutral-100 hover:text-neutral-900"
               aria-label="Página anterior"
             >
-              ‹
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
             </Link>
           ) : (
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border-subtle bg-surface-0 text-content-secondary/50">
-              ‹
+            <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-surface-0 text-neutral-300 shadow-card">
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
             </span>
           )}
 
           {paginationItems.map((item, index) =>
             item === "ellipsis" ? (
-              <span key={`ellipsis-${index}`} className="px-1 text-content-secondary">…</span>
+              <span key={`ellipsis-${index}`} className="px-2 text-neutral-400">
+                …
+              </span>
             ) : item === currentPage ? (
               <span
                 key={item}
-                className="inline-flex h-8 min-w-8 items-center justify-center rounded-lg bg-brand-700 px-2 text-sm font-semibold text-white"
+                className="inline-flex h-9 min-w-9 items-center justify-center rounded-lg bg-neutral-900 px-3 text-sm font-medium text-white shadow-card"
               >
                 {item}
               </span>
@@ -234,7 +242,7 @@ export default async function PropiedadesPage({ searchParams }: { searchParams: 
               <Link
                 key={item}
                 href={buildPageHref(resolvedSearchParams, item)}
-                className="inline-flex h-8 min-w-8 items-center justify-center rounded-lg border border-border-subtle bg-surface-0 px-2 text-sm text-content-secondary hover:text-content-primary"
+                className="inline-flex h-9 min-w-9 items-center justify-center rounded-lg bg-surface-0 px-3 text-sm font-medium text-neutral-600 shadow-card transition hover:bg-neutral-100 hover:text-neutral-900"
               >
                 {item}
               </Link>
@@ -244,14 +252,18 @@ export default async function PropiedadesPage({ searchParams }: { searchParams: 
           {currentPage < totalPages ? (
             <Link
               href={buildPageHref(resolvedSearchParams, nextPage)}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border-subtle bg-surface-0 text-content-secondary hover:text-content-primary"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-surface-0 text-neutral-600 shadow-card transition hover:bg-neutral-100 hover:text-neutral-900"
               aria-label="Página siguiente"
             >
-              ›
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
             </Link>
           ) : (
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border-subtle bg-surface-0 text-content-secondary/50">
-              ›
+            <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-surface-0 text-neutral-300 shadow-card">
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
             </span>
           )}
         </div>

@@ -4,11 +4,17 @@ import Footer from "@/components/Footer"
 import ToasterProvider from "../components/ToasterProvider"
 import ScrollToTopButton from "@/components/ScrollToTopButton"
 import RouteScrollReset from "@/components/RouteScrollReset"
-import { Outfit } from "next/font/google"
+import { Outfit, DM_Serif_Display } from "next/font/google"
 
 const outfit = Outfit({
   subsets: ["latin"],
   variable: "--font-outfit",
+})
+
+const dmSerif = DM_Serif_Display({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-dm-serif",
 })
 
 export const metadata = {
@@ -25,7 +31,7 @@ export default function RootLayout({
     <html lang="es" className="overflow-x-hidden scroll-smooth">
       <body
         suppressHydrationWarning
-        className={`${outfit.variable} bg-surface-0 text-content-primary min-h-screen flex flex-col overflow-x-hidden`}
+        className={`${outfit.variable} ${dmSerif.variable} bg-surface-0 text-content-primary min-h-screen flex flex-col overflow-x-hidden font-sans`}
       >
         <RouteScrollReset />
         <Header />

@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server"
-import { createClient } from "@supabase/supabase-js"
+import { createClient, SupabaseClient } from "@supabase/supabase-js"
 import { requireAdminUser } from "@/lib/admin-auth"
 import { jsonError, jsonSuccess } from "@/lib/api-response"
 import { ADMIN_API_MESSAGES, ADMIN_API_STATUS } from "@/lib/constants"
@@ -62,7 +62,7 @@ function buildHighlightPayloadVariants(
 }
 
 async function tryInsertHighlightVariants(
-  adminSupabase: any,
+  adminSupabase: SupabaseClient,
   variants: JsonObject[]
 ) {
   let lastErrorMessage: string = ADMIN_API_MESSAGES.INVALID_HIGHLIGHT
@@ -85,7 +85,7 @@ async function tryInsertHighlightVariants(
 }
 
 async function tryUpdateHighlightVariants(
-  adminSupabase: any,
+  adminSupabase: SupabaseClient,
   propertyId: string,
   highlightId: string,
   variants: JsonObject[]
