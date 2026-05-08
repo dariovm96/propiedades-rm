@@ -71,7 +71,7 @@ export default function Header() {
     : "hidden md:flex items-center gap-6 text-sm font-semibold text-slate-100"
 
   const desktopLinkClasses = isTransparent
-    ? "drop-shadow-sm transition hover:text-brand-100"
+    ? "drop-shadow-sm transition hover:text-sky-200"
     : "transition hover:text-sky-200"
 
   const mobileNavClasses = isTransparent
@@ -79,7 +79,7 @@ export default function Header() {
     : "md:hidden mt-4 pt-4 border-t border-white/20 space-y-3 text-white font-semibold max-md:dark:border-border-subtle max-md:dark:text-white"
 
   const mobileLinkClasses = isTransparent
-    ? "block py-2 text-white transition hover:text-brand-100"
+    ? "block py-2 text-white transition hover:text-sky-200"
     : "block py-2 text-white transition hover:text-sky-200 max-md:dark:text-white max-md:dark:hover:text-sky-200"
 
   const phoneHeaderButtonClasses = "px-4 py-2 rounded-lg"
