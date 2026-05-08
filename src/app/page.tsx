@@ -186,9 +186,9 @@ export default async function Home() {
                   <Link
                     key={property.id}
                     href={`/propiedades/${property.slug}`}
-                    className="group card-hover flex h-full flex-col overflow-hidden rounded-2xl bg-surface-0 shadow-card border-l-[3px] border-brand-client-400"
+                    className="group card-hover transform-gpu flex h-full flex-col overflow-hidden rounded-2xl bg-surface-0 shadow-card border-l-[3px] border-brand-client-400"
                   >
-                    <div className="relative h-52 overflow-hidden bg-brand-100">
+                    <div className="relative h-52 overflow-hidden rounded-t-2xl bg-brand-100">
                       {cover ? (
                         <>
                           <Image
@@ -332,19 +332,33 @@ export default async function Home() {
         <section className="py-10 sm:py-12">
           <div className="mx-auto max-w-6xl space-y-6">
             <div className="space-y-2 text-center sm:text-left">
-              <p className="border-l-2 border-brand-client-400 pl-2 text-xs font-semibold uppercase tracking-[0.12em] text-brand-client-600">Propiedad top</p>
-              <h2 className="font-display text-2xl font-normal text-content-primary sm:text-3xl">
-                {FEATURED_HOME_VIDEO.title}
-              </h2>
-              <p className="max-w-3xl text-sm text-content-secondary">
-                {FEATURED_HOME_VIDEO.description}
-              </p>
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                <div className="space-y-2">
+                  <p className="border-l-2 border-brand-client-400 pl-2 text-xs font-semibold uppercase tracking-[0.12em] text-brand-client-600">Propiedad top</p>
+                  <h2 className="font-display text-2xl font-normal text-content-primary sm:text-3xl">
+                    {FEATURED_HOME_VIDEO.title}
+                  </h2>
+                  <p className="max-w-3xl text-sm text-content-secondary">
+                    {FEATURED_HOME_VIDEO.description}
+                  </p>
+                </div>
+
+                <Link
+                  href={FEATURED_HOME_VIDEO.ctaHref}
+                  className="group inline-flex shrink-0 items-center gap-2 text-sm font-semibold text-brand-client-600 transition hover:text-brand-client-700"
+                >
+                  {FEATURED_HOME_VIDEO.ctaLabel}
+                  <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </Link>
+              </div>
             </div>
 
-            <div className="overflow-hidden rounded-2xl bg-surface-0 shadow-card">
-              <div className="relative aspect-video w-full bg-neutral-900">
+            <div className="overflow-hidden rounded-2xl shadow-card">
+              <div className="relative aspect-video w-full">
                 <video
-                  className="h-full w-full object-contain"
+                  className="h-full w-full object-cover"
                   controls
                   preload="metadata"
                   playsInline
@@ -353,15 +367,6 @@ export default async function Home() {
                   <source src={FEATURED_HOME_VIDEO.source} type="video/mp4" />
                   Tu navegador no soporta reproducción de video.
                 </video>
-              </div>
-
-              <div className="flex border-t border-neutral-200 p-4 sm:justify-end sm:p-5">
-                <Link
-                  href={FEATURED_HOME_VIDEO.ctaHref}
-                  className="inline-flex min-h-11 items-center justify-center rounded-lg bg-neutral-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-neutral-800 btn-press"
-                >
-                  {FEATURED_HOME_VIDEO.ctaLabel}
-                </Link>
               </div>
             </div>
           </div>
