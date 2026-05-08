@@ -71,49 +71,50 @@ export default async function PropertyDetailPage({ params }: Props) {
      /* ==============================
          3. Render
      ============================== */
-    return (
+return (
         <section className="max-w-full space-y-10 pt-8 sm:space-y-12 sm:pt-10">
-            <nav className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-content-secondary sm:text-sm">
-                <Link href="/" className="hover:text-content-primary transition">Inicio</Link>
-                <span>/</span>
-                <Link href="/propiedades" className="hover:text-content-primary transition">Propiedades</Link>
-                <span>/</span>
-                <span className="break-words font-medium text-content-primary">{property.title}</span>
+            <nav className="flex flex-wrap items-center gap-2 text-sm text-neutral-500">
+                <Link href="/" className="transition hover:text-neutral-800">Inicio</Link>
+                <span className="text-neutral-300">/</span>
+                <Link href="/propiedades" className="transition hover:text-neutral-800">Propiedades</Link>
+                <span className="text-neutral-300">/</span>
+                <span className="break-words font-medium text-neutral-800">{property.title}</span>
             </nav>
 
-            <section className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-stretch">
+            <section className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
                 <div className="order-1 min-w-0 lg:order-2">
                     <PropertyGallery images={imageUrls} />
                 </div>
 
-                <header className="order-2 flex min-w-0 flex-col gap-6 rounded-2xl border border-[#90AFDF] bg-[linear-gradient(180deg,#95B5E8_0%,#B7CCEF_18%,#DCE8FB_34%,#EEF4FF_50%,#DCE8FB_66%,#B7CCEF_82%,#95B5E8_100%)] p-4 shadow-md sm:gap-7 sm:p-6 lg:order-1 lg:h-full max-md:dark:border-border-subtle max-md:dark:bg-none max-md:dark:bg-surface-1">
+                <header className="order-2 flex min-w-0 flex-col gap-6 rounded-2xl bg-surface-0 p-5 shadow-card sm:gap-7 sm:p-6 lg:order-1 lg:h-full">
                     <div className="flex flex-wrap gap-2">
-                        <span className={`inline-block rounded-full px-3 py-1 text-xs sm:text-sm ${PROPERTY_STATUS_BADGE_CLASSES[property.status]}`}>
+                        <span className={`inline-block rounded-full px-3 py-1 text-xs font-medium sm:text-sm ${PROPERTY_STATUS_BADGE_CLASSES[property.status]}`}>
                             {PROPERTY_STATUS_LABELS[property.status]}
-                        </span>
-                        <span className="inline-block rounded-full border border-white/80 bg-white/85 px-3 py-1 text-xs font-medium text-slate-700 sm:text-sm max-md:dark:border-slate-700 max-md:dark:bg-slate-800 max-md:dark:text-slate-200">
-                            Entrega inmediata
                         </span>
                     </div>
 
                     <div className="space-y-3">
-                        <h1 className="break-words text-2xl font-bold leading-tight text-[#0B2540] sm:text-4xl max-md:dark:text-slate-100">
+                        <h1 className="break-words font-display text-2xl font-400 leading-tight text-neutral-900 sm:text-3xl lg:text-4xl">
                             {property.title}
                         </h1>
-                        <p className="text-sm font-medium text-slate-700 sm:text-base max-md:dark:text-slate-300">
-                            {property.location_text || "Ubicacion por confirmar"}
+                        <p className="flex items-center gap-1.5 text-sm font-medium text-neutral-500 sm:text-base">
+                            <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                            </svg>
+                            {property.location_text || "Ubicación por confirmar"}
                         </p>
                     </div>
 
                     <div className="grid gap-3 sm:grid-cols-2 lg:mt-auto">
-                        <article className="rounded-xl border border-white/70 bg-white/65 p-4 backdrop-blur-[1px] max-md:dark:border-slate-700 max-md:dark:bg-slate-900/80">
-                            <p className="text-xs uppercase tracking-wide text-slate-600 max-md:dark:text-slate-300">Precio</p>
-                            <p className="mt-1 break-words text-xl font-semibold text-[#1E3A5F] sm:text-2xl max-md:dark:text-sky-200">{formattedPrice}</p>
+                        <article className="rounded-xl bg-gradient-to-br from-brand-client-50 to-brand-client-100 p-4">
+                            <p className="text-xs uppercase tracking-wide text-brand-client-600">Precio</p>
+                            <p className="mt-1 break-words font-display text-xl font-400 text-brand-client-900 sm:text-2xl">{formattedPrice}</p>
                         </article>
 
-                        <article className="rounded-xl border border-white/70 bg-white/65 p-4 backdrop-blur-[1px] max-md:dark:border-slate-700 max-md:dark:bg-slate-900/80">
-                            <p className="text-xs uppercase tracking-wide text-slate-600 max-md:dark:text-slate-300">Superficie</p>
-                            <p className="mt-1 break-words text-xl font-semibold text-slate-900 sm:text-2xl max-md:dark:text-slate-100">{areaLabel}</p>
+                        <article className="rounded-xl bg-gradient-to-br from-brand-client-50 to-brand-client-100 p-4">
+                            <p className="text-xs uppercase tracking-wide text-brand-client-600">Superficie</p>
+                            <p className="mt-1 break-words font-display text-xl font-400 text-brand-client-900 sm:text-2xl">{areaLabel}</p>
                         </article>
                     </div>
 
@@ -126,12 +127,12 @@ export default async function PropertyDetailPage({ params }: Props) {
                 locationText={property.location_text}
             />
 
-            <section className="rounded-2xl border border-border-subtle bg-gradient-to-b from-surface-0 to-surface-1/70 p-4 shadow-sm sm:p-6">
-                <div className="mb-6 text-center sm:mb-7">
-                    <p className="text-sm font-semibold uppercase tracking-[0.08em] text-content-secondary sm:text-base">
-                        Contacto prioritario
+            <section className="rounded-2xl border-t-2 border-brand-client-400 bg-surface-0 p-5 shadow-card sm:p-6 lg:p-8">
+                <div className="mb-5 text-center sm:mb-6">
+                    <p className="font-display text-base font-400 text-neutral-800 sm:text-lg">
+                        ¿Te interesa esta propiedad?
                     </p>
-                    <p className="mt-2 text-xs text-content-secondary sm:text-sm">
+                    <p className="mt-1.5 text-sm text-neutral-500">
                         {ATTENTION_HOURS_LABEL}
                     </p>
                 </div>
@@ -143,7 +144,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                         label="Llamar ahora"
                         desktopLabel={contactPhoneDisplay}
                         aria-label={`Llamar al ${contactPhoneDisplay}`}
-                        className="flex-1 min-h-12 rounded-xl px-4 py-3 text-sm font-semibold shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md sm:text-base"
+                        className="flex-1 min-h-12 rounded-xl bg-neutral-900 px-4 py-3 text-sm font-medium text-white shadow-lg transition hover:bg-neutral-800 hover:shadow-xl btn-press sm:text-base"
                         iconClassName="h-4 w-4"
                     />
 
@@ -152,7 +153,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                         variant="whatsapp"
                         label="Contactar por WhatsApp"
                         target="_blank"
-                        className="flex-1 min-h-12 rounded-xl px-4 py-3 text-sm font-semibold shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md sm:text-base"
+                        className="flex-1 min-h-12 rounded-xl px-4 py-3 text-sm font-medium shadow-lg transition btn-press sm:text-base"
                         iconClassName="h-4 w-4"
                     />
                 </div>

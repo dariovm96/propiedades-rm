@@ -19,9 +19,9 @@ export const PROPERTY_STATUS_LABELS: Record<PropertyStatus, string> = {
 }
 
 export const PROPERTY_STATUS_BADGE_CLASSES: Record<PropertyStatus, string> = {
-  available: "border border-green-200 bg-green-100 text-green-800 dark:border-green-300/20 dark:bg-green-400/15 dark:text-green-200",
-  sold: "border border-red-200 bg-red-100 text-red-700 dark:border-red-300/20 dark:bg-red-400/15 dark:text-red-200",
-  rented: "border border-amber-200 bg-amber-100 text-amber-800 dark:border-amber-300/20 dark:bg-amber-400/15 dark:text-amber-200",
+  available: "bg-green-100 text-green-800 border border-green-200/50",
+  sold: "bg-neutral-100 text-neutral-600 border border-neutral-200/50",
+  rented: "bg-amber-100 text-amber-800 border border-amber-200/50",
 }
 
 export const ADMIN_API_MESSAGES = {
