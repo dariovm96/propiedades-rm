@@ -19,7 +19,7 @@ export default function PropertyCard({ property }: Props) {
     return (
         <Link
             href={`/propiedades/${property.slug}`}
-            className="group card-hover relative flex h-full flex-col overflow-hidden rounded-2xl bg-surface-0 shadow-card"
+            className="group card-hover relative flex h-full flex-col overflow-hidden rounded-2xl bg-surface-0 shadow-card border-l-[3px] border-brand-client-400"
         >
             <div className="relative h-56 overflow-hidden bg-neutral-200">
                 {cover ? (
@@ -81,7 +81,7 @@ export default function PropertyCard({ property }: Props) {
                             {catalogHighlights.map((highlight, index) => (
                                 <span
                                     key={`${highlight}-${index}`}
-                                    className="line-clamp-1 rounded-md bg-neutral-100 px-2.5 py-1 text-xs text-neutral-600"
+                                    className="line-clamp-1 rounded-md bg-neutral-100 px-2.5 py-1 text-xs text-neutral-700"
                                 >
                                     {highlight}
                                 </span>
@@ -95,7 +95,7 @@ export default function PropertyCard({ property }: Props) {
                     )}
                 </div>
 
-                <div className="mt-4 flex items-center gap-2 border-t border-neutral-100 pt-3 text-sm font-medium text-neutral-500 transition-colors group-hover:text-neutral-700">
+                <div className="mt-4 flex items-center gap-2 border-t border-neutral-100 pt-3 text-sm font-medium text-neutral-500 transition-colors group-hover:text-brand-client-600">
                     <span>Ver detalles</span>
                     <svg className="h-4 w-4 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />

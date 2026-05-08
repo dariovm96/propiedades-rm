@@ -138,6 +138,7 @@ return (
     <section className="space-y-8 sm:space-y-10 py-4 sm:py-6">
       <div className="space-y-6">
         <div className="space-y-2">
+          <p className="border-l-2 border-brand-client-400 pl-2 text-xs font-semibold uppercase tracking-[0.12em] text-brand-client-600">Catálogo de propiedades</p>
           <h1 className="font-display text-2xl font-400 tracking-tight text-content-primary sm:text-3xl lg:text-4xl">
             Propiedades disponibles
           </h1>
@@ -148,7 +149,7 @@ return (
         </div>
 
         <div className="inline-flex items-center gap-2 rounded-2xl bg-surface-0 px-4 py-2.5 text-sm font-medium text-content-secondary shadow-card">
-          <span className="inline-flex h-2 w-2 rounded-full bg-amber-500" aria-hidden="true" />
+          <span className="inline-flex h-2 w-2 rounded-full bg-brand-client-400" aria-hidden="true" />
           {totalProperties} {totalProperties === 1 ? "propiedad publicada" : "propiedades publicadas"}
         </div>
 
@@ -181,7 +182,7 @@ return (
 
           <button
             type="button"
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-neutral-900 px-4 text-sm font-medium text-white transition hover:bg-neutral-800 btn-press"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-brand-client-500 px-4 text-sm font-medium text-white transition hover:bg-brand-client-600 btn-press"
           >
             <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
               <path d="M4 6h16" strokeLinecap="round" />
@@ -234,7 +235,7 @@ return (
             ) : item === currentPage ? (
               <span
                 key={item}
-                className="inline-flex h-9 min-w-9 items-center justify-center rounded-lg bg-neutral-900 px-3 text-sm font-medium text-white shadow-card"
+                className="inline-flex h-9 min-w-9 items-center justify-center rounded-lg bg-brand-client-500 px-3 text-sm font-medium text-white shadow-card"
               >
                 {item}
               </span>

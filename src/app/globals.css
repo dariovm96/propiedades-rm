@@ -54,6 +54,25 @@
   --accent-800: #5c4d43;
   --accent-900: #4e423a;
 
+  /* Brand client - rose */
+  --brand-client-50: #fdf2f5;
+  --brand-client-100: #fae5ec;
+  --brand-client-200: #f4ccd8;
+  --brand-client-300: #eba8bb;
+  --brand-client-400: #de839d;
+  --brand-client-500: #d4849a;
+  --brand-client-600: #bf6a82;
+  --brand-client-700: #a3526a;
+  --brand-client-800: #874357;
+  --brand-client-900: #6f3848;
+
+  /* Footer - forest green */
+  --footer-bg: #1b3a2d;
+  --footer-bg-lighter: #234836;
+  --footer-primary: #a8d4b8;
+  --footer-secondary: #7ab898;
+  --footer-muted: #5a9478;
+
   /* Status colors */
   --status-available: #2d6a4f;
   --status-available-bg: #dcfce7;
@@ -149,6 +168,25 @@
   --color-neutral-800: var(--neutral-800);
   --color-neutral-900: var(--neutral-900);
   --color-neutral-950: var(--neutral-950);
+
+  /* Brand client */
+  --color-brand-client-50: var(--brand-client-50);
+  --color-brand-client-100: var(--brand-client-100);
+  --color-brand-client-200: var(--brand-client-200);
+  --color-brand-client-300: var(--brand-client-300);
+  --color-brand-client-400: var(--brand-client-400);
+  --color-brand-client-500: var(--brand-client-500);
+  --color-brand-client-600: var(--brand-client-600);
+  --color-brand-client-700: var(--brand-client-700);
+  --color-brand-client-800: var(--brand-client-800);
+  --color-brand-client-900: var(--brand-client-900);
+
+  /* Footer */
+  --color-footer-bg: var(--footer-bg);
+  --color-footer-bg-lighter: var(--footer-bg-lighter);
+  --color-footer-primary: var(--footer-primary);
+  --color-footer-secondary: var(--footer-secondary);
+  --color-footer-muted: var(--footer-muted);
 
   /* Status */
   --color-status-available: var(--status-available);

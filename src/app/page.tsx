@@ -156,7 +156,7 @@ export default async function Home() {
           <section className="space-y-8 py-4 sm:space-y-10 sm:py-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-neutral-500">Nuestra selección</p>
+                <p className="border-l-2 border-brand-client-400 pl-2 text-xs font-semibold uppercase tracking-[0.12em] text-brand-client-600">Nuestra selección</p>
                 <h2 className="font-display text-2xl font-normal text-content-primary sm:text-3xl">
                   Propiedades destacadas
                 </h2>
@@ -167,7 +167,7 @@ export default async function Home() {
 
 <Link
                   href="/propiedades"
-                  className="group inline-flex items-center gap-2 text-sm font-semibold text-neutral-700 transition hover:text-neutral-900"
+                  className="group inline-flex items-center gap-2 text-sm font-semibold text-brand-client-600 transition hover:text-brand-client-700"
                 >
                   Ver todas las propiedades
                   <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -186,7 +186,7 @@ export default async function Home() {
                   <Link
                     key={property.id}
                     href={`/propiedades/${property.slug}`}
-                    className="group card-hover flex h-full flex-col overflow-hidden rounded-2xl bg-surface-0 shadow-card"
+                    className="group card-hover flex h-full flex-col overflow-hidden rounded-2xl bg-surface-0 shadow-card border-l-[3px] border-brand-client-400"
                   >
                     <div className="relative h-52 overflow-hidden bg-brand-100">
                       {cover ? (
@@ -239,13 +239,13 @@ export default async function Home() {
                               {catalogHighlights.map((highlight, index) => (
                                 <span
                                   key={`${highlight}-${index}`}
-                                  className="line-clamp-1 rounded-full border border-border-subtle bg-surface-1 px-2.5 py-1 text-xs text-content-secondary"
+                                  className="line-clamp-1 rounded-full border border-brand-client-300 bg-transparent px-2.5 py-1 text-xs text-brand-client-700"
                                 >
                                   {highlight}
                                 </span>
                               ))}
                               {remainingHighlights > 0 && (
-                                <span className="rounded-full border border-border-subtle bg-surface-1 px-2.5 py-1 text-xs text-content-secondary">
+                                <span className="rounded-full border border-brand-client-300 bg-transparent px-2.5 py-1 text-xs text-brand-client-600">
                                   +{remainingHighlights} más
                                 </span>
                               )}
@@ -261,7 +261,7 @@ export default async function Home() {
           </section>
         )}
 
-        <section className="relative left-1/2 right-1/2 -mx-[50vw] w-screen border-y border-neutral-200 bg-neutral-50 py-12 sm:py-14">
+        <section className="relative left-1/2 right-1/2 -mx-[50vw] w-screen border-y border-brand-client-100 bg-gradient-to-b from-brand-client-50/50 via-neutral-50 to-neutral-50 py-12 sm:py-14">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <div className="space-y-10">
             <ScrollRevealStagger className="space-y-10">
@@ -280,7 +280,7 @@ export default async function Home() {
                   className="featured-card-reveal-item rounded-2xl bg-surface-0 p-5 text-center shadow-card sm:p-6"
                   style={{ animationDelay: "760ms", animationDuration: "1950ms" }}
                 >
-                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-neutral-100 text-neutral-600">
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-client-100 text-brand-client-600">
                   <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
                     <path d="M3 12l3 3 6-6 3 3 6-6" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
@@ -295,7 +295,7 @@ export default async function Home() {
                   className="featured-card-reveal-item rounded-2xl bg-surface-0 p-5 text-center shadow-card sm:p-6"
                   style={{ animationDelay: "1080ms", animationDuration: "1950ms" }}
                 >
-                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-neutral-100 text-neutral-600">
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-client-100 text-brand-client-600">
                   <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
                     <path d="M12 6v6l4 2" strokeLinecap="round" strokeLinejoin="round" />
                     <circle cx="12" cy="12" r="8" />
@@ -311,7 +311,7 @@ export default async function Home() {
                   className="featured-card-reveal-item rounded-2xl bg-surface-0 p-5 text-center shadow-card sm:p-6"
                   style={{ animationDelay: "1400ms", animationDuration: "1950ms" }}
                 >
-                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-neutral-100 text-neutral-600">
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-client-100 text-brand-client-600">
                   <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
                     <path d="M6 12h12" strokeLinecap="round" />
                     <path d="M6 8h12" strokeLinecap="round" />
@@ -332,7 +332,7 @@ export default async function Home() {
         <section className="py-10 sm:py-12">
           <div className="mx-auto max-w-6xl space-y-6">
             <div className="space-y-2 text-center sm:text-left">
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-neutral-500">Propiedad top</p>
+              <p className="border-l-2 border-brand-client-400 pl-2 text-xs font-semibold uppercase tracking-[0.12em] text-brand-client-600">Propiedad top</p>
               <h2 className="font-display text-2xl font-normal text-content-primary sm:text-3xl">
                 {FEATURED_HOME_VIDEO.title}
               </h2>
@@ -380,7 +380,7 @@ export default async function Home() {
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
               <Link
                 href="/propiedades"
-                className="inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-neutral-900 px-7 py-3 text-sm font-medium text-white shadow-lg transition hover:bg-neutral-800 hover:shadow-xl btn-press sm:w-auto"
+                className="inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-brand-client-500 px-7 py-3 text-sm font-medium text-white shadow-lg transition hover:bg-brand-client-600 hover:shadow-xl btn-press sm:w-auto"
               >
                 Ver propiedades
               </Link>

@@ -107,14 +107,14 @@ return (
                     </div>
 
                     <div className="grid gap-3 sm:grid-cols-2 lg:mt-auto">
-                        <article className="rounded-xl bg-neutral-100 p-4">
-                            <p className="text-xs uppercase tracking-wide text-neutral-500">Precio</p>
-                            <p className="mt-1 break-words font-display text-xl font-400 text-neutral-900 sm:text-2xl">{formattedPrice}</p>
+                        <article className="rounded-xl bg-gradient-to-br from-brand-client-50 to-brand-client-100 p-4">
+                            <p className="text-xs uppercase tracking-wide text-brand-client-600">Precio</p>
+                            <p className="mt-1 break-words font-display text-xl font-400 text-brand-client-900 sm:text-2xl">{formattedPrice}</p>
                         </article>
 
-                        <article className="rounded-xl bg-neutral-100 p-4">
-                            <p className="text-xs uppercase tracking-wide text-neutral-500">Superficie</p>
-                            <p className="mt-1 break-words font-display text-xl font-400 text-neutral-900 sm:text-2xl">{areaLabel}</p>
+                        <article className="rounded-xl bg-gradient-to-br from-brand-client-50 to-brand-client-100 p-4">
+                            <p className="text-xs uppercase tracking-wide text-brand-client-600">Superficie</p>
+                            <p className="mt-1 break-words font-display text-xl font-400 text-brand-client-900 sm:text-2xl">{areaLabel}</p>
                         </article>
                     </div>
 
@@ -127,7 +127,7 @@ return (
                 locationText={property.location_text}
             />
 
-            <section className="rounded-2xl bg-surface-0 p-5 shadow-card sm:p-6 lg:p-8">
+            <section className="rounded-2xl border-t-2 border-brand-client-400 bg-surface-0 p-5 shadow-card sm:p-6 lg:p-8">
                 <div className="mb-5 text-center sm:mb-6">
                     <p className="font-display text-base font-400 text-neutral-800 sm:text-lg">
                         ¿Te interesa esta propiedad?
