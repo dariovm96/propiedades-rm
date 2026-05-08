@@ -23,8 +23,8 @@ export default function PropertyDetailTabs({ description, highlights, locationTe
 
   return (
     <section className="space-y-4">
-      <div className="rounded-2xl border border-border-subtle bg-surface-1/60 p-2 shadow-sm">
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+      <div className="rounded-2xl bg-neutral-100 p-1.5 shadow-card">
+        <div className="grid grid-cols-2 gap-1.5">
           {TAB_ITEMS.map((tab) => {
             const isActive = activeTab === tab.key
 
@@ -33,11 +33,7 @@ export default function PropertyDetailTabs({ description, highlights, locationTe
                 key={tab.key}
                 type="button"
                 onClick={() => setActiveTab(tab.key)}
-                className={`rounded-xl border px-4 py-3 text-sm font-semibold transition sm:text-base ${
-                  isActive
-                    ? "border-brand-700 bg-brand-700 text-white shadow"
-                    : "border-border-subtle bg-surface-0 text-content-secondary hover:text-content-primary"
-                }`}
+                className={`rounded- xl px-4 py-2.5 text-sm font-medium transition sm:text-base ${isActive ? "bg-surface-0 text- neutral-900 shadow-sm" : "text-neutral-500 hover:text-neutral-700"}`}
                 aria-pressed={isActive}
               >
                 {tab.label}
@@ -47,36 +43,38 @@ export default function PropertyDetailTabs({ description, highlights, locationTe
         </div>
       </div>
 
-      <div className="rounded-2xl border border-border-subtle bg-surface-0 p-5 shadow-sm sm:p-6">
+      <div className="rounded-2xl bg-surface-0 p-5 shadow- card sm:p-6">
         {activeTab === "detalle" && (
           <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
             <div className="space-y-3">
-              <h2 className="text-xl font-semibold text-content-primary">Descripción</h2>
-              <p className="whitespace-pre-line text-sm leading-relaxed text-content-secondary sm:text-base">
-                {hasDescription ? description : "Esta propiedad no tiene descripcion publicada por ahora."}
+              <h2 className="font-display text-lg font-400 text-neutral-800 sm:text-xl">Descripción</h2>
+              <p className="whitespace-pre-line text-sm leading-relaxed text-neutral-500 sm:text-base">
+                {hasDescription ? description : "Esta propiedad no tiene descripción publicada por ahora."}
               </p>
             </div>
 
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold text-content-primary">Amenidades y servicios</h2>
+              <h2 className="font-display text-lg font-400 text-neutral-800 sm:text-xl">Amenidades y servicios</h2>
 
               {hasHighlights ? (
-                <div className="grid gap-3">
+                <div className="grid gap-2.5">
                   {highlights.map((highlight, index) => (
                     <article
                       key={`${highlight}-${index}`}
-                      className="flex items-start gap-3 rounded-xl border border-border-subtle bg-surface-1 px-4 py-3"
+                      className="flex items-center gap-3 rounded-xl bg-neutral-100 px-4 py-3"
                     >
-                      <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-700">
-                        ✓
+                      <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-green-100 text-green-600">
+                        <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
                       </span>
-                      <p className="text-sm text-content-secondary sm:text-base">{highlight}</p>
+                      <p className="text-sm text-neutral-700 sm:text-base">{highlight}</p>
                     </article>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-content-secondary sm:text-base">
-                  Esta propiedad no tiene caracteristicas publicadas por ahora.
+                <p className="text-sm text-neutral-500 sm:text-base">
+                  Esta propiedad no tiene características publicadas por ahora.
                 </p>
               )}
             </div>
@@ -85,14 +83,18 @@ export default function PropertyDetailTabs({ description, highlights, locationTe
 
         {activeTab === "ubicacion" && (
           <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-content-primary">Ubicacion</h2>
+            <h2 className="font-display text-lg font-400 text-neutral-800 sm:text-xl">Ubicación</h2>
 
-            <div className="rounded-xl border border-dashed border-border-subtle bg-surface-1 p-4">
-              <p className="text-sm text-content-secondary sm:text-base">
-                {locationText || "Ubicacion exacta pendiente de publicacion."}
+            <div className="rounded-xl bg-neutral-100 p-4">
+              <p className="flex items-center gap-2 text-sm text-neutral-500 sm:text-base">
+                <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                </svg>
+                {locationText || "Ubicación exacta pendiente de publicación."}
               </p>
-              <div className="mt-4 flex h-52 items-center justify-center rounded-lg bg-surface-0 text-center text-sm text-content-secondary sm:h-64">
-                Mapa interactivo (Leaflet) proximamente.
+              <div className="mt-4 flex h-52 items-center justify-center rounded-lg bg-neutral-50 text-center text-sm text-neutral-400 sm:h-64">
+                Mapa interactivo próximamente.
               </div>
             </div>
           </div>
