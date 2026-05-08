@@ -275,6 +275,12 @@
     --accent-800: #eaddd7;
     --accent-900: #f2e8e5;
 
+    /* Brand client dark — ligeramente más saturado para contraste en fondos oscuros */
+    --brand-client-400: #d4849a;
+    --brand-client-500: #bf6a82;
+    --brand-client-600: #a3526a;
+    --brand-client-700: #874357;
+
     /* Shadows dark - slightly lighter */
     --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.15);

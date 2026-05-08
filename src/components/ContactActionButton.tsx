@@ -16,7 +16,7 @@ const baseClasses =
   "inline-flex items-center justify-center gap-2 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
 
 const variantClasses: Record<ContactVariant, string> = {
-  phone: "bg-brand-700 text-white hover:bg-brand-800 focus-visible:ring-brand-500",
+  phone: "bg-brand-700 text-white hover:bg-brand-800 dark:bg-[#443a29] dark:hover:bg-[#372e23] focus-visible:ring-brand-500",
   whatsapp: "bg-emerald-600 text-white hover:bg-emerald-700 focus-visible:ring-emerald-500",
 }
 

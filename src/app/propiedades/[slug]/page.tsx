@@ -144,7 +144,7 @@ return (
                         label="Llamar ahora"
                         desktopLabel={contactPhoneDisplay}
                         aria-label={`Llamar al ${contactPhoneDisplay}`}
-                        className="flex-1 min-h-12 rounded-xl bg-neutral-900 px-4 py-3 text-sm font-medium text-white shadow-lg transition hover:bg-neutral-800 hover:shadow-xl btn-press sm:text-base"
+                        className="flex-1 min-h-12 rounded-xl bg-brand-700 px-4 py-3 text-sm font-medium text-white shadow-lg transition hover:bg-brand-800 hover:shadow-xl dark:bg-[#443a29] dark:hover:bg-[#372e23] btn-press sm:text-base"
                         iconClassName="h-4 w-4"
                     />
 

@@ -59,8 +59,8 @@ export default function Header() {
     : "border-b border-[#10324D] bg-[#081F32]/92 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-[#081F32]/88 max-md:dark:border-border-subtle max-md:dark:bg-surface-1/95 max-md:dark:supports-[backdrop-filter]:bg-surface-1/85"
 
   const logoClasses = isTransparent
-    ? "text-white drop-shadow-sm"
-    : "text-white drop-shadow-sm"
+    ? "bg-gradient-to-r from-white to-brand-client-300 bg-clip-text text-transparent"
+    : "bg-gradient-to-r from-white to-brand-client-300 bg-clip-text text-transparent"
 
   const menuButtonClasses = isTransparent
     ? "md:hidden rounded-lg p-2 text-white transition hover:bg-white/15"
