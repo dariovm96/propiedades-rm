@@ -25,12 +25,12 @@ export default async function PropertyDetailPage({ params }: Props) {
     /* ==============================
        1. Obtener propiedad
     ============================== */
-    const { data, error } = await supabase
+    const { data: rawProperty, error } = await supabase
         .from("properties")
         .select("*")
         .eq("slug", slug)
-        .returns<Property[]>()
         .single()
+    const data = rawProperty as Property | null
 
     if (error || !data) {
         notFound()
@@ -42,7 +42,7 @@ export default async function PropertyDetailPage({ params }: Props) {
         .from("property_highlights")
         .select("*")
         .eq("property_id", property.id)
-        .returns<PropertyHighlight[]>()
+        .overrideTypes<PropertyHighlight[], { merge: false }>()
 
     const highlights = highlightsData ?? []
     const highlightTexts = highlights

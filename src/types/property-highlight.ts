@@ -34,6 +34,7 @@ export type PropertyHighlightUpdatePayload = PropertyHighlightTextPayload
 export type EditablePropertyHighlight = {
   id?: string
   text: string
+  sort_order?: number
 }
 
 export type PropertyHighlightsListResponse = {

@@ -30,8 +30,8 @@ export default function DashboardPage() {
       const { data, error } = await supabase
         .from("properties")
         .select("*")
-        .returns<Property[]>()
         .order("created_at", { ascending: false })
+        .overrideTypes<Property[], { merge: false }>()
 
       if (!data) {
         console.error(error)

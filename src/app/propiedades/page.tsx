@@ -85,9 +85,9 @@ export default async function PropiedadesPage({ searchParams }: { searchParams: 
   const { data, error } = await supabase
     .from("properties")
     .select("*")
-    .returns<Property[]>()
     .order("created_at", { ascending: false })
     .range(from, to)
+    .overrideTypes<Property[], { merge: false }>()
 
   if (error) {
     return <p>Error cargando propiedades</p>
@@ -104,7 +104,7 @@ export default async function PropiedadesPage({ searchParams }: { searchParams: 
       .select("*")
       .order("sort_order", { ascending: true })
       .in("property_id", propertyIds)
-      .returns<PropertyHighlight[]>()
+      .overrideTypes<PropertyHighlight[], { merge: false }>()
 
     highlightsByPropertyId = (highlightsData ?? []).reduce<Map<string, string[]>>((acc, item) => {
       const value =

@@ -12,12 +12,12 @@ type Props = {
 export default async function EditPropertyPage({ params }: Props) {
     const { id } = await params
 
-    const { data, error } = await supabase
+    const { data: rawData, error } = await supabase
         .from("properties")
         .select("*")
-        .returns<Property[]>()
         .eq("id", id)
         .single()
+    const data = rawData as Property | null
 
     if (error || !data) {
         notFound()

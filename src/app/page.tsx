@@ -32,7 +32,7 @@ async function getHighlightedProperties(): Promise<HighlightedProperty[]> {
     .eq("highlighted", true)
     .order("created_at", { ascending: false })
     .limit(3)
-    .returns<Omit<HighlightedProperty, "highlights">[]>()
+    .overrideTypes<Omit<HighlightedProperty, "highlights">[], { merge: false }>()
 
   if (error || !data) {
     return []
@@ -48,7 +48,7 @@ async function getHighlightedProperties(): Promise<HighlightedProperty[]> {
     .select("*")
     .order("sort_order", { ascending: true })
     .in("property_id", propertyIds)
-    .returns<PropertyHighlight[]>()
+    .overrideTypes<PropertyHighlight[], { merge: false }>()
 
   const highlightsByPropertyId = (highlightsData ?? []).reduce<Map<string, string[]>>((acc, item) => {
     const value =
