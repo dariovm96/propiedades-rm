@@ -86,7 +86,7 @@ return (
                     <PropertyGallery images={imageUrls} />
                 </div>
 
-                <header className="order-2 flex min-w-0 flex-col gap-6 rounded-2xl bg-surface-0 p-5 shadow-card sm:gap-7 sm:p-6 lg:order-1 lg:h-full">
+                <header className="order-2 flex min-w-0 flex-col gap-6 rounded-2xl bg-surface-1 p-5 shadow-card sm:gap-7 sm:p-6 lg:order-1 lg:h-full">
                     <div className="flex flex-wrap gap-2">
                         <span className={`inline-block rounded-full px-3 py-1 text-xs font-medium sm:text-sm ${PROPERTY_STATUS_BADGE_CLASSES[property.status]}`}>
                             {PROPERTY_STATUS_LABELS[property.status]}
@@ -115,8 +115,7 @@ return (
                         <article className="rounded-xl bg-gradient-to-br from-brand-client-50 to-brand-client-100 p-4">
                             <p className="text-xs uppercase tracking-wide text-brand-client-600">Superficie</p>
                             <p className="mt-1 break-words font-display text-xl font-400 text-brand-client-900 sm:text-2xl">{areaLabel}</p>
-                        </article>
-                    </div>
+                        </article>                    </div>
 
                 </header>
             </section>
@@ -127,7 +126,7 @@ return (
                 locationText={property.location_text}
             />
 
-            <section className="rounded-2xl border-t-2 border-brand-client-400 bg-surface-0 p-5 shadow-card sm:p-6 lg:p-8">
+            <section className="rounded-2xl border-t-2 border-brand-client-400 bg-surface-1 p-5 shadow-card sm:p-6 lg:p-8">
                 <div className="mb-5 text-center sm:mb-6">
                     <p className="font-display text-base font-400 text-neutral-800 sm:text-lg">
                         ¿Te interesa esta propiedad?

@@ -86,7 +86,7 @@ export default async function Home() {
             alt="Propiedad residencial moderna con espacios amplios y luminosos"
           />
 
-          <div className="absolute inset-0 bg-gradient-to-b from-neutral-900/70 via-neutral-900/45 to-neutral-900/60" aria-hidden="true" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/45 to-black/60" aria-hidden="true" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.1),transparent_50%)]" aria-hidden="true" />
 
           <div className="relative z-10 mx-auto flex h-full w-full max-w-6xl px-4 pt-20 sm:px-6 sm:pt-24 md:pt-0">
@@ -186,7 +186,7 @@ export default async function Home() {
                   <Link
                     key={property.id}
                     href={`/propiedades/${property.slug}`}
-                    className="group card-hover transform-gpu flex h-full flex-col overflow-hidden rounded-2xl bg-surface-0 shadow-card border-l-[3px] border-brand-client-400"
+                     className="group card-hover transform-gpu flex h-full flex-col overflow-hidden rounded-2xl bg-surface-1 shadow-card border-l-[3px] border-brand-client-400"
                   >
                     <div className="relative h-52 overflow-hidden rounded-t-2xl bg-brand-100">
                       {cover ? (
@@ -277,7 +277,7 @@ export default async function Home() {
 
               <div className="grid gap-5 sm:gap-6 md:grid-cols-3">
                 <article
-                  className="featured-card-reveal-item rounded-2xl bg-surface-0 p-5 text-center shadow-card sm:p-6"
+                  className="featured-card-reveal-item rounded-2xl bg-surface-1 p-5 text-center shadow-card sm:p-6"
                   style={{ animationDelay: "760ms", animationDuration: "1950ms" }}
                 >
                 <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-client-100 text-brand-client-600">
@@ -292,7 +292,7 @@ export default async function Home() {
                 </article>
 
                 <article
-                  className="featured-card-reveal-item rounded-2xl bg-surface-0 p-5 text-center shadow-card sm:p-6"
+                  className="featured-card-reveal-item rounded-2xl bg-surface-1 p-5 text-center shadow-card sm:p-6"
                   style={{ animationDelay: "1080ms", animationDuration: "1950ms" }}
                 >
                 <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-client-100 text-brand-client-600">
@@ -308,7 +308,7 @@ export default async function Home() {
                 </article>
 
                 <article
-                  className="featured-card-reveal-item rounded-2xl bg-surface-0 p-5 text-center shadow-card sm:p-6"
+                  className="featured-card-reveal-item rounded-2xl bg-surface-1 p-5 text-center shadow-card sm:p-6"
                   style={{ animationDelay: "1400ms", animationDuration: "1950ms" }}
                 >
                 <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-client-100 text-brand-client-600">

@@ -19,7 +19,7 @@ export default function PropertyCard({ property }: Props) {
     return (
         <Link
             href={`/propiedades/${property.slug}`}
-            className="group card-hover relative flex h-full flex-col overflow-hidden rounded-2xl bg-surface-0 shadow-card border-l-[3px] border-brand-client-400"
+            className="group card-hover relative flex h-full flex-col overflow-hidden rounded-2xl bg-surface-1 shadow-card border-l-[3px] border-brand-client-400"
         >
             <div className="relative h-56 overflow-hidden bg-neutral-200">
                 {cover ? (

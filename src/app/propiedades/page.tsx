@@ -153,7 +153,7 @@ return (
           {totalProperties} {totalProperties === 1 ? "propiedad publicada" : "propiedades publicadas"}
         </div>
 
-        <div className="grid gap-3 rounded-2xl bg-neutral-100 p-3 shadow-card sm:grid-cols-2 lg:grid-cols-[1.8fr_repeat(3,minmax(0,1fr))_auto] sm:p-4">
+        <div className="grid gap-3 rounded-2xl bg-surface-2 p-3 shadow-card sm:grid-cols-2 lg:grid-cols-[1.8fr_repeat(3,minmax(0,1fr))_auto] sm:p-4">
           <label className="relative sm:col-span-2 lg:col-span-1">
             <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500">
               <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">

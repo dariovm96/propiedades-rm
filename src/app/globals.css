@@ -125,6 +125,7 @@
   --color-surface-1: var(--surface-1);
   --color-surface-2: var(--surface-2);
   --color-surface-3: var(--surface-3);
+  --color-surface-nav: var(--surface-nav);
   --color-content-primary: var(--content-primary);
   --color-content-secondary: var(--content-secondary);
   --color-content-muted: var(--content-muted);
@@ -223,63 +224,74 @@
 @media (prefers-color-scheme: dark) {
   :root {
     /* Neutrals - inverted */
-    --neutral-50: #0c0a09;
-    --neutral-100: #1c1917;
-    --neutral-200: #292524;
-    --neutral-300: #44403c;
-    --neutral-400: #57534e;
-    --neutral-500: #78716c;
-    --neutral-600: #a8a29e;
-    --neutral-700: #d6d3d1;
-    --neutral-800: #e7e5e4;
-    --neutral-900: #f5f5f4;
-    --neutral-950: #fafaf9;
+    --neutral-50: #0d0c0b;
+    --neutral-100: #312e28;
+    --neutral-200: #2a2720;
+    --neutral-300: #46403a;
+    --neutral-400: #5c5650;
+    --neutral-500: #7a746e;
+    --neutral-600: #aaa49e;
+    --neutral-700: #d8d4d0;
+    --neutral-800: #eae8e4;
+    --neutral-900: #f6f4f0;
+    --neutral-950: #faf9f7;
 
-    /* Surface dark */
-    --surface-0: #0c0a09;
-    --surface-1: #1c1917;
-    --surface-2: #292524;
-    --surface-3: #44403c;
+    /* Surface dark — charcoal neutro, menos rojizo, más contraste entre niveles */
+    --surface-0: #161514;
+    --surface-1: #1f1d1a;
+    --surface-2: #2a2620;
+    --surface-3: #373028;
+    --surface-nav: #111010;
 
-    /* Content dark */
-    --content-primary: #fafaf9;
-    --content-secondary: #a8a29e;
-    --content-muted: #78716c;
+    /* Content dark — más blanco, más contraste */
+    --content-primary: #f5f0ea;
+    --content-secondary: #c4aa88;
+    --content-muted: #8a7a6a;
 
-    /* Border dark */
-    --border-subtle: #292524;
-    --border-default: #44403c;
-    --border-strong: #57534e;
+    /* Border dark — más visibles */
+    --border-subtle: #423b30;
+    --border-default: #564a3e;
+    --border-strong: #7a6a56;
 
-    /* Brand dark */
-    --brand-50: #1c1917;
-    --brand-100: #292524;
-    --brand-200: #44403c;
-    --brand-300: #57534e;
-    --brand-400: #78716c;
-    --brand-500: #9a8270;
-    --brand-600: #b8a29e;
-    --brand-700: #d6d3d1;
-    --brand-800: #e7e5e4;
-    --brand-900: #f5f5f4;
+    /* Brand dark — escala invertida, 500/700 más ámbar/dorado */
+    --brand-50: #1c1a16;
+    --brand-100: #28251e;
+    --brand-200: #3e3a32;
+    --brand-300: #524e46;
+    --brand-400: #6e6860;
+    --brand-500: #d4a468;
+    --brand-600: #c09060;
+    --brand-700: #d4a468;
+    --brand-800: #e8ddd0;
+    --brand-900: #f6f2ec;
 
-    /* Accent dark */
-    --accent-50: #1c1917;
-    --accent-100: #292524;
-    --accent-200: #44403c;
-    --accent-300: #57534e;
-    --accent-400: #78716c;
-    --accent-500: #9a8270;
-    --accent-600: #b8a29e;
-    --accent-700: #d6c2b8;
-    --accent-800: #eaddd7;
-    --accent-900: #f2e8e5;
+    /* Accent dark — terracota más viva */
+    --accent-50: #1c1916;
+    --accent-100: #2c2420;
+    --accent-200: #3e3430;
+    --accent-300: #524640;
+    --accent-400: #7a5a50;
+    --accent-500: #e06b54;
+    --accent-600: #c85e48;
+    --accent-700: #d8b0a4;
+    --accent-800: #ecded8;
+    --accent-900: #f4ece8;
 
-    /* Brand client dark — ligeramente más saturado para contraste en fondos oscuros */
-    --brand-client-400: #d4849a;
-    --brand-client-500: #bf6a82;
-    --brand-client-600: #a3526a;
-    --brand-client-700: #874357;
+    /* Brand client dark — rosa sube de luminosidad en dark mode */
+    --brand-client-50: #22201c;
+    --brand-client-100: #2a2218;
+    --brand-client-400: #c4737e;
+    --brand-client-500: #c8768e;
+    --brand-client-600: #c4737e;
+    --brand-client-900: #f5d0dc;
+
+    /* Status dark */
+    --status-available: #6ec896;
+    --status-available-bg: #1a3d28;
+    --status-rented: #7aaaf0;
+    --status-rented-bg: #1a2d5a;
+    --status-sold: #f07090;
+    --status-sold-bg: #4a1520;
 
     /* Shadows dark - slightly lighter */
     --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
@@ -289,6 +301,28 @@
     --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.25);
     --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.15);
     --shadow-card-hover: 0 12px 24px -4px rgba(0, 0, 0, 0.4), 0 4px 8px -4px rgba(0, 0, 0, 0.25);
+  }
+
+  /* Sección "¿Por qué elegirnos?": eliminar gradiente en dark mode */
+  .from-brand-client-50\/50 {
+    background-image: none !important;
+    background-color: var(--surface-0) !important;
+  }
+
+  /* Sección CTA final: borde superior para separar de sección video */
+  #home-content section:has(.btn-press) {
+    border-top: 1px solid var(--brand-client-100);
+  }
+
+  /* Navbar dark override — Header.tsx usa bg-[#081F32]/92 hardcodeado sin dark:* en desktop */
+  .bg-\[\#081F32\]\/92 {
+    background-color: rgb(17 16 16 / 0.95) !important;
+  }
+  .supports-\[backdrop-filter\]\:bg-\[\#081F32\]\/88 {
+    background-color: rgb(17 16 16 / 0.88) !important;
+  }
+  .border-\[\#10324D\] {
+    border-color: #423b30 !important;
   }
 }
 
