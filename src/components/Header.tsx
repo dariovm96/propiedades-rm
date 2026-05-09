@@ -56,7 +56,7 @@ export default function Header() {
 
   const headerClasses = isTransparent
     ? "border-transparent bg-transparent shadow-none"
-    : "border-b border-[#10324D] bg-[#081F32]/92 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-[#081F32]/88 max-md:dark:border-border-subtle max-md:dark:bg-surface-1/95 max-md:dark:supports-[backdrop-filter]:bg-surface-1/85"
+    : "border-b border-[#10324D] bg-[#081F32]/92 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-[#081F32]/88"
 
   const logoClasses = isTransparent
     ? "bg-gradient-to-r from-white to-brand-client-300 bg-clip-text text-transparent"
@@ -76,11 +76,11 @@ export default function Header() {
 
   const mobileNavClasses = isTransparent
     ? "md:hidden mt-4 space-y-3 rounded-xl border border-white/20 bg-black/45 p-4 text-white font-medium backdrop-blur-sm"
-    : "md:hidden mt-4 pt-4 border-t border-white/20 space-y-3 text-white font-semibold max-md:dark:border-border-subtle max-md:dark:text-white"
+    : "md:hidden mt-4 pt-4 border-t border-white/20 space-y-3 text-white font-semibold"
 
   const mobileLinkClasses = isTransparent
     ? "block py-2 text-white transition hover:text-sky-200"
-    : "block py-2 text-white transition hover:text-sky-200 max-md:dark:text-white max-md:dark:hover:text-sky-200"
+    : "block py-2 text-white transition hover:text-sky-200"
 
   const phoneHeaderButtonClasses = "px-4 py-2 rounded-lg"
 

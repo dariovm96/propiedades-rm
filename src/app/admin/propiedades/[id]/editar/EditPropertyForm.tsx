@@ -185,25 +185,25 @@ export default function EditPropertyForm({ property }: Props) {
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-12 text-slate-900 dark:text-content-primary">
+    <div className="max-w-4xl mx-auto py-12 text-slate-900">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-2xl font-bold">Editar propiedad</h2>
-          <p className="text-sm text-brand-700 dark:text-content-secondary">
+          <p className="text-sm text-brand-700">
             Actualiza la informacion y las imagenes segun sea necesario.
           </p>
         </div>
         <button
           type="button"
           onClick={() => router.push("/admin/dashboard")}
-          className="inline-flex items-center gap-2 text-sm font-medium text-brand-700 bg-brand-100 hover:bg-brand-200 px-3 py-2 rounded-lg transition dark:bg-surface-2 dark:text-content-primary dark:hover:bg-surface-3"
+          className="inline-flex items-center gap-2 text-sm font-medium text-brand-700 bg-brand-100 hover:bg-brand-200 px-3 py-2 rounded-lg transition"
         >
           <span aria-hidden="true">←</span>
           Volver
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white border border-brand-200 rounded-xl shadow-sm p-6 sm:p-8 space-y-8 dark:bg-surface-1 dark:border-border-default">
+      <form onSubmit={handleSubmit} className="bg-white border border-brand-200 rounded-xl shadow-sm p-6 sm:p-8 space-y-8">
         <PropertyFormFields
           form={form}
           onChange={handleChange}
@@ -214,7 +214,7 @@ export default function EditPropertyForm({ property }: Props) {
 
         {existingImages.length > 0 && (
           <div className="space-y-4">
-            <h3 className="rounded-lg border border-brand-200 bg-brand-50/85 px-3 py-2 text-sm font-semibold text-brand-900 dark:border-border-default dark:bg-surface-2 dark:text-content-primary">
+            <h3 className="rounded-lg border border-brand-200 bg-brand-50/85 px-3 py-2 text-sm font-semibold text-brand-900">
               Imagenes actuales
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -243,14 +243,14 @@ export default function EditPropertyForm({ property }: Props) {
         )}
 
         <div className="space-y-4">
-          <h3 className="rounded-lg border border-brand-200 bg-brand-50/85 px-3 py-2 text-sm font-semibold text-brand-900 dark:border-border-default dark:bg-surface-2 dark:text-content-primary">
+          <h3 className="rounded-lg border border-brand-200 bg-brand-50/85 px-3 py-2 text-sm font-semibold text-brand-900">
             Agregar nuevas imagenes
           </h3>
           <ImageFilePicker selectedCount={imagesFiles.length} onFilesSelected={handleImagesSelected} />
 
           {previewUrls.length > 0 && (
             <div className="space-y-2">
-              <h4 className="text-xs font-semibold text-brand-700 uppercase tracking-wide dark:text-content-secondary">
+              <h4 className="text-xs font-semibold text-brand-700 uppercase tracking-wide">
                 Nuevas imagenes seleccionadas
               </h4>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -283,7 +283,7 @@ export default function EditPropertyForm({ property }: Props) {
           <button
             type="submit"
             disabled={loading}
-            className="bg-brand-700 text-white px-6 py-3 rounded hover:bg-brand-800 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition dark:bg-[#372e23] dark:hover:bg-[#443a29]"
+            className="bg-brand-700 text-white px-6 py-3 rounded hover:bg-brand-800 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition"
           >
             {loading && <LoadingSpinner size="md" />}
             {loading ? "Actualizando..." : "Actualizar propiedad"}
@@ -291,7 +291,7 @@ export default function EditPropertyForm({ property }: Props) {
           <button
             type="button"
             onClick={() => router.push("/admin/dashboard")}
-            className="border border-brand-300 text-brand-700 px-6 py-3 rounded hover:bg-brand-100 transition dark:border-border-default dark:text-content-primary dark:hover:bg-surface-2"
+            className="border border-brand-300 text-brand-700 px-6 py-3 rounded hover:bg-brand-100 transition"
           >
             Cancelar
           </button>

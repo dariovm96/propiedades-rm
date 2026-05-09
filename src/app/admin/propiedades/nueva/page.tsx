@@ -145,25 +145,25 @@ export default function NuevaPropiedadPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-12 text-slate-900 dark:text-content-primary">
+    <div className="max-w-4xl mx-auto py-12 text-slate-900">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold">Nueva propiedad</h1>
-          <p className="text-sm text-brand-700 dark:text-content-secondary">
+          <p className="text-sm text-brand-700">
             Completa la informacion basica y agrega imagenes para publicar.
           </p>
         </div>
         <button
           type="button"
           onClick={() => router.push("/admin/dashboard")}
-          className="inline-flex items-center gap-2 text-sm font-medium text-brand-700 bg-brand-100 hover:bg-brand-200 px-3 py-2 rounded-lg transition dark:bg-surface-2 dark:text-content-primary dark:hover:bg-surface-3"
+          className="inline-flex items-center gap-2 text-sm font-medium text-brand-700 bg-brand-100 hover:bg-brand-200 px-3 py-2 rounded-lg transition"
         >
           <span aria-hidden="true">←</span>
           Volver
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white border border-brand-200 rounded-xl shadow-sm p-6 sm:p-8 space-y-8 dark:bg-surface-1 dark:border-border-default">
+      <form onSubmit={handleSubmit} className="bg-white border border-brand-200 rounded-xl shadow-sm p-6 sm:p-8 space-y-8">
         <PropertyFormFields
           form={form}
           onChange={handleChange}
@@ -173,7 +173,7 @@ export default function NuevaPropiedadPage() {
         <PropertyHighlightsFields items={highlights} onChange={setHighlights} disabled={loading} />
 
         <div className="space-y-4">
-          <h2 className="rounded-lg border border-brand-200 bg-brand-50/85 px-3 py-2 text-sm font-semibold text-brand-900 dark:border-border-default dark:bg-surface-2 dark:text-content-primary">
+          <h2 className="rounded-lg border border-brand-200 bg-brand-50/85 px-3 py-2 text-sm font-semibold text-brand-900">
             Imagenes
           </h2>
           <ImageFilePicker
@@ -212,7 +212,7 @@ export default function NuevaPropiedadPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-brand-700 text-white px-6 py-3 rounded hover:bg-brand-800 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition dark:bg-[#372e23] dark:hover:bg-[#443a29]"
+            className="w-full bg-brand-700 text-white px-6 py-3 rounded hover:bg-brand-800 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition"
           >
             {loading && <LoadingSpinner size="md" />}
             {loading ? "Guardando..." : "Crear propiedad"}
