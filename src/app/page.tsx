@@ -126,7 +126,7 @@ export default async function Home() {
                   <div className="flex flex-col gap-3 sm:flex-row sm:justify-center md:justify-start">
                     <Link
                       href="/propiedades"
-                      className="inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-brand-700 px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-brand-800 hover:shadow-xl dark:bg-[#443a29] dark:hover:bg-[#372e23] btn-press sm:w-auto"
+                      className="inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-brand-700 px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-brand-800 hover:shadow-xl btn-press sm:w-auto"
                     >
                       Ver propiedades
                     </Link>
@@ -217,7 +217,7 @@ export default async function Home() {
                           <h3 className="line-clamp-2 min-h-[2.8rem] text-base font-semibold leading-tight text-content-primary sm:text-lg">
                             {property.title}
                           </h3>
-                          <p className="whitespace-nowrap text-sm font-bold text-brand-700 sm:text-base max-md:dark:text-sky-100">
+                          <p className="whitespace-nowrap text-sm font-bold text-brand-700 sm:text-base">
                             {property.price ? `$${property.price.toLocaleString()}` : "Precio a consultar"}
                           </p>
                         </div>
@@ -385,7 +385,7 @@ export default async function Home() {
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
               <Link
                 href="/propiedades"
-                className="inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-brand-client-500 dark:bg-brand-client-700 px-7 py-3 text-sm font-medium text-white shadow-lg transition hover:bg-brand-client-600 dark:hover:bg-brand-client-800 hover:shadow-xl btn-press sm:w-auto"
+                className="inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-brand-client-500 px-7 py-3 text-sm font-medium text-white shadow-lg transition hover:bg-brand-client-600 hover:shadow-xl btn-press sm:w-auto"
               >
                 Ver propiedades
               </Link>

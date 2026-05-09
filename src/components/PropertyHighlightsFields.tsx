@@ -44,13 +44,13 @@ export default function PropertyHighlightsFields({
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="rounded-lg border border-brand-200 bg-brand-50/85 px-3 py-2 text-sm font-semibold text-brand-900 dark:border-border-default dark:bg-surface-2 dark:text-content-primary">
+        <h2 className="rounded-lg border border-brand-200 bg-brand-50/85 px-3 py-2 text-sm font-semibold text-brand-900">
           Características destacadas
         </h2>
-        <p className="mt-1 text-xs text-brand-muted dark:text-content-muted">
+        <p className="mt-1 text-xs text-brand-muted">
           Agrega frases cortas que quieras resaltar en la publicación.
         </p>
-        <p className="mt-1 text-xs font-medium text-brand-700 dark:text-content-secondary">
+        <p className="mt-1 text-xs font-medium text-brand-700">
           Los 3 primeros highlights se mostrarán en el catálogo.
         </p>
       </div>
@@ -76,7 +76,7 @@ export default function PropertyHighlightsFields({
             <button
               type="button"
               disabled={disabled}
-              className="shrink-0 rounded border border-brand-300 px-2 text-brand-700 cursor-grab active:cursor-grabbing disabled:opacity-70 dark:border-border-default dark:text-content-primary"
+              className="shrink-0 rounded border border-brand-300 px-2 text-brand-700 cursor-grab active:cursor-grabbing disabled:opacity-70"
               aria-label={`Reordenar característica ${index + 1}`}
               title="Arrastra para reordenar"
             >
@@ -88,13 +88,13 @@ export default function PropertyHighlightsFields({
               onChange={(event) => updateItem(index, event.target.value)}
               placeholder="Ej: Cercano a metro"
               disabled={disabled}
-              className="w-full border border-brand-300 p-3 rounded bg-white text-brand-900 placeholder:text-brand-muted focus:outline-none focus:ring-2 focus:ring-brand-200 disabled:opacity-70 dark:bg-surface-1 dark:text-content-primary dark:placeholder:text-content-muted dark:border-border-default dark:focus:ring-border-strong/40"
+              className="w-full border border-brand-300 p-3 rounded bg-white text-brand-900 placeholder:text-brand-muted focus:outline-none focus:ring-2 focus:ring-brand-200 disabled:opacity-70"
             />
             <button
               type="button"
               onClick={() => removeItem(index)}
               disabled={disabled}
-              className="shrink-0 rounded border border-brand-300 px-3 text-sm text-brand-700 hover:bg-brand-100 disabled:opacity-70 dark:border-border-default dark:text-content-primary dark:hover:bg-surface-2"
+              className="shrink-0 rounded border border-brand-300 px-3 text-sm text-brand-700 hover:bg-brand-100 disabled:opacity-70"
               aria-label={`Eliminar característica ${index + 1}`}
             >
               Quitar
@@ -107,13 +107,13 @@ export default function PropertyHighlightsFields({
         type="button"
         onClick={addItem}
         disabled={disabled}
-        className="inline-flex items-center gap-2 rounded-lg border border-brand-300 bg-white px-3 py-2 text-sm font-medium text-brand-700 hover:bg-brand-100 disabled:opacity-70 dark:bg-surface-1 dark:text-content-primary dark:border-border-default dark:hover:bg-surface-2"
+        className="inline-flex items-center gap-2 rounded-lg border border-brand-300 bg-white px-3 py-2 text-sm font-medium text-brand-700 hover:bg-brand-100 disabled:opacity-70"
       >
         <span aria-hidden="true">＋</span>
         Agregar característica
       </button>
       {items.length > 1 && (
-        <p className="text-xs text-brand-muted dark:text-content-muted">Arrastra las filas para definir el orden de aparición.</p>
+        <p className="text-xs text-brand-muted">Arrastra las filas para definir el orden de aparición.</p>
       )}
     </div>
   )
