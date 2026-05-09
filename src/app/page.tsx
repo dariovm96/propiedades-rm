@@ -385,7 +385,7 @@ export default async function Home() {
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
               <Link
                 href="/propiedades"
-                className="inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-brand-client-500 px-7 py-3 text-sm font-medium text-white shadow-lg transition hover:bg-brand-client-600 hover:shadow-xl btn-press sm:w-auto"
+                className="inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-brand-client-500 dark:bg-brand-client-700 px-7 py-3 text-sm font-medium text-white shadow-lg transition hover:bg-brand-client-600 dark:hover:bg-brand-client-800 hover:shadow-xl btn-press sm:w-auto"
               >
                 Ver propiedades
               </Link>
