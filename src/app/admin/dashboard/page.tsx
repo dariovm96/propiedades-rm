@@ -147,7 +147,7 @@ export default function DashboardPage() {
     }
   }
 
-  if (loading) return <div className="p-10 text-slate-900 dark:text-slate-100">Cargando...</div>
+  if (loading) return <div className="p-10 text-slate-900 dark:text-content-primary">Cargando...</div>
 
   const totalPages = Math.max(1, Math.ceil(properties.length / ITEMS_PER_PAGE))
   const pageNumbers = Array.from({ length: totalPages }, (_, index) => index + 1)
@@ -157,11 +157,11 @@ export default function DashboardPage() {
   )
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-6 text-slate-900 dark:text-slate-100">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-6 text-slate-900 dark:text-content-primary">
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-          <span className="inline-flex items-center gap-2 text-sm font-semibold bg-brand-100 text-brand-700 px-3 py-1 rounded-full dark:bg-slate-800 dark:text-slate-100">
+            <span className="inline-flex items-center gap-2 text-sm font-semibold bg-brand-100 text-brand-700 px-3 py-1 rounded-full dark:bg-surface-2 dark:text-content-primary">
             <span className="w-2 h-2 rounded-full bg-green-500" aria-hidden="true" />
             {properties.length} {properties.length === 1 ? "propiedad" : "propiedades"}
           </span>
@@ -170,7 +170,7 @@ export default function DashboardPage() {
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 w-full sm:w-auto">
           <Link
             href="/admin/propiedades/nueva"
-            className="inline-flex items-center justify-center gap-2 bg-brand-700 text-white px-4 py-2 rounded hover:bg-brand-800 transition"
+            className="inline-flex items-center justify-center gap-2 bg-brand-700 text-white px-4 py-2 rounded hover:bg-brand-800 transition dark:bg-[#372e23] dark:hover:bg-[#443a29]"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -180,16 +180,16 @@ export default function DashboardPage() {
 
           <button
             onClick={handleLogout}
-            className="bg-red-600 text-white px-4 py-2 rounded"
+            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition dark:bg-red-900 dark:hover:bg-red-800 dark:text-red-100"
           >
             Cerrar sesión
           </button>
         </div>
       </div>
 
-      <div className="border border-brand-200 rounded-lg overflow-hidden shadow-sm bg-white dark:bg-slate-900 dark:border-slate-700">
+      <div className="border border-brand-200 rounded-lg overflow-hidden shadow-sm bg-white dark:bg-surface-1 dark:border-border-default">
         <div className="overflow-x-auto">
-        <table className="w-full min-w-[960px] text-sm divide-y divide-brand-200 dark:divide-slate-700">
+        <table className="w-full min-w-[960px] text-sm divide-y divide-brand-200 dark:divide-border-default">
           <thead className="bg-[#25394A] text-white dark:bg-[#25394A] dark:text-slate-100">
             <tr>
                 <th className="text-left p-3">Título</th>
@@ -205,7 +205,7 @@ export default function DashboardPage() {
 
           <tbody>
             {paginatedProperties.map((property) => (
-              <tr key={property.id} className="odd:bg-white even:bg-brand-100/45 hover:bg-brand-200/35 dark:odd:bg-slate-900 dark:even:bg-slate-800/32 dark:hover:bg-slate-700/52">
+              <tr key={property.id} className="odd:bg-white even:bg-brand-100/45 hover:bg-brand-200/35 dark:odd:bg-surface-1 dark:even:bg-surface-2/30 dark:hover:bg-surface-3/50">
                 <td className="p-3">{property.title}</td>
                 <td className="p-3 hidden sm:table-cell">
                   {property.area_m2 ? property.area_m2.toLocaleString() : "—"}
@@ -234,7 +234,7 @@ export default function DashboardPage() {
                     type="button"
                     onClick={() => requestHighlightToggle(property)}
                     disabled={isRowToggleLoading}
-                    className="inline-flex items-center justify-center rounded p-1 hover:bg-brand-100 dark:hover:bg-slate-700 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="inline-flex items-center justify-center rounded p-1 hover:bg-brand-100 dark:hover:bg-surface-3 transition disabled:opacity-60 disabled:cursor-not-allowed"
                     aria-label={property.highlighted ? "Quitar destacada" : "Marcar como destacada"}
                     title={property.highlighted ? "Quitar destacada" : "Marcar como destacada"}
                   >
@@ -248,7 +248,7 @@ export default function DashboardPage() {
                       </svg>
                     ) : (
                       <svg
-                        className="w-5 h-5 text-brand-muted dark:text-slate-300"
+                        className="w-5 h-5 text-brand-muted dark:text-content-secondary"
                         fill="none"
                         stroke="currentColor"
                         strokeWidth="1.8"
@@ -308,7 +308,7 @@ export default function DashboardPage() {
 
             {properties.length === 0 && (
               <tr>
-                <td colSpan={8} className="p-6 text-center text-brand-muted dark:text-slate-300">
+                <td colSpan={8} className="p-6 text-center text-brand-muted dark:text-content-muted">
                   No hay propiedades aún
                 </td>
               </tr>
@@ -320,7 +320,7 @@ export default function DashboardPage() {
 
       {properties.length > 0 && (
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <p className="text-sm text-brand-muted dark:text-slate-300">
+          <p className="text-sm text-brand-muted dark:text-content-secondary">
             Página {currentPage} de {totalPages}
           </p>
 
@@ -329,7 +329,7 @@ export default function DashboardPage() {
               type="button"
               onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
               disabled={currentPage === 1}
-              className="px-3 py-2 rounded border border-brand-300 text-brand-700 bg-white hover:bg-brand-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-slate-800 dark:text-slate-100 dark:border-slate-600 dark:hover:bg-slate-700"
+              className="px-3 py-2 rounded border border-brand-300 text-brand-700 bg-white hover:bg-brand-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-surface-2 dark:text-content-primary dark:border-border-default dark:hover:bg-surface-3"
             >
               Anterior
             </button>
@@ -346,8 +346,8 @@ export default function DashboardPage() {
                     aria-current={isActive ? "page" : undefined}
                     className={`min-w-9 px-3 py-2 rounded border transition ${
                       isActive
-                        ? "bg-brand-700 text-white border-brand-700"
-                        : "bg-white text-brand-700 border-brand-300 hover:bg-brand-50 dark:bg-slate-800 dark:text-slate-100 dark:border-slate-600 dark:hover:bg-slate-700"
+                        ? "bg-brand-700 text-white border-brand-700 dark:bg-[#372e23] dark:border-[#372e23]"
+                        : "bg-white text-brand-700 border-brand-300 hover:bg-brand-50 dark:bg-surface-2 dark:text-content-primary dark:border-border-default dark:hover:bg-surface-3"
                     }`}
                   >
                     {pageNumber}
@@ -360,7 +360,7 @@ export default function DashboardPage() {
               type="button"
               onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
               disabled={currentPage === totalPages}
-              className="px-3 py-2 rounded border border-brand-300 text-brand-700 bg-white hover:bg-brand-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-slate-800 dark:text-slate-100 dark:border-slate-600 dark:hover:bg-slate-700"
+              className="px-3 py-2 rounded border border-brand-300 text-brand-700 bg-white hover:bg-brand-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-surface-2 dark:text-content-primary dark:border-border-default dark:hover:bg-surface-3"
             >
               Siguiente
             </button>
