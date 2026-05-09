@@ -153,6 +153,7 @@ return (
           {totalProperties} {totalProperties === 1 ? "propiedad publicada" : "propiedades publicadas"}
         </div>
 
+        {/* Filtros — deshabilitados temporalmente
         <div className="grid gap-3 rounded-2xl bg-surface-2 p-3 shadow-card sm:grid-cols-2 lg:grid-cols-[1.8fr_repeat(3,minmax(0,1fr))_auto] sm:p-4">
           <label className="relative sm:col-span-2 lg:col-span-1">
             <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500">
@@ -192,6 +193,7 @@ return (
             Filtros
           </button>
         </div>
+        */}
       </div>
 
       {totalProperties === 0 ? (
