@@ -39,3 +39,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# IA / asistentes
+.agents/
+.claude/
+
+# GitHub Copilot
+.github/copilot-instructions.md
+
+#
+PLAN_SEO.md
