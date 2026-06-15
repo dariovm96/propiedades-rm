@@ -89,7 +89,7 @@ export default async function Home() {
           <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/45 to-black/60" aria-hidden="true" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.1),transparent_50%)]" aria-hidden="true" />
 
-          <div className="relative z-10 mx-auto flex h-full w-full max-w-6xl px-4 pt-20 sm:px-6 sm:pt-24 md:pt-0">
+          <div className="relative z-10 mx-auto flex h-full w-full max-w-6xl xl:max-w-7xl 2xl:max-w-8xl px-4 pt-20 sm:px-6 sm:pt-24 md:pt-0">
             <div className="flex h-full w-full flex-col justify-center gap-6 md:flex-row md:items-center">
               <div className="w-full max-w-2xl md:w-1/2">
                 <div className="space-y-5 rounded-2xl border border-white/20 bg-black/40 p-5 text-center shadow-2xl backdrop-blur-md sm:space-y-6 sm:p-7 md:text-left">
@@ -176,7 +176,7 @@ export default async function Home() {
                 </Link>
             </div>
 
-            <div className="grid auto-rows-fr gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+            <div className="grid auto-rows-fr gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
               {highlightedProperties.map((property) => {
                 const cover = property.images?.[0] ? getPublicImageUrl(property.images[0]) : null
                 const catalogHighlights = property.highlights.slice(0, 3)
@@ -262,7 +262,7 @@ export default async function Home() {
         )}
 
         <section className="relative left-1/2 right-1/2 -mx-[50vw] w-screen border-y border-brand-client-100 bg-gradient-to-b from-brand-client-50/50 via-neutral-50 to-neutral-50 py-12 sm:py-14">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-8xl px-4 sm:px-6">
             <div className="space-y-10">
             <ScrollRevealStagger className="space-y-10">
               <div
@@ -330,7 +330,7 @@ export default async function Home() {
         </section>
 
         <section className="py-10 sm:py-12">
-          <div className="mx-auto max-w-6xl space-y-6">
+          <div className="mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-8xl space-y-6">
             <div className="space-y-2 text-center sm:text-left">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                 <div className="space-y-2">

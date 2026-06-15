@@ -95,7 +95,7 @@ export default function Header() {
 
   return (
     <header className={`fixed top-0 z-50 w-full transition-colors duration-300 ${headerClasses}`}>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4">
+      <div className="max-w-6xl xl:max-w-7xl 2xl:max-w-8xl mx-auto px-4 sm:px-6 py-4">
         <div className="flex items-center justify-between">
           <Link href="/" className={`text-lg sm:text-xl font-semibold tracking-tight whitespace-nowrap transition-colors ${logoClasses}`}>
             Propiedades RM

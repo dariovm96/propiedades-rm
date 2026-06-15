@@ -36,7 +36,7 @@ export default function RootLayout({
         <RouteScrollReset />
         <Header />
 
-        <main className="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 pt-[calc(4.5rem+2rem)] sm:pt-[calc(4.5rem+2.5rem)] pb-8 sm:pb-10">
+        <main className="flex-1 max-w-6xl xl:max-w-7xl 2xl:max-w-8xl mx-auto w-full px-4 sm:px-6 pt-[calc(4.5rem+2rem)] sm:pt-[calc(4.5rem+2.5rem)] pb-8 sm:pb-10">
           {children}
         </main>
 
