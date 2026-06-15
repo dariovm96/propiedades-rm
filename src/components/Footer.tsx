@@ -8,7 +8,7 @@ export default function Footer() {
 
   return (
     <footer className="mt-20 bg-footer-bg text-footer-secondary">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-12">
+      <div className="max-w-6xl xl:max-w-7xl 2xl:max-w-8xl mx-auto px-4 sm:px-6 py-10 sm:py-12">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div className="space-y-1">
             <p className="text-base font-semibold text-footer-primary tracking-tight">Propiedades RM</p>
