@@ -1,8 +1,10 @@
 import dynamic from "next/dynamic"
 import {
+  MUNICIPALITY_OPTIONS,
   PROPERTY_STATUS_LABELS,
   PROPERTY_STATUS_OPTIONS,
 } from "@/lib/constants"
+import { getRegionForMunicipality } from "@/lib/location-helpers"
 import { PropertyFormValues } from "@/lib/property-form"
 
 const MapPicker = dynamic(() => import("@/components/MapPicker"), { ssr: false })
@@ -61,16 +63,97 @@ export default function PropertyFormFields({
 
         <div className="space-y-2">
           <label htmlFor="location_text" className="text-sm font-medium text-brand-700">
-            Ubicacion
+            Descripción de ubicación
           </label>
           <input
             id="location_text"
             name="location_text"
-            placeholder="Ej: Las Condes, Santiago"
+            placeholder="ej: a 5 min del centro, camino pavimentado, portón azul"
             className="w-full border border-brand-300 p-3 rounded bg-white text-brand-900 placeholder:text-brand-muted focus:outline-none focus:ring-2 focus:ring-brand-200"
             value={form.location_text}
             onChange={onChange}
           />
+          <p className="text-xs text-brand-muted">Texto libre descriptivo de la ubicación.</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="flex flex-col gap-2">
+            <label htmlFor="municipality" className="text-sm font-medium text-brand-700">
+              Comuna
+            </label>
+            <div className="relative">
+              <select
+                id="municipality"
+                name="municipality"
+                className="w-full appearance-none border border-brand-300 p-3 pr-9 rounded h-12 bg-white text-brand-900 focus:outline-none focus:ring-2 focus:ring-brand-200"
+                value={form.municipality}
+                onChange={(e) => {
+                  const selectedMunicipality = e.target.value
+                  onChange(e)
+                  if (selectedMunicipality !== "Otra") {
+                    const autoRegion = getRegionForMunicipality(selectedMunicipality)
+                    onChange({
+                      target: { name: "region_name", value: autoRegion },
+                    } as React.ChangeEvent<HTMLInputElement>)
+                  }
+                }}
+              >
+                <option value="">Seleccionar comuna</option>
+                {MUNICIPALITY_OPTIONS.map((municipality) => (
+                  <option key={municipality} value={municipality}>
+                    {municipality}
+                  </option>
+                ))}
+              </select>
+              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-brand-muted">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </span>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label htmlFor="region_name" className="text-sm font-medium text-brand-700">
+              Región
+            </label>
+            <input
+              id="region_name"
+              name="region_name"
+              placeholder="Región"
+              className="border border-brand-300 p-3 rounded h-12 bg-white text-brand-900 placeholder:text-brand-muted focus:outline-none focus:ring-2 focus:ring-brand-200"
+              value={form.region_name}
+              onChange={onChange}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label htmlFor="street_address" className="text-sm font-medium text-brand-700">
+              Dirección (calle y número)
+            </label>
+            <input
+              id="street_address"
+              name="street_address"
+              placeholder="ej: Camino Lo Chacón 150, Melipilla"
+              className="border border-brand-300 p-3 rounded h-12 bg-white text-brand-900 placeholder:text-brand-muted focus:outline-none focus:ring-2 focus:ring-brand-200"
+              value={form.street_address}
+              onChange={onChange}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label htmlFor="sector_reference" className="text-sm font-medium text-brand-700">
+              Sector / Referencia
+            </label>
+            <input
+              id="sector_reference"
+              name="sector_reference"
+              placeholder="ej: sector Lo Chacón, camino a Pomaire"
+              className="border border-brand-300 p-3 rounded h-12 bg-white text-brand-900 placeholder:text-brand-muted focus:outline-none focus:ring-2 focus:ring-brand-200"
+              value={form.sector_reference}
+              onChange={onChange}
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">

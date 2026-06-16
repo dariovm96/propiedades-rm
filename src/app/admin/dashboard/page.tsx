@@ -210,7 +210,18 @@ export default function DashboardPage() {
                 <td className="p-3 hidden sm:table-cell">
                   {property.area_m2 ? property.area_m2.toLocaleString() : "—"}
                 </td>
-                <td className="p-3">{property.location_text}</td>
+                <td className="p-3">
+                  {property.municipality && (
+                    <span className="font-medium">{property.municipality}</span>
+                  )}
+                  {property.municipality && property.location_text && (
+                    <span className="text-neutral-400 mx-1">·</span>
+                  )}
+                  {property.location_text && (
+                    <span className="text-neutral-500">{property.location_text}</span>
+                  )}
+                  {!property.municipality && !property.location_text && "—"}
+                </td>
                 <td className="p-3">
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-semibold ${PROPERTY_STATUS_BADGE_CLASSES[property.status]}`}

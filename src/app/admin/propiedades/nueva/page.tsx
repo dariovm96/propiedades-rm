@@ -46,6 +46,10 @@ export default function NuevaPropiedadPage() {
     title: "",
     description: "",
     location_text: "",
+    municipality: "",
+    region_name: "",
+    sector_reference: "",
+    street_address: "",
     price: "",
     status: "available",
     area_m2: "",
@@ -70,8 +74,12 @@ export default function NuevaPropiedadPage() {
   }
 
   const handleGeocode = () => {
-    if (!form.location_text) {
-      toast.warning("Ingresa una direccion primero")
+    const query = [form.street_address, form.municipality, form.region_name]
+      .filter(Boolean)
+      .join(", ") || form.location_text
+
+    if (!query) {
+      toast.warning("Ingresa una dirección o comuna primero")
       return
     }
     if (geocodeTimeoutRef.current) {
@@ -80,7 +88,7 @@ export default function NuevaPropiedadPage() {
     setGeocoding(true)
     geocodeTimeoutRef.current = setTimeout(async () => {
       try {
-        const result = await geocodeAddress(form.location_text)
+        const result = await geocodeAddress(query)
         if (result) {
           setForm((prev) => ({
             ...prev,
@@ -89,10 +97,10 @@ export default function NuevaPropiedadPage() {
           }))
           toast.success("Coordenadas encontradas")
         } else {
-          toast.warning("No se encontraron resultados para esa direccion")
+          toast.warning("No se encontraron resultados para esa dirección")
         }
       } catch {
-        toast.error("Error al buscar la direccion. Intenta de nuevo.")
+        toast.error("Error al buscar la dirección. Intenta de nuevo.")
       } finally {
         setGeocoding(false)
       }
