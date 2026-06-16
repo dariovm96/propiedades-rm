@@ -368,6 +368,20 @@ h1, h2, h3, .font-display {
   background: var(--neutral-500);
 }
 
+/* Leaflet custom marker */
+.custom-marker {
+  background: transparent;
+  border: none;
+}
+
+/* Leaflet z-index fix — prevent map from overlapping fixed header (z-50 = 50) */
+.leaflet-pane,
+.leaflet-control,
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 40 !important;
+}
+
 /* Print styles */
 @media print {
   body {
