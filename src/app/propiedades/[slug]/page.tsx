@@ -9,6 +9,7 @@ import ContactActionButton from "@/components/ContactActionButton"
 import { ATTENTION_HOURS_LABEL, CONTACT_PHONE, CONTACT_PHONE_DISPLAY } from "@/config/contact"
 import { getPublicImageUrl } from "@/lib/storage-helpers"
 import { PROPERTY_STATUS_BADGE_CLASSES, PROPERTY_STATUS_LABELS } from "@/lib/constants"
+import { buildJsonLdAddress, buildLocationDescription, buildLocationTitle } from "@/lib/location-helpers"
 import Link from "next/link"
 import { PropertyHighlight } from "@/types/property-highlight"
 import PropertyDetailTabs from "@/components/PropertyDetailTabs"
@@ -72,7 +73,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const propertyType = inferPropertyType(property.title)
     const areaLabel = property.area_m2 ? `${property.area_m2} m²` : null
     const statusLabel = getStatusLabel(property.status)
-    const city = property.location_text || "Melipilla"
+    const city = buildLocationTitle(property) || "Melipilla"
 
     const titleParts = [propertyType]
     if (areaLabel) titleParts.push(areaLabel)
@@ -85,7 +86,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     descriptionParts.push(property.title)
     if (property.price) descriptionParts.push(`Precio: $${property.price.toLocaleString()} CLP.`)
     if (property.area_m2) descriptionParts.push(`Superficie: ${property.area_m2} m².`)
-    if (property.location_text) descriptionParts.push(`Ubicación: ${property.location_text}.`)
+    const locationDescription = buildLocationDescription(property)
+    if (locationDescription) descriptionParts.push(`Ubicación: ${locationDescription}.`)
+    else if (property.location_text) descriptionParts.push(`Ubicación: ${property.location_text}.`)
     descriptionParts.push("Encuentra propiedades verificadas en Propiedades RM.")
     const description = descriptionParts.join(" ")
 
@@ -184,12 +187,9 @@ export default async function PropertyDetailPage({ params }: Props) {
         }
     }
 
-    if (property.location_text) {
-        jsonLd.address = {
-            "@type": "PostalAddress",
-            addressLocality: property.location_text,
-            addressCountry: "CL",
-        }
+    const jsonLdAddress = buildJsonLdAddress(property)
+    if (jsonLdAddress.addressLocality) {
+        jsonLd.address = jsonLdAddress
     }
 
     if (schemaImages) {
@@ -234,13 +234,27 @@ export default async function PropertyDetailPage({ params }: Props) {
                         <h1 className="break-words font-display text-2xl font-400 leading-tight text-neutral-900 sm:text-3xl lg:text-4xl">
                             {property.title}
                         </h1>
-                        <p className="flex items-center gap-1.5 text-sm font-medium text-neutral-500 sm:text-base">
-                            <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                            </svg>
-                            {property.location_text || "Ubicación por confirmar"}
-                        </p>
+                        <div className="space-y-1">
+                            <p className="flex items-center gap-1.5 text-sm font-medium text-neutral-500 sm:text-base">
+                                <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                                </svg>
+                                {property.municipality && property.region_name
+                                    ? `${property.municipality} · ${property.region_name}`
+                                    : property.municipality || property.location_text || "Ubicación por confirmar"}
+                            </p>
+                            {property.sector_reference && (
+                                <p className="text-sm text-neutral-400">
+                                    Sector: {property.sector_reference}
+                                </p>
+                            )}
+                            {property.location_text && (
+                                <p className="text-sm text-neutral-400">
+                                    {property.location_text}
+                                </p>
+                            )}
+                        </div>
                     </div>
 
                     <div className="grid gap-3 sm:grid-cols-2 lg:mt-auto">
@@ -264,6 +278,10 @@ export default async function PropertyDetailPage({ params }: Props) {
                 title={property.title}
                 lat={property.lat}
                 lng={property.lng}
+                municipality={property.municipality}
+                region_name={property.region_name}
+                sector_reference={property.sector_reference}
+                street_address={property.street_address}
             />
 
             <section className="rounded-2xl border-t-2 border-brand-client-400 bg-surface-1 p-5 shadow-card sm:p-6 lg:p-8">

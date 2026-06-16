@@ -12,6 +12,10 @@ type PropertyDetailTabsProps = {
   title: string
   lat: number | null
   lng: number | null
+  municipality?: string | null
+  region_name?: string | null
+  sector_reference?: string | null
+  street_address?: string | null
 }
 
 type TabKey = "detalle" | "ubicacion"
@@ -21,7 +25,7 @@ const TAB_ITEMS: { key: TabKey; label: string }[] = [
   { key: "ubicacion", label: "Ubicación" },
 ]
 
-export default function PropertyDetailTabs({ description, highlights, locationText, title, lat, lng }: PropertyDetailTabsProps) {
+export default function PropertyDetailTabs({ description, highlights, locationText, title, lat, lng, municipality, region_name, sector_reference, street_address }: PropertyDetailTabsProps) {
   const [activeTab, setActiveTab] = useState<TabKey>("detalle")
 
   const hasDescription = useMemo(() => Boolean(description && description.trim().length > 0), [description])
@@ -91,7 +95,28 @@ export default function PropertyDetailTabs({ description, highlights, locationTe
           <div className="space-y-4">
             <h2 className="font-display text-lg font-400 text-neutral-800 sm:text-xl">Ubicación</h2>
 
-            <div className="rounded-xl bg-surface-2 p-4">
+            <div className="rounded-xl bg-surface-2 p-4 space-y-3">
+              {municipality && (
+                <div className="space-y-1">
+                  <p className="flex items-center gap-1.5 text-sm font-medium text-neutral-600 sm:text-base">
+                    <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                    </svg>
+                    {municipality}{region_name ? ` · ${region_name}` : ""}
+                  </p>
+                  {sector_reference && (
+                    <p className="text-sm text-neutral-400">
+                      Sector: {sector_reference}
+                    </p>
+                  )}
+                  {street_address && (
+                    <p className="text-sm text-neutral-400">
+                      {street_address}
+                    </p>
+                  )}
+                </div>
+              )}
               <p className="flex items-center gap-2 text-sm text-neutral-500 sm:text-base">
                 <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />

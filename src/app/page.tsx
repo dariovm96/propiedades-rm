@@ -4,6 +4,7 @@ import Link from "next/link"
 import { supabase } from "@/lib/supabase"
 import { getPublicImageUrl } from "@/lib/storage-helpers"
 import { PROPERTY_STATUS_LABELS } from "@/lib/constants"
+import { getLocationDisplay } from "@/lib/location-helpers"
 import { ATTENTION_HOURS_LABEL, CONTACT_PHONE_DISPLAY, TEL_URL, WHATSAPP_URL } from "@/config/contact"
 import { FEATURED_HOME_VIDEO } from "@/config/featured-video"
 import HeroScrollIndicator from "@/components/HeroScrollIndicator"
@@ -19,6 +20,8 @@ type HighlightedProperty = {
   price: number | null
   area_m2: number | null
   location_text: string | null
+  municipality: string | null
+  region_name: string | null
   status: "available" | "sold" | "rented"
   images: string[] | null
   highlights: string[]
@@ -34,7 +37,7 @@ export const revalidate = 60
 async function getHighlightedProperties(): Promise<HighlightedProperty[]> {
   const { data, error } = await supabase
     .from("properties")
-    .select("id,title,slug,price,area_m2,location_text,status,images")
+    .select("id,title,slug,price,area_m2,location_text,municipality,region_name,status,images")
     .eq("highlighted", true)
     .order("created_at", { ascending: false })
     .limit(3)
@@ -230,7 +233,7 @@ export default async function Home() {
 
                         <div className="flex items-center justify-between gap-3 text-xs text-content-secondary sm:text-sm">
                           <p className="line-clamp-1 min-w-0">
-                            {property.location_text || "Ubicación por confirmar"}
+                            {getLocationDisplay(property) || "Ubicación por confirmar"}
                           </p>
                           {property.area_m2 && (
                             <span className="shrink-0 font-medium text-content-primary">

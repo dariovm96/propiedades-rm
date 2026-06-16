@@ -8,6 +8,10 @@ export type Property = {
   price: number | null
   area_m2: number | null
   location_text: string | null
+  municipality: string | null
+  region_name: string | null
+  sector_reference: string | null
+  street_address: string | null
   status: PropertyStatus
   highlighted: boolean
   contact_phone: string | null
@@ -19,7 +23,12 @@ export type Property = {
 export type PropertyFormPayload = Pick<
   Property,
   "title" | "description" | "location_text" | "price" | "status" | "area_m2" | "highlighted" | "contact_phone" | "lat" | "lng"
->
+> & {
+  municipality: string | null
+  region_name: string | null
+  sector_reference: string | null
+  street_address: string | null
+}
 
 export type PropertyInsertPayload = PropertyFormPayload & Pick<Property, "slug" | "images">
 

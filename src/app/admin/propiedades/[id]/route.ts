@@ -28,9 +28,21 @@ export async function PATCH(
     )
   }
 
-  let payload: { highlighted?: boolean }
+  let payload: {
+    highlighted?: boolean
+    municipality?: string
+    region_name?: string
+    sector_reference?: string
+    street_address?: string
+  }
   try {
-    payload = (await req.json()) as { highlighted?: boolean }
+    payload = (await req.json()) as {
+      highlighted?: boolean
+      municipality?: string
+      region_name?: string
+      sector_reference?: string
+      street_address?: string
+    }
   } catch {
     return jsonError(ADMIN_API_MESSAGES.INVALID_REQUEST, ADMIN_API_STATUS.BAD_REQUEST)
   }
@@ -39,11 +51,34 @@ export async function PATCH(
     return jsonError(ADMIN_API_MESSAGES.INVALID_REQUEST, ADMIN_API_STATUS.BAD_REQUEST)
   }
 
+  const updateData: {
+    highlighted: boolean
+    municipality?: string
+    region_name?: string
+    sector_reference?: string
+    street_address?: string
+  } = {
+    highlighted: payload.highlighted,
+  }
+
+  if (payload.municipality !== undefined) {
+    updateData.municipality = payload.municipality
+  }
+  if (payload.region_name !== undefined) {
+    updateData.region_name = payload.region_name
+  }
+  if (payload.sector_reference !== undefined) {
+    updateData.sector_reference = payload.sector_reference
+  }
+  if (payload.street_address !== undefined) {
+    updateData.street_address = payload.street_address
+  }
+
   const { data, error } = await adminSupabase
     .from("properties")
-    .update({ highlighted: payload.highlighted })
+    .update(updateData)
     .eq("id", id)
-    .select("id, highlighted")
+    .select("id, highlighted, municipality, region_name, sector_reference, street_address")
 
   if (error) {
     return jsonError(error.message, ADMIN_API_STATUS.INTERNAL_SERVER_ERROR)
