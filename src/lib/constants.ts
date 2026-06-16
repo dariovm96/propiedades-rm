@@ -44,3 +44,11 @@ export const ADMIN_API_STATUS = {
   NOT_FOUND: 404,
   INTERNAL_SERVER_ERROR: 500,
 } as const
+
+export const MUNICIPALITY_OPTIONS = ["Melipilla", "La Estrella", "Otra"] as const
+
+export const MUNICIPALITY_TO_REGION: Record<string, string> = {
+  Melipilla: "Región Metropolitana de Santiago",
+  "La Estrella": "Región del Libertador Bernardo O'Higgins",
+  Otra: "",
+}
