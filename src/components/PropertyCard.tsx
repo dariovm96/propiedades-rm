@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { Property } from "@/types/property"
 import { getPublicImageUrl } from "@/lib/storage-helpers"
+import { getLocationDisplay } from "@/lib/location-helpers"
 import { PROPERTY_STATUS_BADGE_CLASSES, PROPERTY_STATUS_LABELS } from "@/lib/constants"
 import ImageWithLoader from "@/components/ImageWithLoader"
 
@@ -64,7 +65,7 @@ export default function PropertyCard({ property }: Props) {
                             <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
                         </svg>
                         <p className="line-clamp-1 min-w-0">
-                            {property.location_text || "Ubicación por confirmar"}
+                            {getLocationDisplay(property) || "Ubicación por confirmar"}
                         </p>
                         {property.area_m2 && (
                             <>
