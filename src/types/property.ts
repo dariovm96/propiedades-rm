@@ -11,12 +11,14 @@ export type Property = {
   status: PropertyStatus
   highlighted: boolean
   contact_phone: string | null
+  lat: number | null
+  lng: number | null
   images: string[]
 }
 
 export type PropertyFormPayload = Pick<
   Property,
-  "title" | "description" | "location_text" | "price" | "status" | "area_m2" | "highlighted" | "contact_phone"
+  "title" | "description" | "location_text" | "price" | "status" | "area_m2" | "highlighted" | "contact_phone" | "lat" | "lng"
 >
 
 export type PropertyInsertPayload = PropertyFormPayload & Pick<Property, "slug" | "images">

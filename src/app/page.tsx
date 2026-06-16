@@ -1,3 +1,4 @@
+import { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 import { supabase } from "@/lib/supabase"
@@ -21,6 +22,11 @@ type HighlightedProperty = {
   status: "available" | "sold" | "rented"
   images: string[] | null
   highlights: string[]
+}
+
+export const metadata: Metadata = {
+  title: "Propiedades RM – Terrenos, Parcelas y Casas en Melipilla",
+  description: "Encuentra terrenos, parcelas y casas en venta y arriendo en Melipilla y Región Metropolitana. Propiedades verificadas, contacto directo con el dueño y sin intermediarios.",
 }
 
 export const revalidate = 60

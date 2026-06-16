@@ -1,5 +1,6 @@
 export const revalidate = 60 // cache property detail for one minute
 
+import { Metadata } from "next"
 import { supabase } from "@/lib/supabase"
 import { notFound } from "next/navigation"
 import { Property } from "@/types/property"
@@ -18,6 +19,95 @@ type Props = {
     }>
 }
 
+/* ==============================
+   0. Data fetcher (shared)
+============================== */
+async function getPropertyBySlug(slug: string): Promise<Property | null> {
+    const { data: rawProperty, error } = await supabase
+        .from("properties")
+        .select("*")
+        .eq("slug", slug)
+        .single()
+
+    if (error || !rawProperty) {
+        return null
+    }
+
+    return rawProperty as Property
+}
+
+/* ==============================
+   1. Dynamic metadata
+============================== */
+function inferPropertyType(title: string): string {
+    const lower = title.toLowerCase()
+    if (lower.includes("terreno") || lower.includes("parcela") || lower.includes("lote")) return "Terreno"
+    if (lower.includes("casa") || lower.includes("hogar") || lower.includes("residencial")) return "Casa"
+    if (lower.includes("departamento") || lower.includes("apartamento") || lower.includes("flat")) return "Departamento"
+    if (lower.includes("oficina") || lower.includes("comercial")) return "Oficina"
+    return "Propiedad"
+}
+
+function getStatusLabel(status: Property["status"]): string {
+    switch (status) {
+        case "available": return "en venta/arriendo"
+        case "sold": return "vendida"
+        case "rented": return "arrendada"
+        default: return "en venta/arriendo"
+    }
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+    const { slug } = await params
+    const property = await getPropertyBySlug(slug)
+
+    if (!property) {
+        return {
+            title: "Propiedad no encontrada | Propiedades RM",
+            description: "La propiedad que buscas no está disponible. Explora otras opciones en Propiedades RM.",
+        }
+    }
+
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://localhost:3000"
+    const propertyType = inferPropertyType(property.title)
+    const areaLabel = property.area_m2 ? `${property.area_m2} m²` : null
+    const statusLabel = getStatusLabel(property.status)
+    const city = property.location_text || "Melipilla"
+
+    const titleParts = [propertyType]
+    if (areaLabel) titleParts.push(areaLabel)
+    titleParts.push(`${statusLabel} en ${city}`)
+    titleParts.push("| Propiedades RM")
+    const title = titleParts.join(" ")
+
+    const descriptionParts: string[] = []
+    if (property.description) descriptionParts.push(property.description)
+    descriptionParts.push(property.title)
+    if (property.price) descriptionParts.push(`Precio: $${property.price.toLocaleString()} CLP.`)
+    if (property.area_m2) descriptionParts.push(`Superficie: ${property.area_m2} m².`)
+    if (property.location_text) descriptionParts.push(`Ubicación: ${property.location_text}.`)
+    descriptionParts.push("Encuentra propiedades verificadas en Propiedades RM.")
+    const description = descriptionParts.join(" ")
+
+    const openGraphImages = property.images?.[0]
+        ? [{ url: getPublicImageUrl(property.images[0]), alt: property.title }]
+        : undefined
+
+    return {
+        title,
+        description,
+        openGraph: {
+            title,
+            description,
+            type: "website",
+            images: openGraphImages,
+        },
+        alternates: {
+            canonical: `${siteUrl}/propiedades/${slug}`,
+        },
+    }
+}
+
 export default async function PropertyDetailPage({ params }: Props) {
     // ✅ Next 15: params es async
     const { slug } = await params
@@ -25,18 +115,11 @@ export default async function PropertyDetailPage({ params }: Props) {
     /* ==============================
        1. Obtener propiedad
     ============================== */
-    const { data: rawProperty, error } = await supabase
-        .from("properties")
-        .select("*")
-        .eq("slug", slug)
-        .single()
-    const data = rawProperty as Property | null
+    const property = await getPropertyBySlug(slug)
 
-    if (error || !data) {
+    if (!property) {
         notFound()
     }
-
-    const property = data
 
     const { data: highlightsData } = await supabase
         .from("property_highlights")
@@ -71,8 +154,62 @@ export default async function PropertyDetailPage({ params }: Props) {
      /* ==============================
          3. Render
      ============================== */
-return (
+/* ==============================
+   5. JSON-LD Schema.org
+============================== */
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://localhost:3000"
+    const propertyUrl = `${siteUrl}/propiedades/${slug}`
+
+    const schemaImages = property.images?.length
+        ? property.images.map((path) => getPublicImageUrl(path))
+        : undefined
+
+    const jsonLd: Record<string, unknown> = {
+        "@context": "https://schema.org",
+        "@type": "RealEstateListing",
+        name: property.title,
+        description: property.description || property.title,
+        url: propertyUrl,
+    }
+
+    if (property.price != null) {
+        jsonLd.price = `${property.price.toLocaleString()} CLP`
+    }
+
+    if (property.area_m2 != null) {
+        jsonLd.floorSize = {
+            "@type": "QuantitativeValue",
+            value: property.area_m2,
+            unitCode: "MTK",
+        }
+    }
+
+    if (property.location_text) {
+        jsonLd.address = {
+            "@type": "PostalAddress",
+            addressLocality: property.location_text,
+            addressCountry: "CL",
+        }
+    }
+
+    if (schemaImages) {
+        jsonLd.image = schemaImages
+    }
+
+    if (property.lat != null && property.lng != null) {
+        jsonLd.geo = {
+            "@type": "GeoCoordinates",
+            latitude: property.lat,
+            longitude: property.lng,
+        }
+    }
+
+    return (
         <section className="max-w-full space-y-10 pt-8 sm:space-y-12 sm:pt-10">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
             <nav className="flex flex-wrap items-center gap-2 text-sm text-neutral-500">
                 <Link href="/" className="transition hover:text-neutral-800">Inicio</Link>
                 <span className="text-neutral-300">/</span>
@@ -124,6 +261,9 @@ return (
                 description={property.description}
                 highlights={highlightTexts}
                 locationText={property.location_text}
+                title={property.title}
+                lat={property.lat}
+                lng={property.lng}
             />
 
             <section className="rounded-2xl border-t-2 border-brand-client-400 bg-surface-1 p-5 shadow-card sm:p-6 lg:p-8">

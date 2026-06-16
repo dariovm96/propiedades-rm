@@ -1,3 +1,10 @@
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Propiedades en venta y arriendo – Melipilla | Propiedades RM",
+  description: "Explora propiedades disponibles para compra y arriendo en Melipilla y alrededores. Terrenos, parcelas y casas verificadas con información clara y contacto directo.",
+}
+
 export const revalidate = 60 // cache propiedades list for one minute
 
 import { supabase } from "@/lib/supabase"

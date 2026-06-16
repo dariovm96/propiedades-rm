@@ -11,6 +11,7 @@ import PropertyHighlightsFields from "@/components/PropertyHighlightsFields"
 import ImageFilePicker from "@/components/ImageFilePicker"
 import ImageWithLoader from "@/components/ImageWithLoader"
 import { PropertyFormValues, toPropertyPayload } from "@/lib/property-form"
+import { geocodeAddress } from "@/lib/geocode"
 import { createPropertyHighlights } from "@/lib/property-highlights-client"
 import { EditablePropertyHighlight } from "@/types/property-highlight"
 import { PropertyInsertPayload } from "@/types/property"
@@ -50,7 +51,11 @@ export default function NuevaPropiedadPage() {
     area_m2: "",
     highlighted: false,
     contact_phone: "",
+    lat: "",
+    lng: "",
   })
+  const [geocoding, setGeocoding] = useState(false)
+  const geocodeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -62,6 +67,36 @@ export default function NuevaPropiedadPage() {
     }
 
     setForm((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleGeocode = () => {
+    if (!form.location_text) {
+      toast.warning("Ingresa una direccion primero")
+      return
+    }
+    if (geocodeTimeoutRef.current) {
+      clearTimeout(geocodeTimeoutRef.current)
+    }
+    setGeocoding(true)
+    geocodeTimeoutRef.current = setTimeout(async () => {
+      try {
+        const result = await geocodeAddress(form.location_text)
+        if (result) {
+          setForm((prev) => ({
+            ...prev,
+            lat: result.lat.toString(),
+            lng: result.lng.toString(),
+          }))
+          toast.success("Coordenadas encontradas")
+        } else {
+          toast.warning("No se encontraron resultados para esa direccion")
+        }
+      } catch {
+        toast.error("Error al buscar la direccion. Intenta de nuevo.")
+      } finally {
+        setGeocoding(false)
+      }
+    }, 1000)
   }
 
   const handleImagesSelected = (incomingFiles: File[]) => {
@@ -168,6 +203,8 @@ export default function NuevaPropiedadPage() {
           form={form}
           onChange={handleChange}
           onHighlightedChange={(checked) => setForm((prev) => ({ ...prev, highlighted: checked }))}
+          onGeocode={handleGeocode}
+          geocoding={geocoding}
         />
 
         <PropertyHighlightsFields items={highlights} onChange={setHighlights} disabled={loading} />
