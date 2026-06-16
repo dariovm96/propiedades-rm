@@ -13,6 +13,7 @@ import ImageFilePicker from "@/components/ImageFilePicker"
 import ImageWithLoader from "@/components/ImageWithLoader"
 import { Property } from "@/types/property"
 import { PropertyFormValues, toPropertyPayload } from "@/lib/property-form"
+import { geocodeAddress } from "@/lib/geocode"
 import { getPublicImageUrl } from "@/lib/storage-helpers"
 import { fetchPropertyHighlights, syncPropertyHighlights } from "@/lib/property-highlights-client"
 import { EditablePropertyHighlight } from "@/types/property-highlight"
@@ -35,7 +36,11 @@ export default function EditPropertyForm({ property }: Props) {
     area_m2: property.area_m2?.toString() || "",
     highlighted: property.highlighted,
     contact_phone: property.contact_phone || "",
+    lat: property.lat?.toString() ?? "",
+    lng: property.lng?.toString() ?? "",
   })
+  const [geocoding, setGeocoding] = useState(false)
+  const geocodeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const [imagesFiles, setImagesFiles] = useState<File[]>([])
   const [previewUrls, setPreviewUrls] = useState<string[]>([])
@@ -99,6 +104,36 @@ export default function EditPropertyForm({ property }: Props) {
     }
 
     setForm((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleGeocode = () => {
+    if (!form.location_text) {
+      toast.warning("Ingresa una direccion primero")
+      return
+    }
+    if (geocodeTimeoutRef.current) {
+      clearTimeout(geocodeTimeoutRef.current)
+    }
+    setGeocoding(true)
+    geocodeTimeoutRef.current = setTimeout(async () => {
+      try {
+        const result = await geocodeAddress(form.location_text)
+        if (result) {
+          setForm((prev) => ({
+            ...prev,
+            lat: result.lat.toString(),
+            lng: result.lng.toString(),
+          }))
+          toast.success("Coordenadas encontradas")
+        } else {
+          toast.warning("No se encontraron resultados para esa direccion")
+        }
+      } catch {
+        toast.error("Error al buscar la direccion. Intenta de nuevo.")
+      } finally {
+        setGeocoding(false)
+      }
+    }, 1000)
   }
 
   const handleImagesSelected = (incomingFiles: File[]) => {
@@ -208,6 +243,8 @@ export default function EditPropertyForm({ property }: Props) {
           form={form}
           onChange={handleChange}
           onHighlightedChange={(checked) => setForm((prev) => ({ ...prev, highlighted: checked }))}
+          onGeocode={handleGeocode}
+          geocoding={geocoding}
         />
 
         <PropertyHighlightsFields items={highlights} onChange={setHighlights} disabled={loading} />

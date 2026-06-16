@@ -1,11 +1,17 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import dynamic from "next/dynamic"
+
+const PropertyMap = dynamic(() => import("@/components/PropertyMap"), { ssr: false })
 
 type PropertyDetailTabsProps = {
   description: string | null
   highlights: string[]
   locationText: string | null
+  title: string
+  lat: number | null
+  lng: number | null
 }
 
 type TabKey = "detalle" | "ubicacion"
@@ -15,7 +21,7 @@ const TAB_ITEMS: { key: TabKey; label: string }[] = [
   { key: "ubicacion", label: "Ubicación" },
 ]
 
-export default function PropertyDetailTabs({ description, highlights, locationText }: PropertyDetailTabsProps) {
+export default function PropertyDetailTabs({ description, highlights, locationText, title, lat, lng }: PropertyDetailTabsProps) {
   const [activeTab, setActiveTab] = useState<TabKey>("detalle")
 
   const hasDescription = useMemo(() => Boolean(description && description.trim().length > 0), [description])
@@ -93,9 +99,7 @@ export default function PropertyDetailTabs({ description, highlights, locationTe
                 </svg>
                 {locationText || "Ubicación exacta pendiente de publicación."}
               </p>
-              <div className="mt-4 flex h-52 items-center justify-center rounded-lg bg-surface-0 text-center text-sm text-neutral-400 sm:h-64">
-                Mapa interactivo próximamente.
-              </div>
+              <PropertyMap lat={lat} lng={lng} title={title} />
             </div>
           </div>
         )}

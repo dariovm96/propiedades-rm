@@ -196,6 +196,14 @@ export default async function PropertyDetailPage({ params }: Props) {
         jsonLd.image = schemaImages
     }
 
+    if (property.lat != null && property.lng != null) {
+        jsonLd.geo = {
+            "@type": "GeoCoordinates",
+            latitude: property.lat,
+            longitude: property.lng,
+        }
+    }
+
     return (
         <section className="max-w-full space-y-10 pt-8 sm:space-y-12 sm:pt-10">
             <script
@@ -253,6 +261,9 @@ export default async function PropertyDetailPage({ params }: Props) {
                 description={property.description}
                 highlights={highlightTexts}
                 locationText={property.location_text}
+                title={property.title}
+                lat={property.lat}
+                lng={property.lng}
             />
 
             <section className="rounded-2xl border-t-2 border-brand-client-400 bg-surface-1 p-5 shadow-card sm:p-6 lg:p-8">

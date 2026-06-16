@@ -10,6 +10,8 @@ export type PropertyFormValues = {
   area_m2: string
   highlighted: boolean
   contact_phone: string
+  lat: string
+  lng: string
 }
 
 export function toPropertyPayload(form: PropertyFormValues): PropertyFormPayload {
@@ -22,5 +24,7 @@ export function toPropertyPayload(form: PropertyFormValues): PropertyFormPayload
     area_m2: form.area_m2 ? Number(form.area_m2) : null,
     highlighted: form.highlighted,
     contact_phone: form.contact_phone || null,
+    lat: form.lat && !isNaN(Number(form.lat)) ? Number(form.lat) : null,
+    lng: form.lng && !isNaN(Number(form.lng)) ? Number(form.lng) : null,
   }
 }

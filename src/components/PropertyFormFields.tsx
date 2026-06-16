@@ -1,19 +1,26 @@
+import dynamic from "next/dynamic"
 import {
   PROPERTY_STATUS_LABELS,
   PROPERTY_STATUS_OPTIONS,
 } from "@/lib/constants"
 import { PropertyFormValues } from "@/lib/property-form"
 
+const MapPicker = dynamic(() => import("@/components/MapPicker"), { ssr: false })
+
 type PropertyFormFieldsProps = {
   form: PropertyFormValues
   onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void
   onHighlightedChange: (checked: boolean) => void
+  onGeocode: () => void
+  geocoding?: boolean
 }
 
 export default function PropertyFormFields({
   form,
   onChange,
   onHighlightedChange,
+  onGeocode,
+  geocoding,
 }: PropertyFormFieldsProps) {
   return (
     <>
@@ -63,6 +70,64 @@ export default function PropertyFormFields({
             className="w-full border border-brand-300 p-3 rounded bg-white text-brand-900 placeholder:text-brand-muted focus:outline-none focus:ring-2 focus:ring-brand-200"
             value={form.location_text}
             onChange={onChange}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="flex flex-col gap-2">
+            <label htmlFor="lat" className="text-sm font-medium text-brand-700">
+              Latitud
+            </label>
+            <input
+              id="lat"
+              name="lat"
+              placeholder="Ej: -33.686"
+              type="number"
+              step="any"
+              className="border border-brand-300 p-3 rounded h-12 bg-white text-brand-900 placeholder:text-brand-muted focus:outline-none focus:ring-2 focus:ring-brand-200"
+              value={form.lat}
+              onChange={onChange}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label htmlFor="lng" className="text-sm font-medium text-brand-700">
+              Longitud
+            </label>
+            <input
+              id="lng"
+              name="lng"
+              placeholder="Ej: -71.216"
+              type="number"
+              step="any"
+              className="border border-brand-300 p-3 rounded h-12 bg-white text-brand-900 placeholder:text-brand-muted focus:outline-none focus:ring-2 focus:ring-brand-200"
+              value={form.lng}
+              onChange={onChange}
+            />
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <button
+            type="button"
+            onClick={onGeocode}
+            disabled={geocoding || !form.location_text}
+            className="inline-flex items-center justify-center gap-2 text-sm font-medium text-brand-700 bg-brand-100 hover:bg-brand-200 disabled:opacity-60 disabled:cursor-not-allowed px-4 py-2.5 rounded-lg transition"
+          >
+            {geocoding ? "Buscando..." : "Buscar direccion"}
+          </button>
+
+          <MapPicker
+            lat={form.lat ? Number(form.lat) : null}
+            lng={form.lng ? Number(form.lng) : null}
+            onLatLngChange={(lat, lng) => {
+              onChange({
+                target: { name: "lat", value: lat.toString() },
+              } as React.ChangeEvent<HTMLInputElement>)
+              onChange({
+                target: { name: "lng", value: lng.toString() },
+              } as React.ChangeEvent<HTMLInputElement>)
+            }}
           />
         </div>
       </div>
