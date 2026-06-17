@@ -1,16 +1,13 @@
 import { Metadata } from "next"
-import Image from "next/image"
 import Link from "next/link"
 import { supabase } from "@/lib/supabase"
-import { getPublicImageUrl } from "@/lib/storage-helpers"
-import { PROPERTY_STATUS_LABELS } from "@/lib/constants"
-import { getLocationDisplay } from "@/lib/location-helpers"
 import { ATTENTION_HOURS_LABEL, CONTACT_PHONE_DISPLAY, TEL_URL, WHATSAPP_URL } from "@/config/contact"
 import { FEATURED_HOME_VIDEO } from "@/config/featured-video"
 import HeroScrollIndicator from "@/components/HeroScrollIndicator"
 import HeroParallaxImage from "@/components/HeroParallaxImage"
 import ContactActionButton from "@/components/ContactActionButton"
 import ScrollRevealStagger from "@/components/ScrollRevealStagger"
+import PropertyCard from "@/components/PropertyCard"
 import { PropertyHighlight } from "@/types/property-highlight"
 
 type HighlightedProperty = {
@@ -185,87 +182,10 @@ export default async function Home() {
                 </Link>
             </div>
 
-            <div className="grid auto-rows-fr gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
-              {highlightedProperties.map((property) => {
-                const cover = property.images?.[0] ? getPublicImageUrl(property.images[0]) : null
-                const catalogHighlights = property.highlights.slice(0, 3)
-                const remainingHighlights = Math.max(property.highlights.length - catalogHighlights.length, 0)
-
-                return (
-                  <Link
-                    key={property.id}
-                    href={`/propiedades/${property.slug}`}
-                     className="group card-hover transform-gpu flex h-full flex-col overflow-hidden rounded-2xl bg-surface-1 shadow-card border-l-[3px] border-brand-client-400"
-                  >
-                    <div className="relative h-52 overflow-hidden rounded-t-2xl bg-brand-100">
-                      {cover ? (
-                        <>
-                          <Image
-                            src={cover}
-                            alt={property.title}
-                            fill
-                            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                            className="object-cover transition duration-500 group-hover:scale-105"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" aria-hidden="true" />
-                        </>
-                      ) : (
-                        <div className="flex h-full items-center justify-center text-sm text-brand-muted">
-                          Sin imagen
-                        </div>
-                      )}
-
-                      <span className="absolute left-3 top-3 rounded-full border border-white/70 bg-black/45 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-white backdrop-blur-sm">
-                        {PROPERTY_STATUS_LABELS[property.status]}
-                      </span>
-                    </div>
-
-                    <div className="flex flex-1 flex-col p-4">
-                      <div className="space-y-2.5">
-                        <div className="flex items-start justify-between gap-2">
-                          <h3 className="line-clamp-2 min-h-[2.8rem] text-base font-semibold leading-tight text-content-primary sm:text-lg">
-                            {property.title}
-                          </h3>
-                          <p className="whitespace-nowrap text-sm font-bold text-brand-700 sm:text-base">
-                            {property.price ? `$${property.price.toLocaleString()}` : "Precio a consultar"}
-                          </p>
-                        </div>
-
-                        <div className="flex items-center justify-between gap-3 text-xs text-content-secondary sm:text-sm">
-                          <p className="line-clamp-1 min-w-0">
-                            {getLocationDisplay(property) || "Ubicación por confirmar"}
-                          </p>
-                          {property.area_m2 && (
-                            <span className="shrink-0 font-medium text-content-primary">
-                              {property.area_m2} m²
-                            </span>
-                          )}
-                        </div>
-
-                        <div className="min-h-[3.25rem] border-t border-border-subtle pt-3">
-                          {catalogHighlights.length > 0 ? (
-                            <div className="flex flex-wrap gap-2">
-                              {catalogHighlights.map((highlight, index) => (
-                                <span
-                                  key={`${highlight}-${index}`}
-                                  className="line-clamp-1 rounded-full border border-brand-client-300 bg-transparent px-2.5 py-1 text-xs text-brand-client-700"
-                                >
-                                  {highlight}
-                                </span>
-                              ))}
-                              {remainingHighlights > 0 && (
-                                <span className="rounded-full border border-brand-client-300 bg-transparent px-2.5 py-1 text-xs text-brand-client-600">
-                                  +{remainingHighlights} más
-                                </span>
-                              )}
-                            </div>
-                          ) : null}
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                )
-              })}
+            <div className="grid auto-rows-fr gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+              {highlightedProperties.map((property) => (
+                <PropertyCard key={property.id} property={property} />
+              ))}
             </div>
           </section>
         )}
