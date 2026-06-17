@@ -1,8 +1,9 @@
-import { Property } from "@/types/property"
 import PropertyCard from "./PropertyCard"
 
+type PropertyLike = Parameters<typeof PropertyCard>[0]["property"]
+
 type Props = {
-  properties: Array<Property & { highlights?: string[] }>
+  properties: PropertyLike[]
 }
 
 export default function PropertyGrid({ properties }: Props) {

@@ -4,9 +4,22 @@ import { getPublicImageUrl } from "@/lib/storage-helpers"
 import { getLocationDisplay } from "@/lib/location-helpers"
 import { PROPERTY_STATUS_BADGE_CLASSES, PROPERTY_STATUS_LABELS } from "@/lib/constants"
 import ImageWithLoader from "@/components/ImageWithLoader"
+import PropertyBadges from "@/components/PropertyBadges"
 
 type Props = {
-    property: Property & { highlights?: string[] }
+    property: {
+        id: string
+        title: string
+        slug: string
+        price: number | null
+        area_m2: number | null
+        location_text: string | null
+        municipality: string | null
+        region_name: string | null
+        status: Property["status"]
+        images?: string[] | null
+        highlights?: string[] | null
+    }
 }
 
 export default function PropertyCard({ property }: Props) {
@@ -14,9 +27,6 @@ export default function PropertyCard({ property }: Props) {
         property.images?.length
             ? getPublicImageUrl(property.images[0])
             : null
-    const catalogHighlights = property.highlights?.slice(0, 3) ?? []
-    const remainingHighlights = Math.max((property.highlights?.length ?? 0) - catalogHighlights.length, 0)
-
     return (
         <Link
             href={`/propiedades/${property.slug}`}
@@ -77,23 +87,11 @@ export default function PropertyCard({ property }: Props) {
                         )}
                     </div>
 
-                    {catalogHighlights.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5 pt-1">
-                            {catalogHighlights.map((highlight, index) => (
-                                <span
-                                    key={`${highlight}-${index}`}
-                                    className="line-clamp-1 rounded-md bg-neutral-100 px-2.5 py-1 text-xs text-neutral-700"
-                                >
-                                    {highlight}
-                                </span>
-                            ))}
-                            {remainingHighlights > 0 && (
-                                <span className="rounded-md bg-neutral-100 px-2.5 py-1 text-xs text-neutral-500">
-                                    +{remainingHighlights}
-                                </span>
-                            )}
-                        </div>
-                    )}
+                    <PropertyBadges
+                        highlights={property.highlights ?? []}
+                        maxVisible={3}
+                        className="gap-1.5 pt-1"
+                    />
                 </div>
 
                 <div className="mt-4 flex items-center gap-2 border-t border-neutral-100 pt-3 text-sm font-medium text-neutral-500 transition-colors group-hover:text-brand-client-600">
