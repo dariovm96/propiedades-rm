@@ -158,123 +158,32 @@ export default async function Home() {
       </section>
 
       <div id="home-content" className="space-y-16 pt-12 sm:space-y-20 sm:pt-14">
-        {highlightedProperties.length > 0 && (
-          <section className="space-y-8 py-4 sm:space-y-10 sm:py-6">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-              <div className="space-y-2">
-                <p className="border-l-2 border-brand-client-400 pl-2 text-xs font-semibold uppercase tracking-[0.12em] text-brand-client-600">Nuestra selección</p>
-                <h2 className="font-display text-2xl font-normal text-content-primary sm:text-3xl">
-                  Propiedades destacadas
-                </h2>
-                <p className="max-w-2xl text-sm text-content-secondary">
-                  Una selección curada para visitar hoy, con información clara y contacto directo.
-                </p>
-              </div>
-
-<Link
-                  href="/propiedades"
-                  className="group inline-flex items-center gap-2 text-sm font-semibold text-brand-client-600 transition hover:text-brand-client-700"
-                >
-                  Ver todas las propiedades
-                  <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </Link>
-            </div>
-
-            <div className="grid auto-rows-fr gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
-              {highlightedProperties.map((property) => (
-                <PropertyCard key={property.id} property={property} />
-              ))}
-            </div>
-          </section>
-        )}
-
-        <section className="relative left-1/2 right-1/2 -mx-[50vw] w-screen border-y border-brand-client-100 bg-gradient-to-b from-brand-client-50/50 via-neutral-50 to-neutral-50 py-12 sm:py-14">
-          <div className="mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-8xl px-4 sm:px-6">
-            <div className="space-y-10">
-            <ScrollRevealStagger className="space-y-10">
-              <div
-                className="featured-card-reveal-item space-y-3 text-center"
-                style={{ animationDelay: "280ms" }}
-              >
-                <h2 className="font-display text-2xl font-normal text-neutral-900 sm:text-3xl">¿Por qué elegirnos?</h2>
-                <p className="mx-auto max-w-2xl text-sm font-medium text-neutral-600">
-                  Te acompañamos en cada paso con un enfoque claro, cercano y confiable.
-                </p>
-              </div>
-
-              <div className="grid gap-5 sm:gap-6 md:grid-cols-3">
-                <article
-                  className="featured-card-reveal-item rounded-2xl bg-surface-1 p-5 text-center shadow-card sm:p-6"
-                  style={{ animationDelay: "760ms", animationDuration: "1950ms" }}
-                >
-                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-client-100 text-brand-client-600">
-                  <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
-                    <path d="M3 12l3 3 6-6 3 3 6-6" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </div>
-                <h3 className="font-display text-lg font-normal text-content-primary">Sin intermediarios</h3>
-                <p className="mt-2 text-sm leading-relaxed text-content-secondary">
-                  Conectamos directamente con propietarios para una comunicación rápida y auténtica.
-                </p>
-                </article>
-
-                <article
-                  className="featured-card-reveal-item rounded-2xl bg-surface-1 p-5 text-center shadow-card sm:p-6"
-                  style={{ animationDelay: "1080ms", animationDuration: "1950ms" }}
-                >
-                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-client-100 text-brand-client-600">
-                  <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
-                    <path d="M12 6v6l4 2" strokeLinecap="round" strokeLinejoin="round" />
-                    <circle cx="12" cy="12" r="8" />
-                  </svg>
-                </div>
-                <h3 className="font-display text-lg font-normal text-content-primary">Atención personalizada</h3>
-                <p className="mt-2 text-sm leading-relaxed text-content-secondary">
-                  Resolvemos dudas con apoyo humano, claro y adaptado a tus necesidades reales.
-                </p>
-                </article>
-
-                <article
-                  className="featured-card-reveal-item rounded-2xl bg-surface-1 p-5 text-center shadow-card sm:p-6"
-                  style={{ animationDelay: "1400ms", animationDuration: "1950ms" }}
-                >
-                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-client-100 text-brand-client-600">
-                  <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
-                    <path d="M6 12h12" strokeLinecap="round" />
-                    <path d="M6 8h12" strokeLinecap="round" />
-                    <path d="M6 16h8" strokeLinecap="round" />
-                  </svg>
-                </div>
-                <h3 className="font-display text-lg font-normal text-content-primary">Proceso transparente</h3>
-                <p className="mt-2 text-sm leading-relaxed text-content-secondary">
-                  Presentamos información clara desde el inicio para que tomes decisiones con confianza.
-                </p>
-                </article>
-              </div>
-            </ScrollRevealStagger>
-          </div>
-          </div>
-        </section>
-
         <section className="py-10 sm:py-12">
           <div className="mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-8xl space-y-6">
-            <div className="space-y-2 text-center sm:text-left">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                <div className="space-y-2">
-                  <p className="border-l-2 border-brand-client-400 pl-2 text-xs font-semibold uppercase tracking-[0.12em] text-brand-client-600">Propiedad top</p>
-                  <h2 className="font-display text-2xl font-normal text-content-primary sm:text-3xl">
-                    {FEATURED_HOME_VIDEO.title}
-                  </h2>
-                  <p className="max-w-3xl text-sm text-content-secondary">
-                    {FEATURED_HOME_VIDEO.description}
-                  </p>
-                </div>
+            <div className="space-y-4 text-center sm:text-left">
+              <div className="space-y-2">
+                <p className="border-l-2 border-brand-client-400 pl-2 text-xs font-semibold uppercase tracking-[0.12em] text-brand-client-600">Propiedad top</p>
+                <h2 className="font-display text-2xl font-normal text-content-primary sm:text-3xl">
+                  {FEATURED_HOME_VIDEO.title}
+                </h2>
+                <p className="text-sm font-medium text-content-secondary">
+                  {FEATURED_HOME_VIDEO.description.split(/(\[b\].*?\[\/b\])/).map((part, i) => {
+                    if (part.startsWith("[b]") && part.endsWith("[/b]")) {
+                      return <strong key={i} className="font-semibold text-content-primary">{part.slice(3, -4)}</strong>
+                    }
+                    return <span key={i}>{part}</span>
+                  })}
+                </p>
+              </div>
 
+              <p className="text-sm leading-relaxed text-content-secondary">
+                {FEATURED_HOME_VIDEO.bodyText}
+              </p>
+
+              <div className="flex justify-center sm:justify-end">
                 <Link
                   href={FEATURED_HOME_VIDEO.ctaHref}
-                  className="group inline-flex shrink-0 items-center gap-2 text-sm font-semibold text-brand-client-600 transition hover:text-brand-client-700"
+                  className="group inline-flex items-center gap-2 text-sm font-semibold text-brand-client-600 transition hover:text-brand-client-700"
                 >
                   {FEATURED_HOME_VIDEO.ctaLabel}
                   <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -301,8 +210,108 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="py-10 sm:py-12">
-          <div className="mx-auto max-w-3xl space-y-5 text-center">
+        {highlightedProperties.length > 0 && (
+          <section className="relative left-1/2 right-1/2 -mx-[50vw] w-screen border-y border-brand-client-100 bg-gradient-to-b from-brand-client-50/50 via-neutral-50 to-neutral-50 py-12 sm:py-14">
+            <div className="mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-8xl px-4 sm:px-6 space-y-8 sm:space-y-10">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                <div className="space-y-2">
+                  <p className="border-l-2 border-brand-client-400 pl-2 text-xs font-semibold uppercase tracking-[0.12em] text-brand-client-600">Nuestra selección</p>
+                  <h2 className="font-display text-2xl font-normal text-content-primary sm:text-3xl">
+                    Propiedades destacadas
+                  </h2>
+                  <p className="max-w-2xl text-sm text-content-secondary">
+                    Una selección curada para visitar hoy, con información clara y contacto directo.
+                  </p>
+                </div>
+
+                <Link
+                  href="/propiedades"
+                  className="group inline-flex items-center gap-2 text-sm font-semibold text-brand-client-600 transition hover:text-brand-client-700"
+                >
+                  Ver todas las propiedades
+                  <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </Link>
+              </div>
+
+              <div className="grid auto-rows-fr gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+                {highlightedProperties.map((property) => (
+                  <PropertyCard key={property.id} property={property} />
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        <section className="py-12 sm:py-14">
+          <div className="mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-8xl px-4 sm:px-6 space-y-10">
+            <ScrollRevealStagger className="space-y-10">
+              <div
+                className="featured-card-reveal-item space-y-3 text-center"
+                style={{ animationDelay: "280ms" }}
+              >
+                <h2 className="font-display text-2xl font-normal text-content-primary sm:text-3xl">¿Por qué elegirnos?</h2>
+                <p className="mx-auto max-w-2xl text-sm font-medium text-content-secondary">
+                  Te acompañamos en cada paso con un enfoque claro, cercano y confiable.
+                </p>
+              </div>
+
+              <div className="grid gap-5 sm:gap-6 md:grid-cols-3">
+                <article
+                  className="featured-card-reveal-item rounded-2xl bg-surface-1 p-5 text-center shadow-card sm:p-6"
+                  style={{ animationDelay: "760ms", animationDuration: "1950ms" }}
+                >
+                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-client-100 text-brand-client-600">
+                    <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
+                      <path d="M3 12l3 3 6-6 3 3 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </div>
+                  <h3 className="font-display text-lg font-normal text-content-primary">Sin intermediarios</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-content-secondary">
+                    Conectamos directamente con propietarios para una comunicación rápida y auténtica.
+                  </p>
+                </article>
+
+                <article
+                  className="featured-card-reveal-item rounded-2xl bg-surface-1 p-5 text-center shadow-card sm:p-6"
+                  style={{ animationDelay: "1080ms", animationDuration: "1950ms" }}
+                >
+                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-client-100 text-brand-client-600">
+                    <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
+                      <path d="M12 6v6l4 2" strokeLinecap="round" strokeLinejoin="round" />
+                      <circle cx="12" cy="12" r="8" />
+                    </svg>
+                  </div>
+                  <h3 className="font-display text-lg font-normal text-content-primary">Atención personalizada</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-content-secondary">
+                    Resolvemos dudas con apoyo humano, claro y adaptado a tus necesidades reales.
+                  </p>
+                </article>
+
+                <article
+                  className="featured-card-reveal-item rounded-2xl bg-surface-1 p-5 text-center shadow-card sm:p-6"
+                  style={{ animationDelay: "1400ms", animationDuration: "1950ms" }}
+                >
+                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-client-100 text-brand-client-600">
+                    <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
+                      <path d="M6 12h12" strokeLinecap="round" />
+                      <path d="M6 8h12" strokeLinecap="round" />
+                      <path d="M6 16h8" strokeLinecap="round" />
+                    </svg>
+                  </div>
+                  <h3 className="font-display text-lg font-normal text-content-primary">Proceso transparente</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-content-secondary">
+                    Presentamos información clara desde el inicio para que tomes decisiones con confianza.
+                  </p>
+                </article>
+              </div>
+            </ScrollRevealStagger>
+          </div>
+        </section>
+
+        <section className="relative left-1/2 right-1/2 -mx-[50vw] w-screen border-y border-brand-client-100 bg-gradient-to-b from-brand-client-50/50 via-neutral-50 to-neutral-50 py-12 sm:py-14">
+          <div className="mx-auto max-w-3xl px-4 sm:px-6 space-y-5 text-center">
             <h2 className="font-display text-2xl font-normal text-content-primary sm:text-3xl">
               ¿Listo para encontrar tu próxima propiedad?
             </h2>
